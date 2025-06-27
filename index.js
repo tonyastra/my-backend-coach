@@ -9,7 +9,7 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
