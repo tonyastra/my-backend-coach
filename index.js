@@ -685,17 +685,12 @@ app.post(
   (req, res) => {
     const rawEmail = req.params.email;
 
-
-
-
     const tokenEmail = req.user?.email;
 
     if (!tokenEmail || tokenEmail !== rawEmail) {
       console.warn(`❌ Accès interdit. Email dans le token (${tokenEmail}) ≠ cible (${rawEmail})`);
       return res.status(403).json({ message: 'Accès interdit : token ne correspond pas à l’email cible.' });
     }
-
-
 
     const sanitizedEmail = rawEmail.replace(/[@.]/g, '_');
     const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
