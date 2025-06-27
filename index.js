@@ -117,9 +117,9 @@ app.post('/login', (req, res) => {
   // 🔐 Connexion spéciale "coach admin" en dur
   if (email === 'coach@admin.com' && password === 'coach123') {
     const token = jwt.sign(
-      { email, role: 'coach' },    // Payload avec rôle "coach"
-      'secret123',                 // Clé secrète (à sécuriser en prod)
-      { expiresIn: '1h' }          // Expiration du token
+      { email, role: 'coach' },                        // Payload avec rôle "coach"
+      process.env.JWT_SECRET,                          // Clé secrète sécurisée
+      { expiresIn: '1h' }                              // Expiration du token
     );
     return res.json({ message: "Connexion coach réussie", token });
   }
