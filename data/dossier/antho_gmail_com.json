@@ -1,0 +1,1414 @@
+{
+  "email": "antho@gmail.com",
+  "profil": [
+    {
+      "nom": "Delaveau ",
+      "prenom": "Anthony",
+      "dateNaissance": "1992-01-16T23:00:00.000Z",
+      "sexe": "Homme",
+      "profession": "Coach",
+      "telephone": "06.79.56.17.09",
+      "photoProfil": "",
+      "age": 33
+    }
+  ],
+  "mensurationProfil": [
+    {
+      "taille": "163",
+      "poids": "67",
+      "imc": "je sais pas ",
+      "fcmax": "50"
+    }
+  ],
+  "hygieneVie": [
+    {
+      "sommeil": "8",
+      "sortiealcool": "1 fois",
+      "tabac": "non",
+      "stress": "3"
+    }
+  ],
+  "objectifs": [
+    {
+      "objectif": "prise de masse",
+      "delais": "3 à 6 mois",
+      "motivation": "le body",
+      "obstacle": "Les sorties et sucré salé / copain qui mange mal (tentation) ",
+      "disponibilite": "3 heures",
+      "momentTraining": "Le midi"
+    }
+  ],
+  "medical": [
+    {
+      "problemeSante": "non",
+      "cardiaque": "non",
+      "blessure": "non",
+      "traitement": "non",
+      "allergies": "non"
+    }
+  ],
+  "physio": [
+    {
+      "frequenceAuRepos": "",
+      "tensionArte": "",
+      "vo2max": "",
+      "retardMusculaire": "",
+      "mobilite": "",
+      "massegr": "",
+      "massema": ""
+    }
+  ],
+  "nutrition": [
+    {
+      "habitude": "",
+      "nbrrepas": "",
+      "hydratation": "",
+      "intolerenceregime": "",
+      "rapportnourriture": ""
+    }
+  ],
+  "activite": [
+    {
+      "nbrseance": "",
+      "type": "",
+      "duree": "",
+      "intensite": "",
+      "recuperation": "",
+      "passesportif": ""
+    }
+  ],
+  "psychomotivation": [
+    {
+      "stress": "",
+      "sommeil": "",
+      "motivation": "",
+      "obstacle": "",
+      "disponibilite": "",
+      "momentTraining": "midi"
+    }
+  ],
+  "preference": [
+    {
+      "petitobjectif": "",
+      "preferenceactivite": "",
+      "lieux": "",
+      "equipement": ""
+    }
+  ],
+  "mensurations": [
+    {
+      "date": "2025-06-25",
+      "poids": "45",
+      "poitrine": "67",
+      "taille": "89",
+      "hanches": "65",
+      "brasD": "32",
+      "brasG": "",
+      "cuisseD": "",
+      "cuisseG": "",
+      "molletD": "",
+      "molletG": "",
+      "photoFace": "/uploads/bb4d817accb98862c4a22198b0c47092",
+      "photoDos": null,
+      "photoProfilD": null,
+      "photoProfilG": null
+    },
+    {
+      "date": "2025-06-25",
+      "poids": "13",
+      "poitrine": "45",
+      "taille": "67",
+      "hanches": "",
+      "brasD": "",
+      "brasG": "",
+      "cuisseD": "",
+      "cuisseG": "",
+      "molletD": "",
+      "molletG": "",
+      "photoFace": "/uploads/3d5e7592a341ea664cc8a9cd7afd706e",
+      "photoDos": null,
+      "photoProfilD": null,
+      "photoProfilG": null
+    },
+    {
+      "date": "2025-06-25",
+      "poids": "12",
+      "poitrine": "",
+      "taille": "",
+      "hanches": "",
+      "brasD": "",
+      "brasG": "",
+      "cuisseD": "",
+      "cuisseG": "",
+      "molletD": "",
+      "molletG": "",
+      "photoFace": null,
+      "photoDos": null,
+      "photoProfilD": null,
+      "photoProfilG": null
+    },
+    {
+      "date": "2025-06-25",
+      "poids": "12",
+      "poitrine": "34",
+      "taille": "54",
+      "hanches": "",
+      "brasD": "56",
+      "brasG": "87",
+      "cuisseD": "",
+      "cuisseG": "",
+      "molletD": "",
+      "molletG": "",
+      "photoFace": "/uploads/0280fa8b8840fee7fd1f87ec3d03ee82",
+      "photoDos": null,
+      "photoProfilD": null,
+      "photoProfilG": null
+    }
+  ],
+  "entrainements": [
+    {
+      "id": "aede6ca7-4e69-45eb-bc5a-67bd5b65feac",
+      "date": "lundi",
+      "muscle1": "Pectoraux",
+      "muscle2": "Dos",
+      "muscle3": "",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Escalier",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Escalier.png",
+          "series": "15 min",
+          "note": ""
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_3",
+          "nom": "Chest press TRX",
+          "charge": "guidée",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "debout",
+          "prise": "pronation",
+          "materiel": "TRX",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/DC_TRX.png",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "2-0-1-0",
+          "methode": "Dégressif",
+          "note": ""
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_10",
+          "nom": "Développé écarté",
+          "charge": "libre",
+          "sollicitation_articulaire": "isolation",
+          "position": "couché",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "étirement",
+          "representation": "/representation_exo/pect/Écarté_haltère.jpeg",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "3min 0s",
+          "tempo": "2-0-1-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_2",
+          "nom": "Développé couché haltères",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/DC_Haltère.jpg",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "3min 0s",
+          "tempo": "2-0-1-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_1",
+          "nom": "Développé couché barre ",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Developper_coucher.jpg",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "3min 0s",
+          "tempo": "2-0-1-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing poulie basse",
+          "sollicitation_articulaire": "poly-articulaire",
+          "charge": "guidée",
+          "position": "assis",
+          "prise": "neutre",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/aucuneImage.png",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "3min 0s",
+          "tempo": "2-0-1-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Tirage unilatéral poulie",
+          "sollicitation_articulaire": "isolation",
+          "charge": "guidée",
+          "position": "assis",
+          "prise": "supination",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Tirage_horizontal_uni_G.png",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "3min 0s",
+          "tempo": "2-0-1-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "superSet": true,
+          "nom": "Super Set Pectoraux - Dos",
+          "exercices": [
+            {
+              "groupe": "Pectoraux",
+              "id": "pec_8",
+              "nom": "Développé décliné haltères",
+              "charge": "libre",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "décliné",
+              "prise": "neutre",
+              "materiel": "haltères",
+              "nature": "contraction",
+              "representation": "/representation_exo/pect/DD_haltères.png",
+              "series": "3",
+              "repetitions": "6",
+              "tempo": "2-0-1-0",
+              "methode": "Dégressif",
+              "note": "-"
+            },
+            {
+              "groupe": "Pectoraux",
+              "nom": "Rowing T-barre",
+              "sollicitation_articulaire": "poly-articulaire",
+              "charge": "libre",
+              "position": "debout",
+              "prise": "neutre",
+              "materiel": "barre + prise H",
+              "nature": "contraction",
+              "representation": "/representation_exo/Dos/T-barre.jpeg",
+              "series": "3",
+              "repetitions": "6",
+              "tempo": "2-0-1-0",
+              "methode": "Dégressif",
+              "note": "-"
+            }
+          ],
+          "series": "3",
+          "repetitions": "6",
+          "repos": "3min 0s"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Rameur",
+          "charge": "",
+          "type": "cardio",
+          "position": "assis",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Rameur.png",
+          "series": "65 min"
+        }
+      ],
+      "noteTraining": ""
+    },
+    {
+      "id": "e6d8fddf-7e5c-4034-bddc-c83d25667658",
+      "date": "lundi",
+      "muscle1": "Pectoraux",
+      "muscle2": "Dos",
+      "muscle3": "",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Skierg",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Skierg.png",
+          "series": "10 min"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_1",
+          "nom": "Développé couché barre ",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Developper_coucher.jpg",
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s",
+          "tempo": "2-0-2-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_2",
+          "nom": "Développé couché haltères",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/DC_Haltère.jpg",
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s",
+          "tempo": "2-0-2-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_3",
+          "nom": "Développé couché machine",
+          "charge": "guidée",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/aucuneImage.jpg",
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s",
+          "tempo": "2-0-2-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_10",
+          "nom": "Développé écarté",
+          "charge": "libre",
+          "sollicitation_articulaire": "isolation",
+          "position": "couché",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "étirement",
+          "representation": "/representation_exo/pect/Écarté_haltère.jpeg",
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s",
+          "tempo": "2-0-2-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing barre buste penché",
+          "sollicitation_articulaire": "poly-articulaire",
+          "charge": "libre",
+          "position": "penché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Rowing_barre.jpeg",
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s",
+          "tempo": "2-0-2-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing poulie basse",
+          "sollicitation_articulaire": "poly-articulaire",
+          "charge": "guidée",
+          "position": "assis",
+          "prise": "neutre",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/aucuneImage.png",
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s",
+          "tempo": "2-0-2-0",
+          "methode": "Dégressif",
+          "note": "-"
+        },
+        {
+          "superSet": true,
+          "nom": "Super Set Pectoraux - Dos",
+          "exercices": [
+            {
+              "groupe": "Pectoraux",
+              "id": "pec_8",
+              "nom": "Développé décliné haltères",
+              "charge": "libre",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "décliné",
+              "prise": "neutre",
+              "materiel": "haltères",
+              "nature": "contraction",
+              "representation": "/representation_exo/pect/DD_haltères.png",
+              "series": "5",
+              "repetitions": "8",
+              "tempo": "2-0-2-0",
+              "methode": "Dégressif",
+              "note": "-"
+            },
+            {
+              "groupe": "Pectoraux",
+              "nom": "Rowing haltère unilatéral",
+              "sollicitation_articulaire": "poly-articulaire",
+              "charge": "libre",
+              "position": "penché",
+              "prise": "neutre",
+              "materiel": "haltère",
+              "nature": "contraction",
+              "representation": "/representation_exo/Dos/Tirage_bûcheron_D.jpeg",
+              "series": "5",
+              "repetitions": "8",
+              "tempo": "2-0-2-0",
+              "methode": "Dégressif",
+              "note": "-"
+            }
+          ],
+          "series": "5",
+          "repetitions": "8",
+          "repos": "2min 0s"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Vélo",
+          "charge": "",
+          "type": "cardio",
+          "position": "assis",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Velo.png",
+          "series": "10 min"
+        }
+      ],
+      "noteTraining": ""
+    }
+  ],
+  "performances": [
+    {
+      "id": "5f0e3a11-1810-4a04-901f-85e9fd6fe48c",
+      "jourS": "lundi",
+      "nom": "Elliptique",
+      "series": "65 min",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": 10
+        },
+        {
+          "date": "2025-07-07",
+          "charge": "20"
+        }
+      ]
+    },
+    {
+      "id": "dfda9cef-be22-42e5-9ec2-49973cfc2367",
+      "jourS": "lundi",
+      "nom": "Développé couché machine",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": 20
+        },
+        {
+          "date": "2025-07-07",
+          "charge": "30"
+        }
+      ]
+    },
+    {
+      "id": "0ae48417-f12a-434f-9bf2-d394ec143e6e",
+      "jourS": "lundi",
+      "nom": "Développé écarté",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": 29
+        },
+        {
+          "date": "2025-07-07",
+          "charge": "40"
+        }
+      ]
+    },
+    {
+      "id": "296c0d4a-28b7-4aa4-8a40-5b7e181c0b8d",
+      "jourS": "lundi",
+      "nom": "Développé couché haltères",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": 40
+        },
+        {
+          "date": "2025-07-07",
+          "charge": "50"
+        }
+      ]
+    },
+    {
+      "id": "35a542df-ca3e-4dcf-a219-6f29dbe212e6",
+      "jourS": "lundi",
+      "nom": "Développé couché barre ",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": "48"
+        },
+        {
+          "date": "2025-07-07",
+          "charge": "60"
+        }
+      ]
+    },
+    {
+      "id": "914c1f61-f0cf-4d4b-afee-4150b387d3b7",
+      "jourS": "lundi",
+      "nom": "Rowing poulie basse",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": "60"
+        }
+      ]
+    },
+    {
+      "id": "8d01ace3-4a0e-4f41-9eaf-176a9ee32f43",
+      "jourS": "lundi",
+      "nom": "Tirage unilatéral poulie",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": "70"
+        }
+      ]
+    },
+    {
+      "id": "5e1eadbb-9a2f-405a-8743-fdbf32f99977",
+      "jourS": "lundi",
+      "nom": "Super Set Pectoraux - Dos",
+      "series": "3",
+      "reps": "6",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": "80"
+        }
+      ]
+    },
+    {
+      "id": "2c829240-816d-473a-a2a8-45322d00b585",
+      "jourS": "lundi",
+      "nom": "Rameur",
+      "series": "65 min",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        },
+        {
+          "date": "2025-06-30",
+          "charge": "88"
+        }
+      ]
+    },
+    {
+      "id": "b8ec253f-d782-454c-b077-ceef877e925e",
+      "jourS": "lundi",
+      "nom": "Skierg",
+      "series": "10 min",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "e1d2e539-1737-42f8-a166-8b3d0da47eec",
+      "jourS": "lundi",
+      "nom": "Développé couché barre ",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "5eacac8e-86d6-46a5-b335-032a210b168f",
+      "jourS": "lundi",
+      "nom": "Développé couché haltères",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "0791a947-1bc7-4a27-9a2d-11eaf747f28f",
+      "jourS": "lundi",
+      "nom": "Développé couché machine",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "bc7c944b-63cb-4acd-bbb1-e1aa60fc5af2",
+      "jourS": "lundi",
+      "nom": "Développé écarté",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "e97cf90e-0575-4495-aa17-100aa0df6883",
+      "jourS": "lundi",
+      "nom": "Rowing barre buste penché",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "b3b7b305-c9d1-4f4b-a6bc-b08e3d2e529e",
+      "jourS": "lundi",
+      "nom": "Rowing poulie basse",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "091f2ed3-2994-42d3-9a81-4fe5746f5581",
+      "jourS": "lundi",
+      "nom": "Super Set Pectoraux - Dos",
+      "series": "5",
+      "reps": "8",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    },
+    {
+      "id": "35e2739a-94fd-46c9-9a49-62d346da0a29",
+      "jourS": "lundi",
+      "nom": "Vélo",
+      "series": "10 min",
+      "charges": [
+        {
+          "date": "2025-06-24",
+          "charge": 0
+        }
+      ]
+    }
+  ],
+  "dietes": [
+    {
+      "id": "1750777641228",
+      "date": "2025-06-24T15:07:21.221Z",
+      "kcalObjectif": 2951,
+      "repas": {
+        "matin": [
+          {
+            "nom": "Flocon d’avoine",
+            "quantite": "119",
+            "glu": "70.3",
+            "prot": "14.3",
+            "lip": "11.9",
+            "fib": "8.3",
+            "cal": "440.0",
+            "prix": "0.21",
+            "url": "https://www.auchan.fr/auchan-flocons-d-avoine/pr-C1259480",
+            "id": "ae1286c4-840d-4fdc-8ff1-48bef804d579"
+          },
+          {
+            "nom": "Oeuf",
+            "quantite": "155",
+            "glu": "0.8",
+            "prot": "20.1",
+            "lip": "15.5",
+            "fib": "0.0",
+            "cal": "216.5",
+            "prix": "0.28",
+            "remarques": "Repère de calcul !! -> 1 oeuf = 100g (réellement 1 oeuf = 60g) / Riches en oméga 3, cuisson coulante",
+            "url": "https://www.auchan.fr/pouce-oeufs-de-poules/pr-C1608829",
+            "id": "d9bb6031-fe3a-4a13-8ec6-e44c57031e3f"
+          },
+          {
+            "nom": "Noix de cajou",
+            "quantite": "17",
+            "glu": "3.3",
+            "prot": "3.4",
+            "lip": "7.9",
+            "fib": "0.9",
+            "cal": "100.2",
+            "prix": "0.23",
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-noix-de-cajou-grillees-sans-sel-ajoute/pr-C1239667",
+            "id": "783cc746-bd41-42b2-bf36-b51bdf0c5d2a"
+          },
+          {
+            "nom": "Framboise (surgelé)",
+            "quantite": "54",
+            "glu": "3.5",
+            "prot": "1.0",
+            "lip": "0.3",
+            "fib": "5.3",
+            "cal": "31.1",
+            "prix": "0.61",
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-framboises-surgelees-fruits-entiers/pr-C1173769",
+            "id": "c1d200bb-010c-4de4-9736-f274b0c20572"
+          }
+        ],
+        "collation_matin": [
+          {
+            "nom": "Flocon d’avoine",
+            "quantite": "79",
+            "glu": "46.9",
+            "prot": "9.5",
+            "lip": "7.9",
+            "fib": "5.6",
+            "cal": "293.3",
+            "prix": "0.14",
+            "url": "https://www.auchan.fr/auchan-flocons-d-avoine/pr-C1259480",
+            "id": "55ba74f0-c9d5-443e-94a9-8f7d448b72c3"
+          },
+          {
+            "nom": "Avoine + whey",
+            "quantite": "42",
+            "glu": "21.8",
+            "prot": "13.4",
+            "lip": "2.1",
+            "fib": "5.4",
+            "cal": "170.0",
+            "prix": "0.60",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/avoine-complete-instantanee-et-whey-1000-g",
+            "id": "356f7a1c-1611-459d-8e0c-fa65a7637de3"
+          },
+          {
+            "nom": "Noix de cajou",
+            "quantite": "11",
+            "glu": "2.2",
+            "prot": "2.3",
+            "lip": "5.3",
+            "fib": "0.6",
+            "cal": "66.8",
+            "prix": "0.16",
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-noix-de-cajou-grillees-sans-sel-ajoute/pr-C1239667",
+            "id": "ccce36ec-99a7-451a-80fb-a1a8ce3e00c8"
+          },
+          {
+            "nom": "Ananas",
+            "quantite": "200",
+            "glu": "24.0",
+            "prot": "0.4",
+            "lip": "0.6",
+            "fib": "1.4",
+            "cal": "114.0",
+            "prix": "1.10",
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-ananas-en-morceaux-au-jus/pr-C1261202",
+            "id": "60f5cffe-7650-4343-9195-6971c6c670be"
+          }
+        ],
+        "midi": [
+          {
+            "titre": "Variante 1",
+            "lignes": [
+              {
+                "nom": "Pâtes complètes",
+                "quantite": "147",
+                "glu": "93.8",
+                "prot": "17.6",
+                "lip": "11.7",
+                "fib": "4.1",
+                "cal": "502.7",
+                "prix": "0.31",
+                "remarques": "A peser cru",
+                "url": "https://www.auchan.fr/auchan-penne-rigate-au-ble-complet/pr-C1600528",
+                "id": "127ac7fe-3871-48d6-9810-7dce2032c07c"
+              },
+              {
+                "nom": "Oeuf",
+                "quantite": "200",
+                "glu": "1.0",
+                "prot": "26.0",
+                "lip": "20.0",
+                "fib": "0.0",
+                "cal": "280.0",
+                "prix": "0.36",
+                "remarques": "Repère de calcul !! -> 1 oeuf = 100g (réellement 1 oeuf = 60g) / Riches en oméga 3, cuisson coulante",
+                "url": "https://www.auchan.fr/pouce-oeufs-de-poules/pr-C1608829",
+                "id": "4d69c830-340f-4d35-b6cb-53dbedb2fc63"
+              },
+              {
+                "nom": "Huile de coco",
+                "quantite": "12",
+                "glu": "0.1",
+                "prot": "0.1",
+                "lip": "10.6",
+                "fib": "0.1",
+                "cal": "104.8",
+                "prix": "0.15",
+                "remarques": "Cuisson haute température",
+                "url": "https://www.auchan.fr/auchan-bio-huile-vierge-de-noix-de-coco/pr-C1223962",
+                "id": "246ec811-12c4-4d7b-be3f-21b9ef85cdcb"
+              },
+              {
+                "nom": "Brocolis (surgelé)",
+                "quantite": "200",
+                "glu": "14.0",
+                "prot": "5.6",
+                "lip": "0.8",
+                "fib": "5.2",
+                "cal": "68.0",
+                "prix": "0.50",
+                "remarques": "Riche en vitamine C et magnésium",
+                "url": "https://www.auchan.fr/auchan-deja-cuit-brocolis-en-fleurettes/pr-C1457650",
+                "id": "09e13ba8-4b7e-4e05-9858-9de5cbcc5dc7"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 2",
+            "lignes": [
+              {
+                "nom": "Pâtes complètes",
+                "quantite": "147",
+                "glu": "93.8",
+                "prot": "17.6",
+                "lip": "11.7",
+                "fib": "4.1",
+                "cal": "502.7",
+                "prix": "0.31",
+                "remarques": "A peser cru",
+                "url": "https://www.auchan.fr/auchan-penne-rigate-au-ble-complet/pr-C1600528",
+                "id": "0c32a5dc-7fa8-4731-8c0a-c412703509cf"
+              },
+              {
+                "nom": "Limite calorique atteinte pour prot",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "173d02ad-6962-44c6-bacc-7453215640d5"
+              },
+              {
+                "nom": "Limite calorique atteinte pour lip",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "07746dab-0ec1-4bb2-91df-d6c709175191"
+              },
+              {
+                "nom": "Limite calorique atteinte pour fib",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "bb0ab214-2967-49c8-b493-c1259557e00e"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 3",
+            "lignes": [
+              {
+                "nom": "Limite calorique atteinte pour glu",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "e91d5cb0-67ca-403d-9c1b-97ce813a9e6b"
+              },
+              {
+                "nom": "Limite calorique atteinte pour prot",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "8f8ac50b-aa71-4315-81d7-aaa6523c1fba"
+              },
+              {
+                "nom": "Limite calorique atteinte pour lip",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "710f75fe-674f-4b18-919f-56d2b49e90d8"
+              },
+              {
+                "nom": "Limite calorique atteinte pour fib",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "8cc2197c-accf-49ac-acef-bb2de91611ab"
+              }
+            ]
+          }
+        ],
+        "collation_aprem": [
+          {
+            "nom": "Limite calorique atteinte pour glu",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "eb58dd81-77b7-4008-9491-8e93c794837c"
+          },
+          {
+            "nom": "Limite calorique atteinte pour prot",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "81e36367-739d-447a-8401-28c3b25fd815"
+          },
+          {
+            "nom": "Limite calorique atteinte pour lip",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "42dad66b-c7f0-44b0-b0bc-34c75655b585"
+          },
+          {
+            "nom": "Limite calorique atteinte pour fib",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "2c30883b-5e13-4541-a599-9a1defc8f522"
+          }
+        ],
+        "post_training": [
+          {
+            "nom": "Limite calorique atteinte pour glu",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "d9e94d74-3eb2-4879-a6ef-e4f1c5590d1e"
+          },
+          {
+            "nom": "Limite calorique atteinte pour prot",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "40717f1b-f87f-4c76-b801-b88100bf886e"
+          },
+          {
+            "nom": "Limite calorique atteinte pour lip",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "281e088a-abf7-4f2d-85bf-4b2a02933224"
+          },
+          {
+            "nom": "Aucun aliment disponible pour fib",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "a97ac08c-8399-41c0-acbe-7a6b2a1447f8"
+          }
+        ],
+        "soir": [
+          {
+            "titre": "Variante 1",
+            "lignes": [
+              {
+                "nom": "Limite calorique atteinte pour glu",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "939d9bb7-d9c2-42dc-8bd8-38f6e35bd0e6"
+              },
+              {
+                "nom": "Limite calorique atteinte pour prot",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "1faffc14-c69f-452a-9e06-a2af2dda93ba"
+              },
+              {
+                "nom": "Limite calorique atteinte pour lip",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "4fb01ff1-1de1-4303-b9f2-4196d36675cd"
+              },
+              {
+                "nom": "Brocolis (surgelé)",
+                "quantite": "135",
+                "glu": "9.4",
+                "prot": "3.8",
+                "lip": "0.5",
+                "fib": "3.5",
+                "cal": "45.8",
+                "prix": "0.34",
+                "remarques": "Riche en vitamine C et magnésium",
+                "url": "https://www.auchan.fr/auchan-deja-cuit-brocolis-en-fleurettes/pr-C1457650",
+                "id": "dcf674b3-57b3-4f29-9727-3ed536367f19"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 2",
+            "lignes": [
+              {
+                "nom": "Limite calorique atteinte pour glu",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "a351b8e6-620d-4348-ade6-ac501fe5f82f"
+              },
+              {
+                "nom": "Limite calorique atteinte pour prot",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "5d879a28-f4b6-45be-9e04-c99e22ee2cd6"
+              },
+              {
+                "nom": "Limite calorique atteinte pour lip",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "894ab4df-c86a-47d3-935b-09789d7b05db"
+              },
+              {
+                "nom": "Limite calorique atteinte pour fib",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "672a9c67-1c3e-4923-ba1c-d97bb85de15f"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 3",
+            "lignes": [
+              {
+                "nom": "Limite calorique atteinte pour glu",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "ef3e4289-cdd7-4893-bb93-9001a64771b6"
+              },
+              {
+                "nom": "Limite calorique atteinte pour prot",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "07d97f64-79b4-403b-90d5-39802fce151f"
+              },
+              {
+                "nom": "Limite calorique atteinte pour lip",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "b51f7d75-99d9-4439-925a-8d7c92dd5156"
+              },
+              {
+                "nom": "Limite calorique atteinte pour fib",
+                "quantite": "-",
+                "glu": "-",
+                "prot": "-",
+                "lip": "-",
+                "fib": "-",
+                "cal": "-",
+                "prix": "-",
+                "remarques": "_",
+                "id": "5141a07f-cda2-490a-9e16-1e423b2c5ecc"
+              }
+            ]
+          }
+        ],
+        "avant_coucher": [
+          {
+            "nom": "Limite calorique atteinte pour glu",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "be269f0a-bccd-43a0-85e6-7979c9428ee6"
+          },
+          {
+            "nom": "Limite calorique atteinte pour prot",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "af49122e-8f4b-49d4-81f5-50cc36da4af8"
+          },
+          {
+            "nom": "Limite calorique atteinte pour lip",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "a0b196e2-009c-4146-a169-bef9e281a8ac"
+          },
+          {
+            "nom": "Limite calorique atteinte pour fib",
+            "quantite": "-",
+            "glu": "-",
+            "prot": "-",
+            "lip": "-",
+            "fib": "-",
+            "cal": "-",
+            "prix": "-",
+            "remarques": "_",
+            "id": "74365c28-97b9-414c-ab2f-24579de446a0"
+          }
+        ]
+      }
+    }
+  ]
+}

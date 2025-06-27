@@ -1,0 +1,1681 @@
+{
+  "email": "celine.maillotte@gmail.com",
+  "profil": [
+    {
+      "nom": "Celine",
+      "prenom": "Maillotte",
+      "sexe": "Femme",
+      "dateNaissance": "1989-10-15T23:00:00.000Z",
+      "profession": "commercial",
+      "telephone": "07 68 34 87 27",
+      "photoProfil": ""
+    }
+  ],
+  "mensurationProfil": [
+    {
+      "taille": "156",
+      "poids": "55"
+    }
+  ],
+  "hygieneVie": [
+    {
+      "sommeil": "7 heures",
+      "sortiealcool": "aucun",
+      "tabac": "Pas du tout",
+      "stress": "4"
+    }
+  ],
+  "objectifs": [
+    {
+      "objectif": "perte de poids",
+      "delais": "1 à 3 mois",
+      "motivation": "summer body",
+      "obstacle": "sucre le soir ",
+      "disponibilite": "4 heures",
+      "momentTraining": "Le midi"
+    }
+  ],
+  "medical": [
+    {
+      "problemeSante": "non",
+      "cardiaque": "non",
+      "blessure": "chevilles gauche",
+      "traitement": "non",
+      "allergies": "non"
+    }
+  ],
+  "physio": [
+    {
+      "frequenceAuRepos": "je sais pas",
+      "vo2max": "je sais pas ",
+      "retardMusculaire": "non",
+      "mobilite": "bonne ",
+      "massegr": "20%",
+      "massema": "je sais pas"
+    }
+  ],
+  "nutrition": [
+    {
+      "habitude": "Equilibré",
+      "nbrrepas": "4 repas",
+      "hydratation": "2 Litres",
+      "intolerenceregime": "non",
+      "rapportnourriture": "sucre le soir fatigue "
+    }
+  ],
+  "activite": [
+    {
+      "nbrseance": "3 séance",
+      "type": "Musculation",
+      "duree": "1 h",
+      "intensite": "7",
+      "recuperation": "24h",
+      "passesportif": "oui salle de sport / ski y'a longtemps"
+    }
+  ],
+  "preference": [
+    {
+      "petitobjectif": "3 kg pour le summer body ",
+      "preferenceactivite": "question a changé ",
+      "lieux": "En salle",
+      "equipement": ""
+    }
+  ],
+  "dietes": [
+    {
+      "id": "1750715739595",
+      "date": "2025-06-23T22:03:57.140Z",
+      "repas": {
+        "matin": [
+          {
+            "nom": "Flocon d’avoine",
+            "quantite": "30",
+            "glu": 17.7,
+            "prot": 3.6,
+            "lip": 3,
+            "fib": 2.1,
+            "cal": 110.7,
+            "prix": 0.05399999999999999,
+            "url": "https://www.auchan.fr/auchan-flocons-d-avoine/pr-C1259480",
+            "id": "46ffeefc-175c-4c96-bfff-a0126b0027b5"
+          },
+          {
+            "nom": "Oeuf",
+            "quantite": "120",
+            "glu": 0.6,
+            "prot": 15.6,
+            "lip": 12,
+            "fib": 0,
+            "cal": 168,
+            "prix": 0.21599999999999997,
+            "remarques": "Repère de calcul !! -> 1 oeuf = 100g (réellement 1 oeuf = 60g) / Riches en oméga 3, cuisson coulante",
+            "url": "https://www.auchan.fr/pouce-oeufs-de-poules/pr-C1608829",
+            "id": "89e13128-ccdd-4e56-bc66-96732eff4cef"
+          },
+          {
+            "nom": "Noix de cajou",
+            "quantite": "10",
+            "glu": 1.98,
+            "prot": 2.05,
+            "lip": 4.76,
+            "fib": 0.52,
+            "cal": 60,
+            "prix": 0.14,
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-noix-de-cajou-grillees-sans-sel-ajoute/pr-C1239667",
+            "id": "38a64af3-e78e-4a08-aa96-88852e359547"
+          },
+          {
+            "nom": "Framboise (surgelé)",
+            "quantite": "50",
+            "glu": 3.3,
+            "prot": 0.9,
+            "lip": 0.25,
+            "fib": 4.9,
+            "cal": 29,
+            "prix": 0.565,
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-framboises-surgelees-fruits-entiers/pr-C1173769",
+            "id": "a94390d0-3ca7-42ff-a41d-0a5517ecaa0f"
+          },
+          {
+            "nom": "Thé vert",
+            "quantite": "1",
+            "glu": 0.005,
+            "prot": 0.005,
+            "lip": 0.005,
+            "fib": 0,
+            "cal": 0.004,
+            "prix": 0.0684,
+            "remarque": "",
+            "remarques": "1 sachet = 1,6g",
+            "url": "https://www.auchan.fr/auchan-the-vert-a-la-menthe/pr-C1334089"
+          },
+          {
+            "nom": "Oméga 3",
+            "quantite": "2",
+            "glu": 0.01,
+            "prot": 0,
+            "lip": 0.02,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.002,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/omega-3-360-softgels"
+          },
+          {
+            "nom": "Q10",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0022,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/coenzyme-q10-60-capsules-molles"
+          },
+          {
+            "nom": "Zinc",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.001,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/gluconate-de-zinc-120-mg-120-comprimes"
+          },
+          {
+            "nom": "Vitamines D",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0005,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/vitamin-d3-360-softgels"
+          }
+        ],
+        "collation_matin": [
+          {
+            "nom": "Pain de mie complet",
+            "quantite": "20",
+            "glu": 8.8,
+            "prot": 1.6,
+            "lip": 1.3,
+            "fib": 0.94,
+            "cal": 52.6,
+            "prix": 0.054000000000000006,
+            "remarques": "1 tranche = 40g",
+            "url": "https://www.auchan.fr/auchan-pain-de-mie-complet-avec-croute-special-sandwich/pr-C1198225",
+            "id": "ff0cd9d3-ae8d-469e-980d-a3acaa0e3211"
+          },
+          {
+            "nom": "Beurre de cacahuète",
+            "quantite": "10",
+            "glu": 1.1,
+            "prot": 2.6,
+            "lip": 5.2,
+            "fib": 0.72,
+            "cal": 63,
+            "prix": 0.14,
+            "remarques": "Riche en magnésium, vitamine E",
+            "url": "https://www.prozis.com/fr/fr/prozis/beurre-de-cacahouete-1000-g",
+            "id": "c8483972-4bde-4574-90db-a8361268c979"
+          },
+          {
+            "nom": "Skyr",
+            "quantite": "100",
+            "glu": 3.2,
+            "prot": 9.7,
+            "lip": 0.5,
+            "fib": 0.5,
+            "cal": 56,
+            "prix": 0.57,
+            "remarques": "",
+            "id": "25cd71f9-d0df-4ea5-9d8f-1d48254ce660",
+            "url": "https://www.auchan.fr/yoplait-skyr-nature-0-recette-islandaise/pr-C1461694"
+          },
+          {
+            "nom": "Pomme",
+            "quantite": "120",
+            "glu": 14.04,
+            "prot": 0.36,
+            "lip": 0.36,
+            "fib": 3,
+            "cal": 66,
+            "prix": 0.3,
+            "remarques": "1 = 120g",
+            "url": "https://www.auchan.fr/pommes-granny/pr-C1349594",
+            "id": "98489195-7ae7-4424-bfae-0e28a40501ef"
+          }
+        ],
+        "midi": [
+          {
+            "titre": "Variante 1",
+            "lignes": [
+              {
+                "nom": "Riz basmati",
+                "quantite": "30",
+                "glu": 7.5,
+                "prot": 1.05,
+                "lip": 0.24,
+                "fib": 0.12,
+                "cal": 35.4,
+                "prix": 0.105,
+                "remarques": "A peser cru",
+                "url": "https://www.auchan.fr/auchan-riz-basmati-pret-en-11-min/pr-C1240661",
+                "id": "21071357-4249-4d0e-a929-af89eb85ad1d"
+              },
+              {
+                "nom": "Brocolis (surgelé)",
+                "quantite": "150",
+                "glu": 10.5,
+                "prot": 4.2,
+                "lip": 0.6,
+                "fib": 3.9,
+                "cal": 51,
+                "prix": 0.375,
+                "remarques": "Riche en vitamine C et magnésium",
+                "url": "https://www.auchan.fr/auchan-deja-cuit-brocolis-en-fleurettes/pr-C1457650",
+                "id": "b6835a21-84cd-40f2-b3de-a3271a9b16af"
+              },
+              {
+                "nom": "Poulet",
+                "quantite": "120",
+                "glu": 0,
+                "prot": 28.32,
+                "lip": 0.84,
+                "fib": 0,
+                "cal": 122.4,
+                "prix": 0.8639999999999999,
+                "remarques": "Maigre en matière grasse",
+                "id": "37fe97f3-3a59-4561-b9fc-2e16b13a5754",
+                "url": "https://www.auchan.fr/prix-bas-filets-de-poulet-blanc/pr-C1163407"
+              },
+              {
+                "nom": "Huile de noix",
+                "quantite": "5",
+                "glu": 0.015,
+                "prot": 0.015,
+                "lip": 5,
+                "fib": 0.015,
+                "cal": 45,
+                "prix": 0.048,
+                "remarques": "Cuisson à froid",
+                "url": "https://www.auchan.fr/auchan-huile-de-noix/pr-C1240247",
+                "id": "bca39158-4693-4157-9b82-9926c74baa63"
+              },
+              {
+                "nom": "Abricot",
+                "quantite": "100",
+                "glu": 11,
+                "prot": 1.4,
+                "lip": 0.4,
+                "fib": 2,
+                "cal": 48,
+                "prix": 0.87,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.auchan.fr/auchan-abricots-moelleux-denoyautes/pr-C1184833"
+              },
+              {
+                "nom": "Oméga 3",
+                "quantite": "1",
+                "glu": 0.005,
+                "prot": 0,
+                "lip": 0.01,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.001,
+                "remarque": "",
+                "remarques": "okkkk",
+                "url": "https://www.prozis.com/fr/fr/prozis/omega-3-360-softgels"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 2",
+            "lignes": []
+          },
+          {
+            "titre": "Variante 3",
+            "lignes": []
+          }
+        ],
+        "collation_aprem": [
+          {
+            "nom": "Pomme pote",
+            "quantite": "90",
+            "glu": 10.8,
+            "prot": 0.45,
+            "lip": 1.17,
+            "fib": 0.54,
+            "cal": 51.3,
+            "prix": 0.414,
+            "remarques": "1 = 90g",
+            "id": "ae65a05d-ce28-44a3-ac9e-c1ab5ef6ba2e",
+            "url": "https://www.auchan.fr/pom-potes-gourdes-compote-pomme-nature-sans-sucres-ajoutes/pr-C1261226"
+          },
+          {
+            "nom": "100% Whey gold muscle tech",
+            "quantite": "30",
+            "glu": 1.83,
+            "prot": 21.81,
+            "lip": 2.28,
+            "fib": 0,
+            "cal": 118.17,
+            "prix": 0.9209999999999999,
+            "remarques": "",
+            "id": "9757bee4-7a4a-4355-b5c3-800d4d3bdd4e",
+            "url": "https://www.zumub.com/FR/lactoserum/nitro-tech-100-whey-gold-2-49kg"
+          },
+          {
+            "nom": "Amandes",
+            "quantite": "10",
+            "glu": 0.87,
+            "prot": 2.14,
+            "lip": 5.25,
+            "fib": 0.99,
+            "cal": 60,
+            "prix": 0.11299999999999999,
+            "remarques": "",
+            "id": "11b4a942-9ebe-433b-ad16-148247e4fa32",
+            "url": "https://www.auchan.fr/auchan-amandes-non-salees/pr-C1358871"
+          },
+          {
+            "nom": "Poire",
+            "quantite": "99",
+            "glu": 10.791000000000002,
+            "prot": 0.495,
+            "lip": 0.297,
+            "fib": 2.8709999999999996,
+            "cal": 56.43,
+            "prix": 0.396,
+            "remarques": "",
+            "id": "ec52603b-f73b-459c-9e04-4ae986fab858",
+            "url": "https://www.auchan.fr/poires-mures-a-point/pr-C1348590"
+          }
+        ],
+        "post_training": [
+          {
+            "nom": "Peptide de collagène",
+            "quantite": "30",
+            "glu": 0.3,
+            "prot": 25.5,
+            "lip": 0,
+            "fib": 0,
+            "cal": 108.24,
+            "prix": 1.332,
+            "remarques": "",
+            "id": "e21f4636-0e7b-4585-95ee-b097663d25a6",
+            "url": "https://www.prozis.com/fr/fr/prozis/peptiplus-proteine-de-collagene-hydrolyse-900-g"
+          },
+          {
+            "nom": "Vitamines C",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0009,
+            "remarques": "",
+            "id": "6a70112a-4596-4b92-9ae4-4280460e6435",
+            "url": "https://www.prozis.com/fr/fr/prozis/vitamin-c-1000-mg-rose-hip-360-tabs"
+          },
+          {
+            "nom": "Vitamines D",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0005,
+            "remarques": "",
+            "id": "a8eddc87-b9e4-4b5d-a171-aaabb8f41b5e",
+            "url": "https://www.prozis.com/fr/fr/prozis/vitamin-d3-360-softgels"
+          },
+          {
+            "nom": "Magnésium bisglycinate",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0022,
+            "remarques": "",
+            "id": "5797557e-6660-4a7e-8945-feaa255d0680",
+            "url": "https://www.prozis.com/fr/fr/prozis/albion-magnesium-bisglycinate-60-veg-caps"
+          },
+          {
+            "nom": "Ashwagandha",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0013,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/extrait-dashwagandha-450-mg-90-veg-caps"
+          }
+        ],
+        "soir": [
+          {
+            "titre": "Variante 1",
+            "lignes": [
+              {
+                "nom": "Ratatouille (surgelé)",
+                "quantite": "150",
+                "glu": 6.9,
+                "prot": 2.1,
+                "lip": 4.95,
+                "fib": 2.55,
+                "cal": 85.5,
+                "prix": 0.57,
+                "remarques": "",
+                "id": "113092c2-798f-4601-b941-aa474b71de42",
+                "url": "https://www.auchan.fr/auchan-ratatouille-cuisinee/pr-C1177577"
+              },
+              {
+                "nom": "Colin",
+                "quantite": "80",
+                "glu": 0,
+                "prot": 13.6,
+                "lip": 0.32,
+                "fib": 0,
+                "cal": 62.4,
+                "prix": 0.52,
+                "remarques": "",
+                "id": "85bfce43-6034-4a6d-9c7d-e457c10bbcc4",
+                "url": "https://www.auchan.fr/auchan-essentiel-filet-de-colin-d-alaska-sans-arete/pr-C1177748"
+              },
+              {
+                "nom": "Pomme",
+                "quantite": "120",
+                "glu": 14.04,
+                "prot": 0.36,
+                "lip": 0.36,
+                "fib": 3,
+                "cal": 66,
+                "prix": 0.3,
+                "remarques": "1 = 120g",
+                "id": "b235b3f7-0b6e-499c-9db5-e5f28c3d3d89",
+                "url": "https://www.auchan.fr/pommes-granny/pr-C1349594"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 2",
+            "lignes": [
+              {
+                "nom": "Concombre",
+                "quantite": "150",
+                "glu": 5.4,
+                "prot": 1.05,
+                "lip": 0.15,
+                "fib": 1.05,
+                "cal": 25.5,
+                "prix": 0.6,
+                "remarques": "",
+                "id": "8230644c-2998-46f3-91e0-c1c5b38ce4da",
+                "url": "https://www.auchan.fr/concombre/pr-C1350470"
+              },
+              {
+                "nom": "Crevettes",
+                "quantite": "80",
+                "glu": 0.4,
+                "prot": 17.6,
+                "lip": 0.4,
+                "fib": 0,
+                "cal": 76,
+                "prix": 1.056,
+                "remarques": "",
+                "id": "4da4d77e-3df4-4b61-8bac-21e3829987a3",
+                "url": "https://www.auchan.fr/auchan-le-poissonnier-crevettes-entieres-cuites-refrigerees/pr-C1348288"
+              },
+              {
+                "nom": "Abricot",
+                "quantite": "100",
+                "glu": 11,
+                "prot": 1.4,
+                "lip": 0.4,
+                "fib": 2,
+                "cal": 48,
+                "prix": 0.87,
+                "remarques": "",
+                "id": "558e47da-5357-43dc-9646-a4f06d844fe2",
+                "url": "https://www.auchan.fr/auchan-abricots-moelleux-denoyautes/pr-C1184833"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 3",
+            "lignes": [
+              {
+                "nom": "Courgettes (surgelé)",
+                "quantite": "150",
+                "glu": 3,
+                "prot": 2.7,
+                "lip": 0.3,
+                "fib": 2.25,
+                "cal": 28.5,
+                "prix": 0.21000000000000005,
+                "remarques": "",
+                "id": "3d878e6d-f1da-4fff-ac80-e2ebb4b71ea9",
+                "url": "https://www.auchan.fr/auchan-courgettes-en-rondelles/pr-C1178182"
+              },
+              {
+                "nom": "Steack",
+                "quantite": "100",
+                "glu": 0.4,
+                "prot": 18,
+                "lip": 15,
+                "fib": 0,
+                "cal": 210,
+                "prix": 1,
+                "remarques": "Riche en fer pour augmenter le taux de globule rouge",
+                "id": "8ed0d9d1-d18c-4a7a-8994-a96e4fcae1dc",
+                "url": "https://www.auchan.fr/auchan-steaks-haches-pur-boeuf-15-mg/pr-C1164710"
+              },
+              {
+                "nom": "Huile d’olive",
+                "quantite": "5",
+                "glu": 0.015,
+                "prot": 0.015,
+                "lip": 5,
+                "fib": 0.015,
+                "cal": 45,
+                "prix": 0.06,
+                "remarques": "Cuisson moyenne température",
+                "id": "ad1bf67e-45ea-468c-ab4e-de1d46c2c3bd",
+                "url": "https://www.auchan.fr/auchan-huile-d-olive-vierge-extra-origine-espagne/pr-C1227331"
+              }
+            ]
+          }
+        ],
+        "avant_coucher": [
+          {
+            "nom": "Applied Nutrition 100% Micellar Casein",
+            "quantite": "30",
+            "glu": 1.212,
+            "prot": 24.230999999999998,
+            "lip": 0.8190000000000001,
+            "fib": 0,
+            "cal": 103.5,
+            "prix": 0.267,
+            "remarques": "mélange avec du lait pour te faire chocolat chaud",
+            "id": "2a4bde1a-7b0f-4656-8f41-254877fa570e",
+            "url": "https://appliednutrition.uk/products/micellar-casein-protein"
+          },
+          {
+            "nom": "Mélatonine",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0011,
+            "remarques": "",
+            "id": "e0191926-f83a-4efa-99d7-1cf064fe36ed",
+            "url": "https://www.prozis.com/fr/fr/prozis/melatonine-19-mg-90-gelules"
+          },
+          {
+            "nom": "Gaba",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0022,
+            "remarques": "",
+            "id": "08db516b-b098-41ef-91e1-1076a84316aa",
+            "url": "https://www.prozis.com/fr/fr/prozis/gaba-750-mg-60-veg-caps"
+          },
+          {
+            "nom": "Oméga 3",
+            "quantite": "2",
+            "glu": 0.01,
+            "prot": 0,
+            "lip": 0.02,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.002,
+            "remarques": "",
+            "id": "644ba5a5-e7a8-4a7c-b12a-04755811fae8",
+            "url": "https://www.prozis.com/fr/fr/prozis/omega-3-360-softgels"
+          }
+        ]
+      }
+    }
+  ],
+  "mensurations": [
+    {
+      "date": "2025-06-22",
+      "poids": "54,10",
+      "poitrine": "84",
+      "taille": "66",
+      "hanches": "87",
+      "brasD": "28",
+      "brasG": "28",
+      "cuisseD": "55",
+      "cuisseG": "53",
+      "molletD": "32",
+      "molletG": "32",
+      "photoFace": "/uploads/fed285f377a86a27247b3965c509227b",
+      "photoDos": "/uploads/67029ca25aa17b8d1e9643ee39704248",
+      "photoProfilD": "/uploads/5b267e507810d20d91fdf37d27160a92",
+      "photoProfilG": "/uploads/924adfee08cec1d5ce73fa0448a51110"
+    },
+    {
+      "date": "2025-06-15",
+      "poids": "54,30",
+      "poitrine": "86",
+      "taille": "66",
+      "hanches": "87",
+      "brasD": "28",
+      "brasG": "28",
+      "cuisseD": "55",
+      "cuisseG": "53",
+      "molletD": "31",
+      "molletG": "31",
+      "photoFace": null,
+      "photoDos": null,
+      "photoProfilD": null,
+      "photoProfilG": null
+    },
+    {
+      "date": "2025-06-08",
+      "poids": "54,35",
+      "poitrine": "86",
+      "taille": "66",
+      "hanches": "87",
+      "brasD": "28",
+      "brasG": "28",
+      "cuisseD": "55",
+      "cuisseG": "53",
+      "molletD": "31",
+      "molletG": "31",
+      "photoFace": "/uploads/35bfab1fd41284bb76c5d7e06c08b726",
+      "photoDos": "/uploads/a5009689ac8498724666ad25bfb18aea",
+      "photoProfilD": null,
+      "photoProfilG": "/uploads/a536873556fd31b475fbbdd50488c37a"
+    },
+    {
+      "date": "2025-06-01",
+      "poids": "55,35",
+      "poitrine": "84",
+      "taille": "67",
+      "hanches": "87",
+      "brasD": "29",
+      "brasG": "29",
+      "cuisseD": "56",
+      "cuisseG": "55",
+      "molletD": "31",
+      "molletG": "31",
+      "photoFace": "/uploads/8bb16d71cceb2569f48fdca39fe8a06f",
+      "photoDos": "/uploads/b865a3794e9ab438c783f80a1bc102fd",
+      "photoProfilD": "/uploads/ffc29f238572ab57d8e40b85956d3990",
+      "photoProfilG": null
+    }
+  ],
+  "entrainements": [
+    {
+      "id": "627ed6bc-9304-4f7d-b779-b7de1d7366f6",
+      "date": "lundi",
+      "muscle1": "Fessiers",
+      "muscle2": "Ischios",
+      "muscle3": "Fessiers",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Vélo",
+          "charge": "",
+          "type": "cardio",
+          "position": "assis",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Velo.png",
+          "series": "10 min"
+        },
+        {
+          "groupe": "Ischios",
+          "nom": "Soulevé de terre roumain",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "debout",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Ischios/Romanian_Deadlift.png",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "Ischios",
+          "nom": "Leg Curl assis",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "assis",
+          "prise": "pieds",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Ischios/Leg_curl_assis.png",
+          "series": "3",
+          "repetitions": "Voir notes",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": "8/4/6 -> pump",
+          "note": "Voir méthode"
+        },
+        {
+          "groupe": "Ischios",
+          "nom": "Leg Curl allongé",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "allongé",
+          "prise": "pieds",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Ischios/Leg_curl_coucher.png",
+          "series": "3",
+          "repetitions": "15",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "Fessiers",
+          "nom": "Kick-back",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "debout",
+          "prise": "pieds",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Fessiers/kick_back_poulie.png",
+          "series": "3",
+          "repetitions": "15",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "Fessiers",
+          "nom": "Hip thrust",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "assis",
+          "prise": "barre sur hanches",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Fessiers/Hip_trust_rack.png",
+          "series": "3",
+          "repetitions": "15",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Escalier",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Escalier.png",
+          "series": "5 min"
+        }
+      ],
+      "noteTraining": ""
+    },
+    {
+      "id": "16d0c75c-c8a4-4f14-8319-0f6034ea0f31",
+      "date": "mardi",
+      "muscle1": "Dos",
+      "muscle2": "Biceps",
+      "muscle3": "Triceps",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Skierg",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Skierg.png",
+          "series": "5 min"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Tractions_machine",
+          "sollicitation_articulaire": "poly-articulaire",
+          "charge": "guidée",
+          "position": "suspendu",
+          "prise": "pronation",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Tractions_machine.jpg",
+          "series": "3",
+          "repetitions": "10",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Tirage vertical poulie haute prise large",
+          "sollicitation_articulaire": "isolation",
+          "charge": "guidée",
+          "position": "assis",
+          "prise": "pronation",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Tirage_vertical_prise_large.jpg",
+          "series": "3",
+          "repetitions": "Voir notes",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": "Lourd-léger",
+          "note": "10 / 15"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing machine",
+          "sollicitation_articulaire": "poly-articulaire",
+          "charge": "libre",
+          "position": "assis",
+          "prise": "neutre",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Rowing_machine.jpeg",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "",
+          "note": ""
+        },
+        {
+          "groupe": "Biceps",
+          "nom": "Pull over poulie",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "debout",
+          "prise": "pronation",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Pull_over.jpeg",
+          "series": "3",
+          "repetitions": "Voir notes",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": "8/4/6 -> pump",
+          "note": "Voir méthode"
+        },
+        {
+          "groupe": "Biceps",
+          "nom": "Extension lombaire",
+          "charge": "libre",
+          "sollicitation_articulaire": "isolation",
+          "position": "penché",
+          "prise": "largeur bassin",
+          "materiel": "poids de corps",
+          "nature": "contraction",
+          "representation": "/representation_exo/Lombaires/Extension_lombaire.jpeg",
+          "series": "3",
+          "repetitions": "20",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "superSet": true,
+          "nom": "Super Set Biceps - Triceps",
+          "exercices": [
+            {
+              "groupe": "Biceps",
+              "nom": "Curl barre",
+              "charge": "libre",
+              "sollicitation_articulaire": "isolation",
+              "position": "debout",
+              "prise": "supination",
+              "materiel": "barre",
+              "nature": "contraction",
+              "representation": "/representation_exo/Bras/Biceps/Curl_barre.png",
+              "series": "3",
+              "repetitions": "15",
+              "tempo": "Aucun",
+              "methode": "Aucune",
+              "note": "-"
+            },
+            {
+              "groupe": "Biceps",
+              "nom": "Barre au front",
+              "charge": "libre",
+              "sollicitation_articulaire": "isolation",
+              "position": "couché",
+              "prise": "pronation",
+              "materiel": "barre",
+              "nature": "contraction",
+              "representation": "/representation_exo/Bras/Triceps/Barre_front.png",
+              "series": "3",
+              "repetitions": "15",
+              "tempo": "Aucun",
+              "methode": "Aucune",
+              "note": "-"
+            }
+          ],
+          "series": "3",
+          "repetitions": "25",
+          "repos": "45"
+        },
+        {
+          "superSet": true,
+          "nom": "Super Set Biceps - Triceps",
+          "exercices": [
+            {
+              "groupe": "Biceps",
+              "nom": "Curl à la poulie basse",
+              "charge": "guidée",
+              "sollicitation_articulaire": "isolation",
+              "position": "debout",
+              "prise": "supination",
+              "materiel": "poulie",
+              "nature": "contraction",
+              "representation": "/representation_exo/Bras/Biceps/Poulie_basse.png",
+              "series": "3",
+              "repetitions": "15",
+              "tempo": "Aucun",
+              "methode": "Aucune",
+              "note": "-"
+            },
+            {
+              "groupe": "Biceps",
+              "nom": "Extension poulie haute",
+              "charge": "guidée",
+              "sollicitation_articulaire": "isolation",
+              "position": "debout",
+              "prise": "pronation",
+              "materiel": "poulie",
+              "nature": "contraction",
+              "representation": "/representation_exo/Bras/Triceps/Poulie_haute.png",
+              "series": "3",
+              "repetitions": "25",
+              "tempo": "Aucun",
+              "methode": "Aucune",
+              "note": "-"
+            }
+          ],
+          "series": "3",
+          "repetitions": "25",
+          "repos": "45"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Escalier",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Escalier.png",
+          "series": "5 min"
+        }
+      ],
+      "noteTraining": ""
+    },
+    {
+      "id": "de825631-5522-4b99-b660-4a499dd0a11a",
+      "date": "jeudi",
+      "muscle1": "Pectoraux",
+      "muscle2": "Epaules",
+      "muscle3": "",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Vélo",
+          "charge": "",
+          "type": "cardio",
+          "position": "assis",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Velo.png",
+          "series": "10 min"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_5",
+          "nom": "Écarté vis-à-vis",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "debout",
+          "prise": "neutre",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Ecarté_vis_à_vis.png",
+          "series": "3",
+          "repetitions": "15",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_14",
+          "nom": "Développé couché haltères",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "couché",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "étirement",
+          "representation": "/representation_exo/pect/DC_Haltère.jpg",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "",
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_4",
+          "nom": "Chest press",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Chest_press.png",
+          "series": "3",
+          "repetitions": "Voir notes",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": "8/4/6 -> pump",
+          "note": "Voir methodes"
+        },
+        {
+          "groupe": "Epaules",
+          "nom": "Shoulder press",
+          "charge": "guidée",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "assis",
+          "prise": "pronation",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Epaules/Shoulder_press.png",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "",
+          "note": "-"
+        },
+        {
+          "groupe": "Epaules",
+          "nom": "Élévations latérales",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "debout",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "contraction",
+          "representation": "/representation_exo/Epaules/Élévation_latérale.png",
+          "series": "3",
+          "repetitions": "15",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "",
+          "note": "-"
+        },
+        {
+          "id": 1749651907716,
+          "nom": "Face pulls",
+          "series": "3",
+          "repetitions": "20",
+          "repos": "60",
+          "tempo": "Aucune",
+          "methode": "",
+          "position": "debout",
+          "prise": "neutre",
+          "materiel": "poulie",
+          "note": "",
+          "representation": "/representation_exo/Epaules/Trapèze/Tirage_front.png",
+          "superSet": false
+        },
+        {
+          "id": 1749651915798,
+          "nom": "Elliptique",
+          "series": "5 min",
+          "repetitions": "",
+          "repos": "",
+          "tempo": "",
+          "methode": "",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "note": "",
+          "representation": "/representation_exo/Cardio_ergo/Elliptique.png",
+          "superSet": false
+        }
+      ],
+      "noteTraining": ""
+    },
+    {
+      "id": "8780ee44-cf38-41c5-ba48-83023bb0436a",
+      "date": "vendredi",
+      "muscle1": "ErgoCross",
+      "muscle2": "Quadriceps",
+      "muscle3": "Ischios",
+      "typeTraining": "cross-training",
+      "exercices": [
+        {
+          "nom": "Tabata - Variante 2",
+          "tours": 8,
+          "on": 30,
+          "off": 30,
+          "exercices": [
+            {
+              "id": "Ergo_3",
+              "exercice": "SkiErg",
+              "type": "cardio",
+              "materiel": "skierg",
+              "representation": "/representation_exo/Cardio_ergo/Skierg.png",
+              "note": "",
+              "nom": "SkiErg",
+              "charge": "machine",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "debout",
+              "prise": "poignées"
+            },
+            {
+              "id": "ischio_8",
+              "exercice": "Kettlebell deadlift sumo",
+              "materiel": "kettlebell",
+              "representation": "/representation_exo/Jambes/Quadri/Squat_sumo_ketllebel.png",
+              "note": "",
+              "nom": "Kettlebell deadlift sumo",
+              "charge": "libre",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "debout",
+              "prise": "double",
+              "nature": "extension hanche",
+              "remarque": "Pieds larges, dos droit, concentre-toi sur la poussée des hanches pour remonter."
+            },
+            {
+              "id": "Ergo_8",
+              "exercice": "Corde ondulatoire",
+              "type": "cardio",
+              "materiel": "corde ondulatoire",
+              "representation": "/representation_exo/Cardio_training/Corde_oscillante.png",
+              "note": ""
+            },
+            {
+              "id": "quad_2",
+              "exercice": "Fentes marchées",
+              "materiel": "aucun",
+              "representation": "/representation_exo/Jambes/Quadri/Fentes.png",
+              "note": "Tiens-toi aux sangles et maintiens une position assise sans mur. Gros travail isométrique sur les quadriceps.",
+              "nom": "Fentes marchées",
+              "charge": "poids du corps",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "debout",
+              "prise": "aucune",
+              "nature": "flexion-extension",
+              "remarque": "Avance un pied devant l’autre en alternant, genou arrière proche du sol."
+            },
+            {
+              "id": "ischio_4",
+              "exercice": "Assault Bike",
+              "materiel": "assault bike",
+              "representation": "/representation_exo/Cardio_ergo/Assaut_bike.png",
+              "note": "",
+              "nom": "Kettlebell swing",
+              "charge": "libre",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "debout",
+              "prise": "double prise",
+              "nature": "charnière hanche explosive",
+              "remarque": "Concentre-toi sur la poussée des hanches, pas sur les bras. Exercice explosif idéal pour les ischios.",
+              "type": "cardio"
+            },
+            {
+              "id": "Ergo_6",
+              "exercice": "Kettlebell swing",
+              "type": "",
+              "materiel": "kettlebell",
+              "representation": "/representation_exo/Cardio_training/Swing_1.png",
+              "note": "",
+              "nom": "Assaut bike",
+              "charge": "machine",
+              "sollicitation_articulaire": "mono-articulaire",
+              "position": "assis",
+              "prise": "guidon",
+              "nature": "extension hanche",
+              "remarque": "Pieds larges, dos droit, concentre-toi sur la poussée des hanches pour remonter."
+            },
+            {
+              "id": "ischio_5",
+              "exercice": "Épaulé-jeté haltère (clean & press)",
+              "materiel": "haltères",
+              "representation": [
+                "/representation_exo/Cardio_training/Epaulé.png",
+                "/representation_exo/Cardio_training/Truster_1.png",
+                "/representation_exo/Cardio_training/Truster_2.png"
+              ],
+              "note": "",
+              "type": ""
+            },
+            {
+              "id": "quad_10",
+              "exercice": "Rameur",
+              "materiel": "rameur",
+              "representation": "/representation_exo/Cardio_ergo/Rameur.png",
+              "note": "",
+              "type": "cardio"
+            }
+          ]
+        }
+      ],
+      "noteTraining": "Effectuer seulement 3 à 4 tours "
+    },
+    {
+      "id": "81973fa5-0e04-4afc-91ba-0b51a1001430",
+      "date": "vendredi",
+      "muscle1": "Fessiers",
+      "muscle2": "",
+      "muscle3": "",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Elliptique",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Elliptique.png",
+          "series": "15 min"
+        },
+        {
+          "groupe": "Fessiers",
+          "nom": "Squat sumo",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "debout",
+          "prise": "barre sur trapèzes",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Quadri/Squat_sumo_ketllebel.png",
+          "series": "3",
+          "repetitions": "30",
+          "repos": "25s",
+          "tempo": "0-1-0-1",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "Fessiers",
+          "nom": "Lever de bassin",
+          "charge": "poids de corps",
+          "sollicitation_articulaire": "isolation",
+          "position": "allongé",
+          "prise": "aucune",
+          "materiel": "poids du corps",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Fessiers/Soulever_de_bassin.png",
+          "series": "3",
+          "repetitions": "30",
+          "repos": "25s",
+          "tempo": "0-1-0-1",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "groupe": "Fessiers",
+          "nom": "Abduction machine",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "assis",
+          "prise": "aucune",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Jambes/Abducteurs/Machine_abducteurs.png",
+          "series": "4",
+          "repetitions": "20",
+          "repos": "60",
+          "tempo": "Aucun",
+          "methode": "Aucune",
+          "note": "-"
+        },
+        {
+          "superSet": true,
+          "nom": "Super Set Fessiers - Fessiers",
+          "exercices": [
+            {
+              "groupe": "Fessiers",
+              "nom": "Hip thrust",
+              "charge": "libre",
+              "sollicitation_articulaire": "poly-articulaire",
+              "position": "assis",
+              "prise": "barre sur hanches",
+              "materiel": "barre",
+              "nature": "contraction",
+              "representation": "/representation_exo/Jambes/Fessiers/Hip_trust_rack.png",
+              "series": "3",
+              "repetitions": "20",
+              "tempo": "Aucun",
+              "methode": "Aucune",
+              "note": "-"
+            },
+            {
+              "groupe": "Fessiers",
+              "nom": "Donkey kick au sol",
+              "charge": "libre",
+              "sollicitation_articulaire": "isolation",
+              "position": "à genoux",
+              "prise": "aucune",
+              "materiel": "tapis",
+              "nature": "contraction",
+              "representation": "/representation_exo/Jambes/Fessiers/Donkey_kick_a_genoux.png",
+              "series": "3",
+              "repetitions": "20",
+              "tempo": "Aucune",
+              "methode": "Aucune",
+              "note": "-"
+            }
+          ],
+          "series": "3",
+          "repetitions": "30",
+          "repos": "90"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Escalier",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Escalier.png",
+          "series": "15 min"
+        }
+      ],
+      "noteTraining": ""
+    }
+  ],
+  "performances": [
+    {
+      "id": "f4afd7b9-045d-421c-87ee-1fcfd0bc321c",
+      "jourS": "lundi",
+      "nom": "Vélo",
+      "series": "10 min",
+      "charges": []
+    },
+    {
+      "id": "5d127a4a-98fa-4781-9e5a-b79c65e61c3c",
+      "jourS": "lundi",
+      "nom": "Soulevé de terre roumain",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "5551439e-22d8-40b0-853c-7f4b22b30caa",
+      "jourS": "lundi",
+      "nom": "Leg Curl assis",
+      "series": "3",
+      "reps": "Voir notes",
+      "charges": []
+    },
+    {
+      "id": "bc33b83d-6b05-48a4-a7a1-cdb3b539eb97",
+      "jourS": "lundi",
+      "nom": "Leg Curl allongé",
+      "series": "3",
+      "reps": "15",
+      "charges": []
+    },
+    {
+      "id": "7aa25663-5d75-44a7-a2e3-687371370a66",
+      "jourS": "lundi",
+      "nom": "Kick-back",
+      "series": "3",
+      "reps": "15",
+      "charges": []
+    },
+    {
+      "id": "d1d5504d-0c30-4345-85e8-1f001254833b",
+      "jourS": "lundi",
+      "nom": "Hip thrust",
+      "series": "3",
+      "reps": "15",
+      "charges": []
+    },
+    {
+      "id": "9c7d0882-a1a5-4043-96cf-69977b87f28a",
+      "jourS": "lundi",
+      "nom": "Escalier",
+      "series": "5 min",
+      "charges": []
+    },
+    {
+      "id": "da848445-6e57-4530-a6a8-d967b63a1c49",
+      "jourS": "mardi",
+      "nom": "Skierg",
+      "series": "5 min",
+      "charges": []
+    },
+    {
+      "id": "51ed872b-1acc-4d44-bfb4-c8688d82002b",
+      "jourS": "mardi",
+      "nom": "Tractions_machine",
+      "series": "3",
+      "reps": "10",
+      "charges": []
+    },
+    {
+      "id": "d32bea21-89fb-4d29-a43c-c37434115f44",
+      "jourS": "mardi",
+      "nom": "Tirage vertical poulie haute prise large",
+      "series": "3",
+      "reps": "Voir notes",
+      "charges": []
+    },
+    {
+      "id": "0e46a687-8b05-42d3-9c04-e10f86f3fbc1",
+      "jourS": "mardi",
+      "nom": "Rowing machine",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "61c53784-a37c-4d69-9bf3-95098a651b21",
+      "jourS": "mardi",
+      "nom": "Pull over poulie",
+      "series": "3",
+      "reps": "Voir notes",
+      "charges": []
+    },
+    {
+      "id": "47889aea-8ca1-462e-a960-135966ca6d66",
+      "jourS": "mardi",
+      "nom": "Extension lombaire",
+      "series": "3",
+      "reps": "20",
+      "charges": []
+    },
+    {
+      "id": "b408255f-8352-4ce7-bc06-4bf92b108b7f",
+      "jourS": "mardi",
+      "nom": "Extension nuque haltère",
+      "series": "3",
+      "reps": "25",
+      "charges": []
+    },
+    {
+      "id": "5466535d-f8ea-4159-8772-a83a84713b09",
+      "jourS": "mardi",
+      "nom": "Dips",
+      "series": "3",
+      "reps": "25",
+      "charges": []
+    },
+    {
+      "id": "61f469fe-b53e-4a56-9003-e027183b432a",
+      "jourS": "mardi",
+      "nom": "Super Set Biceps - Triceps",
+      "series": "3",
+      "reps": "25",
+      "charges": []
+    },
+    {
+      "id": "ae77e6c4-7470-4024-b10b-ecd4df98efdc",
+      "jourS": "mardi",
+      "nom": "Super Set Biceps - Triceps",
+      "series": "3",
+      "reps": "25",
+      "charges": []
+    },
+    {
+      "id": "ba162915-f153-4268-9692-6e03cb783ff0",
+      "jourS": "mardi",
+      "nom": "Escalier",
+      "series": "5 min",
+      "charges": []
+    },
+    {
+      "id": "cd84611b-97b2-4d6e-995b-51e87b34654a",
+      "jourS": "jeudi",
+      "nom": "Vélo",
+      "series": "10 min",
+      "charges": []
+    },
+    {
+      "id": "49e5c812-8406-4849-b3dd-36551f54fea6",
+      "jourS": "jeudi",
+      "nom": "Écarté vis-à-vis",
+      "series": "3",
+      "reps": "15",
+      "charges": []
+    },
+    {
+      "id": "75ba083a-8a99-4d45-8a95-fecbeca06438",
+      "jourS": "jeudi",
+      "nom": "Développé couché haltères",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "40be85b1-1c5d-4219-9f2a-1464c853e7f9",
+      "jourS": "jeudi",
+      "nom": "Chest press",
+      "series": "3",
+      "reps": "Voir notes",
+      "charges": []
+    },
+    {
+      "id": "da395e94-1ae6-4b3d-9858-0a47d131938e",
+      "jourS": "jeudi",
+      "nom": "Shoulder press",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "7387fb1d-3a29-4653-9544-585be602e3bd",
+      "jourS": "jeudi",
+      "nom": "Élévations latérales",
+      "series": "3",
+      "reps": "15",
+      "charges": []
+    },
+    {
+      "id": "bb066eb8-c853-404f-83c4-c88ec9d4c0a0",
+      "jourS": "jeudi",
+      "nom": "Elliptique",
+      "series": "10 min",
+      "charges": []
+    },
+    {
+      "id": "a8bce174-adac-4221-8edd-ab25e4cc7940",
+      "jourS": "vendredi",
+      "nom": "Elliptique",
+      "series": "15 min",
+      "charges": []
+    },
+    {
+      "id": "59c4a83e-7a64-4403-8863-0f4ebf9fe9d2",
+      "jourS": "vendredi",
+      "nom": "Squat sumo",
+      "series": "3",
+      "reps": "30",
+      "charges": []
+    },
+    {
+      "id": "7ce09302-7ab1-4985-bf8f-656fa8458753",
+      "jourS": "vendredi",
+      "nom": "Lever de bassin",
+      "series": "3",
+      "reps": "30",
+      "charges": []
+    },
+    {
+      "id": "f9157668-c2e9-4c2e-b3f5-1d179727717c",
+      "jourS": "vendredi",
+      "nom": "Abduction machine",
+      "series": "4",
+      "reps": "20",
+      "charges": []
+    },
+    {
+      "id": "83c4e6a6-38c7-4e03-8c81-52bb4f3f7a09",
+      "jourS": "vendredi",
+      "nom": "Super Set Fessiers - Fessiers",
+      "series": "3",
+      "reps": "30",
+      "charges": []
+    },
+    {
+      "id": "74daeb2f-0fad-4f47-a6ea-155be5776564",
+      "jourS": "vendredi",
+      "nom": "Escalier",
+      "series": "15 min",
+      "charges": []
+    }
+  ]
+}

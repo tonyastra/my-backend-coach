@@ -1,0 +1,553 @@
+{
+  "email": "srimbaud07@hotmail.com",
+  "profil": [
+    {
+      "nom": "Stéphane",
+      "prenom": "Rimbaud",
+      "sexe": "Homme",
+      "dateNaissance": "1969-12-31T23:00:00.000Z",
+      "profession": "chef d'entreprise ",
+      "telephone": "06 80 96 71 43",
+      "photoProfil": "",
+      "age": "51"
+    }
+  ],
+  "mensurationProfil": [
+    {
+      "taille": "183",
+      "poids": "76"
+    }
+  ],
+  "hygieneVie": [
+    {
+      "sommeil": "7 heures",
+      "sortiealcool": "aucun",
+      "tabac": "Pas du tout",
+      "stress": "4"
+    }
+  ],
+  "objectifs": [
+    {
+      "objectif": "remise en forme",
+      "delais": "aucune limite de temps",
+      "motivation": "obtenir plus de force et avoir moins mal a mon épaules",
+      "obstacle": "",
+      "momentTraining": "Le matin"
+    }
+  ],
+  "medical": [
+    {
+      "problemeSante": "non",
+      "cardiaque": "non",
+      "blessure": "Epaules gauche ",
+      "traitement": "non",
+      "allergies": "non"
+    }
+  ],
+  "physio": [
+    {
+      "frequenceAuRepos": "je sais pas",
+      "vo2max": "",
+      "retardMusculaire": "non",
+      "mobilite": "bonne ",
+      "massegr": "je sais pas",
+      "massema": "je sais pas"
+    }
+  ],
+  "nutrition": [
+    {
+      "habitude": "Equilibré",
+      "nbrrepas": "3 repas",
+      "hydratation": "1 Litres",
+      "intolerenceregime": "non",
+      "rapportnourriture": ""
+    }
+  ],
+  "activite": [
+    {
+      "nbrseance": "3 séance",
+      "type": "Musculation",
+      "duree": "1h30",
+      "intensite": "6",
+      "recuperation": "72h",
+      "passesportif": ""
+    }
+  ],
+  "preference": [
+    {
+      "petitobjectif": "",
+      "preferenceactivite": "",
+      "lieux": "En salle",
+      "equipement": ""
+    }
+  ],
+  "mensurations": [],
+  "entrainements": [
+    {
+      "id": "006cc4ee-6de7-4a6b-a332-0ebed35e69f6",
+      "date": "samedi",
+      "muscle1": "Pectoraux",
+      "muscle2": "Biceps",
+      "muscle3": "Triceps",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Tapis",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Tapis.png",
+          "series": "10 min"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_6",
+          "nom": "Développé couché barre ",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Developper_coucher.jpg",
+          "series": "3",
+          "repetitions": "Voir notes",
+          "repos": "45",
+          "tempo": "Aucun",
+          "methode": "Pyramidal",
+          "note": "12 / 10 / 8 "
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_17",
+          "nom": "Développé couché barre ",
+          "charge": "guidée",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Developper_coucher.jpg",
+          "series": "3",
+          "repetitions": "4",
+          "repos": "180",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Pectoraux",
+          "id": "pec_11",
+          "nom": "Développé incliné haltères",
+          "charge": "libre",
+          "sollicitation_articulaire": "isolation",
+          "position": "incliné",
+          "prise": "neutre",
+          "materiel": "haltères",
+          "nature": "étirement",
+          "representation": "/representation_exo/pect/Incliner_haltère.jpg",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "150",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Biceps",
+          "nom": "Chest press",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "couché",
+          "prise": "pronation",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/pect/Chest_press.png",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Biceps",
+          "nom": "Curl barre",
+          "charge": "libre",
+          "sollicitation_articulaire": "isolation",
+          "position": "debout",
+          "prise": "supination",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Bras/Biceps/Curl_barre.png",
+          "series": "3",
+          "repetitions": "8",
+          "repos": "120",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Triceps",
+          "nom": "Larry-scott",
+          "charge": "libre",
+          "sollicitation_articulaire": "isolation",
+          "position": "assis",
+          "prise": "supination",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Bras/Biceps/Larry_Scott.png",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Triceps",
+          "nom": "Dips",
+          "charge": "guidée",
+          "sollicitation_articulaire": "isolation",
+          "position": "suspendu",
+          "prise": "neutre",
+          "materiel": "barres parallèles",
+          "nature": "contraction",
+          "representation": "/representation_exo/Bras/Triceps/Dips_barre_parallele.png",
+          "series": "3",
+          "repetitions": "8",
+          "repos": "120",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "id": 1749740580623,
+          "nom": "Extension poulie haute",
+          "type": "",
+          "materiel": "poulie",
+          "note": "",
+          "representation": "/representation_exo/Bras/Triceps/Poulie_haute.png",
+          "position": "debout",
+          "prise": "pronation",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Elliptique",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Elliptique.png",
+          "series": "10 min"
+        }
+      ],
+      "noteTraining": ""
+    },
+    {
+      "id": "60a97fee-09c9-4c28-bc7b-a73213c82b78",
+      "date": "dimanche",
+      "muscle1": "Dos",
+      "muscle2": "Epaules",
+      "muscle3": "",
+      "typeTraining": "musculation",
+      "exercices": [
+        {
+          "groupe": "ergo",
+          "nom": "Tapis",
+          "charge": "",
+          "type": "cardio",
+          "position": "debout",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Tapis.png",
+          "series": "10 min"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing barre buste penché",
+          "sollicitation_articulaire": "isolation",
+          "charge": "guidée",
+          "position": "penché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Rowing_barre.jpeg",
+          "series": "3",
+          "repetitions": "Voir notes",
+          "repos": "45",
+          "tempo": "Aucun",
+          "methode": "Pyramidal",
+          "note": "12 / 10 / 8"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing barre buste penché",
+          "sollicitation_articulaire": "isolation",
+          "charge": "guidée",
+          "position": "penché",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Rowing_barre.jpeg",
+          "series": "3",
+          "repetitions": "4",
+          "repos": "180",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Dos",
+          "nom": "Rowing machine",
+          "sollicitation_articulaire": "isolation",
+          "charge": "guidée",
+          "position": "assis",
+          "prise": "neutre",
+          "materiel": "machine",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Rowing_machine.jpeg",
+          "series": "3",
+          "repetitions": "6",
+          "repos": "150",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Epaules",
+          "nom": "Pull over poulie",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "debout",
+          "prise": "pronation",
+          "materiel": "poulie",
+          "nature": "contraction",
+          "representation": "/representation_exo/Dos/Pull_over.jpeg",
+          "series": "3",
+          "repetitions": "20",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "groupe": "Epaules",
+          "nom": "Développé militaire",
+          "charge": "libre",
+          "sollicitation_articulaire": "poly-articulaire",
+          "position": "assis",
+          "prise": "pronation",
+          "materiel": "barre",
+          "nature": "contraction",
+          "representation": "/representation_exo/Epaules/Développer_militaire.png",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun",
+          "methode": null,
+          "note": "-"
+        },
+        {
+          "id": 1749742084278,
+          "nom": "Élévations latérales",
+          "type": "",
+          "materiel": "haltères",
+          "note": "",
+          "representation": "/representation_exo/Epaules/Élévation_latérale.png",
+          "position": "debout",
+          "prise": "neutre",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun"
+        },
+        {
+          "id": 1749742095585,
+          "nom": "Face pulls",
+          "type": "",
+          "materiel": "poulie",
+          "note": "",
+          "representation": "/representation_exo/Epaules/Trapèze/Tirage_front.png",
+          "position": "debout",
+          "prise": "neutre",
+          "series": "3",
+          "repetitions": "12",
+          "repos": "90",
+          "tempo": "Aucun"
+        },
+        {
+          "groupe": "ergo",
+          "nom": "Vélo",
+          "charge": "",
+          "type": "cardio",
+          "position": "assis",
+          "prise": "",
+          "materiel": "ergometre",
+          "representation": "/representation_exo/Cardio_ergo/Velo.png",
+          "series": "5 min"
+        }
+      ],
+      "noteTraining": "Entrainements A "
+    }
+  ],
+  "performances": [
+    {
+      "id": "6f8b0574-adaf-4fc2-b30e-8460f51af9ad",
+      "jourS": "samedi",
+      "nom": "Tapis",
+      "series": "10 min",
+      "charges": []
+    },
+    {
+      "id": "c1d05eb3-e433-4428-a67e-97f57ec01f0f",
+      "jourS": "samedi",
+      "nom": "Développé couché barre ",
+      "series": "3",
+      "reps": "Voir notes",
+      "charges": []
+    },
+    {
+      "id": "d7ea4f6d-d826-4fe8-8bc3-6423a05eac63",
+      "jourS": "samedi",
+      "nom": "Développé couché barre ",
+      "series": "3",
+      "reps": "4",
+      "charges": []
+    },
+    {
+      "id": "23d72933-cf83-4b9c-a213-92be95bd1aa0",
+      "jourS": "samedi",
+      "nom": "Développé incliné haltères",
+      "series": "3",
+      "reps": "6",
+      "charges": []
+    },
+    {
+      "id": "9741ddfa-d13c-4dbd-b099-d89c2fc8e668",
+      "jourS": "samedi",
+      "nom": "Chest press",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "a7e921b2-8df4-426a-a9ee-338974256bf0",
+      "jourS": "samedi",
+      "nom": "Curl barre",
+      "series": "3",
+      "reps": "8",
+      "charges": []
+    },
+    {
+      "id": "998c4dad-b7a9-47e1-b181-a390393c4a75",
+      "jourS": "samedi",
+      "nom": "Larry-scott",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "7c3aad0c-cce6-4751-9f18-9333ad7f2e7e",
+      "jourS": "samedi",
+      "nom": "Dips",
+      "series": "3",
+      "reps": "8",
+      "charges": []
+    },
+    {
+      "id": "d2924d86-3b7e-4b73-834a-dfe79877d8c0",
+      "jourS": "samedi",
+      "nom": "Extension poulie haute",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "cb71f6a0-61fc-4d67-ad26-04b6acf71d5f",
+      "jourS": "samedi",
+      "nom": "Elliptique",
+      "series": "10 min",
+      "charges": []
+    },
+    {
+      "id": "6bf625ed-69bf-4f51-bc94-70b34926da2b",
+      "jourS": "dimanche",
+      "nom": "Tapis",
+      "series": "10 min",
+      "charges": []
+    },
+    {
+      "id": "96fe3d62-53b4-48ac-a4f1-bc660bede94c",
+      "jourS": "dimanche",
+      "nom": "Rowing barre buste penché",
+      "series": "3",
+      "reps": "Voir notes",
+      "charges": []
+    },
+    {
+      "id": "cd9943b8-361c-4f97-82ad-600cf4a77492",
+      "jourS": "dimanche",
+      "nom": "Rowing barre buste penché",
+      "series": "3",
+      "reps": "4",
+      "charges": []
+    },
+    {
+      "id": "605f7312-eb1a-46b8-9db4-348d68edfbaf",
+      "jourS": "dimanche",
+      "nom": "Rowing machine",
+      "series": "3",
+      "reps": "6",
+      "charges": []
+    },
+    {
+      "id": "be08774e-448a-4ed1-8b4b-d2bf9f9b994c",
+      "jourS": "dimanche",
+      "nom": "Pull over poulie",
+      "series": "3",
+      "reps": "20",
+      "charges": []
+    },
+    {
+      "id": "0559edb1-c7cb-4244-bac5-3165874addc0",
+      "jourS": "dimanche",
+      "nom": "Développé militaire",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "075823b3-dac4-4c3e-aad4-07946124c4c6",
+      "jourS": "dimanche",
+      "nom": "Élévations latérales",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "6673d646-866a-4737-b17d-3214815bc475",
+      "jourS": "dimanche",
+      "nom": "Face pulls",
+      "series": "3",
+      "reps": "12",
+      "charges": []
+    },
+    {
+      "id": "f2907171-c190-4075-b6d5-7a81eef5fd2f",
+      "jourS": "dimanche",
+      "nom": "Vélo",
+      "series": "5 min",
+      "charges": []
+    }
+  ],
+  "dietes": []
+}

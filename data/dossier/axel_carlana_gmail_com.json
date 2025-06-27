@@ -1,0 +1,655 @@
+{
+  "email": "axel.carlana@gmail.com",
+  "profil": [
+    {
+      "nom": "Carlana",
+      "prenom": "Axel",
+      "sexe": "Homme",
+      "dateNaissance": "1992-01-29T23:00:00.000Z",
+      "profession": "Dessinateur",
+      "telephone": "06 51 19 49 63",
+      "photoProfil": ""
+    }
+  ],
+  "mensurationProfil": [
+    {
+      "taille": "174",
+      "poids": "109"
+    }
+  ],
+  "hygieneVie": [
+    {
+      "sommeil": "8 heures",
+      "sortiealcool": "1 fois",
+      "tabac": "Pas du tout",
+      "stress": "4"
+    }
+  ],
+  "objectifs": [
+    {
+      "objectif": "perte de poids",
+      "delais": "6 à 12 mois",
+      "motivation": "Me sentir mieux et plus jolie",
+      "obstacle": "Le temps",
+      "momentTraining": "Le soir"
+    }
+  ],
+  "medical": [
+    {
+      "problemeSante": "non",
+      "cardiaque": "non",
+      "blessure": "Epaules gauche ",
+      "traitement": "non",
+      "allergies": "non"
+    }
+  ],
+  "physio": [
+    {
+      "frequenceAuRepos": "je sais pas",
+      "vo2max": "je sais pas ",
+      "retardMusculaire": "non",
+      "mobilite": "bonne ",
+      "massegr": "je sais pas",
+      "massema": "je sais pas"
+    }
+  ],
+  "nutrition": [
+    {
+      "habitude": "Equilibré",
+      "nbrrepas": "5 repas",
+      "hydratation": "2 Litres",
+      "intolerenceregime": "non",
+      "rapportnourriture": "Refuge si coup de mou"
+    }
+  ],
+  "activite": [
+    {
+      "nbrseance": "4 séance",
+      "type": "Musculation",
+      "duree": "1 h",
+      "intensite": "7",
+      "recuperation": "24h",
+      "passesportif": "Non"
+    }
+  ],
+  "preference": [
+    {
+      "petitobjectif": "",
+      "preferenceactivite": "",
+      "lieux": "En salle",
+      "equipement": "battle rope step kettlebell"
+    }
+  ],
+  "mensurations": [],
+  "entrainements": [],
+  "performances": [],
+  "dietes": [
+    {
+      "id": "1749890511539",
+      "date": "2025-06-14T08:41:51.531Z",
+      "kcalObjectif": 2520,
+      "repas": {
+        "matin": [
+          {
+            "nom": "Flocon d’avoine",
+            "quantite": "30",
+            "glu": 17.7,
+            "prot": 3.6,
+            "lip": 3,
+            "fib": 2.1,
+            "cal": 110.7,
+            "prix": 0.05399999999999999,
+            "url": "https://www.auchan.fr/auchan-flocons-d-avoine/pr-C1259480",
+            "id": "da75f50b-f01d-427a-975c-9b01416a0a5c"
+          },
+          {
+            "nom": "Oeuf",
+            "quantite": "200",
+            "glu": 1,
+            "prot": 26,
+            "lip": 20,
+            "fib": 0,
+            "cal": 280,
+            "prix": 0.36,
+            "remarques": "Repère de calcul !! -> 1 oeuf = 100g (réellement 1 oeuf = 60g) / Riches en oméga 3, cuisson coulante",
+            "url": "https://www.auchan.fr/pouce-oeufs-de-poules/pr-C1608829",
+            "id": "2c95fc83-f273-4ce3-ab3f-71a05594988f"
+          },
+          {
+            "nom": "Beurre de cacahuète",
+            "quantite": "10",
+            "glu": 1.1,
+            "prot": 2.6,
+            "lip": 5.2,
+            "fib": 0.72,
+            "cal": 63,
+            "prix": 0.14,
+            "remarques": "Riche en magnésium, vitamine E",
+            "url": "https://www.prozis.com/fr/fr/prozis/beurre-de-cacahouete-1000-g",
+            "id": "65d12a12-bc8f-4280-b327-3ef8545a50fa"
+          },
+          {
+            "nom": "Framboise (surgelé)",
+            "quantite": "40",
+            "glu": 2.64,
+            "prot": 0.72,
+            "lip": 0.2,
+            "fib": 3.92,
+            "cal": 23.2,
+            "prix": 0.45199999999999996,
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-framboises-surgelees-fruits-entiers/pr-C1173769",
+            "id": "fc66d02f-bd62-4e40-8555-6e12f6079972"
+          },
+          {
+            "nom": "Thé vert",
+            "quantite": "1",
+            "glu": 0.005,
+            "prot": 0.005,
+            "lip": 0.005,
+            "fib": 0,
+            "cal": 0.004,
+            "prix": 0.0684,
+            "remarque": "",
+            "remarques": "1 sachet = 1,6g",
+            "url": "https://www.auchan.fr/auchan-the-vert-a-la-menthe/pr-C1334089"
+          },
+          {
+            "nom": "Zinc",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.001,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/gluconate-de-zinc-120-mg-120-comprimes"
+          },
+          {
+            "nom": "Vitamines D",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0005,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/vitamin-d3-360-softgels"
+          },
+          {
+            "nom": "Q10",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0022,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/coenzyme-q10-60-capsules-molles"
+          },
+          {
+            "nom": "Vitamines C",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0009,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/vitamin-c-1000-mg-rose-hip-360-tabs"
+          },
+          {
+            "nom": "Complexe B",
+            "quantite": "1",
+            "glu": 0,
+            "prot": 0,
+            "lip": 0,
+            "fib": 0,
+            "cal": 0,
+            "prix": 0.0011,
+            "remarque": "",
+            "remarques": "Uniquement si consome de de la viande rouge 1 à 2 fois par semaine",
+            "url": "https://www.prozis.com/fr/fr/prozis/b-complex-90-tabs"
+          }
+        ],
+        "collation_matin": [
+          {
+            "nom": "Pomme pote",
+            "quantite": "55",
+            "glu": 6.6,
+            "prot": 0.275,
+            "lip": 0.715,
+            "fib": 0.33,
+            "cal": 31.35,
+            "prix": 0.253,
+            "remarques": "1 = 90g",
+            "url": "https://www.auchan.fr/pom-potes-gourdes-compote-pomme-nature-sans-sucres-ajoutes/pr-C1261226",
+            "id": "5ec823e3-5257-47a1-83d1-9890d0dbbcd7"
+          },
+          {
+            "nom": "Oeuf",
+            "quantite": "120",
+            "glu": 0.6,
+            "prot": 15.6,
+            "lip": 12,
+            "fib": 0,
+            "cal": 168,
+            "prix": 0.21599999999999997,
+            "remarques": "2 oeuf dur ",
+            "url": "https://www.auchan.fr/pouce-oeufs-de-poules/pr-C1608829",
+            "id": "4d7ebfce-f654-4f05-ab61-662e3bf74672"
+          },
+          {
+            "nom": "Noix de cajou",
+            "quantite": "10",
+            "glu": 1.98,
+            "prot": 2.05,
+            "lip": 4.76,
+            "fib": 0.52,
+            "cal": 60,
+            "prix": 0.14,
+            "remarques": "",
+            "url": "https://www.auchan.fr/auchan-noix-de-cajou-grillees-sans-sel-ajoute/pr-C1239667",
+            "id": "47662872-f727-4171-a3d6-6bd0f11b7503"
+          },
+          {
+            "nom": "Farine de riz instante",
+            "quantite": "10",
+            "glu": 7.6,
+            "prot": 0.9,
+            "lip": 0.21,
+            "fib": 0.33,
+            "cal": 36.6,
+            "prix": 0.096,
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/farine-de-riz-instantanee-1250-g",
+            "id": "5c87515f-30a7-4724-8fb9-d9e005ffee0e"
+          },
+          {
+            "nom": "100% Whey gold muscle tech",
+            "quantite": "10",
+            "glu": 0.61,
+            "prot": 7.27,
+            "lip": 0.76,
+            "fib": 0,
+            "cal": 39.39,
+            "prix": 0.307,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.zumub.com/FR/lactoserum/nitro-tech-100-whey-gold-2-49kg"
+          }
+        ],
+        "midi": [
+          {
+            "titre": "Variante 1",
+            "lignes": [
+              {
+                "nom": "Riz basmati",
+                "quantite": "40",
+                "glu": 10,
+                "prot": 1.4,
+                "lip": 0.32,
+                "fib": 0.16,
+                "cal": 47.2,
+                "prix": 0.14,
+                "remarques": "A peser cru",
+                "url": "https://www.auchan.fr/auchan-riz-basmati-pret-en-11-min/pr-C1240661",
+                "id": "0050a59c-a222-414c-9160-b4808a7bebec"
+              },
+              {
+                "nom": "Poulet",
+                "quantite": "120",
+                "glu": 0,
+                "prot": 28.32,
+                "lip": 0.84,
+                "fib": 0,
+                "cal": 122.4,
+                "prix": 0.8639999999999999,
+                "remarques": "Maigre en matière grasse",
+                "url": "https://www.auchan.fr/prix-bas-filets-de-poulet-blanc/pr-C1163407",
+                "id": "ed441031-a0bc-47dc-92d6-db8797638f02"
+              },
+              {
+                "nom": "Brocolis (surgelé)",
+                "quantite": "150",
+                "glu": 10.5,
+                "prot": 4.2,
+                "lip": 0.6,
+                "fib": 3.9,
+                "cal": 51,
+                "prix": 0.375,
+                "remarques": "Riche en vitamine C et magnésium",
+                "url": "https://www.auchan.fr/auchan-deja-cuit-brocolis-en-fleurettes/pr-C1457650",
+                "id": "20a0cd19-23b6-4976-88d4-71f00c7ede97"
+              },
+              {
+                "nom": "Huile de noix",
+                "quantite": "10",
+                "glu": 0.03,
+                "prot": 0.03,
+                "lip": 10,
+                "fib": 0.03,
+                "cal": 90,
+                "prix": 0.096,
+                "remarques": "Cuisson à froid",
+                "url": "https://www.auchan.fr/auchan-huile-de-noix/pr-C1240247",
+                "id": "569792dd-5d5a-43f4-8b79-833ecb858ff7"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 2",
+            "lignes": []
+          },
+          {
+            "titre": "Variante 3",
+            "lignes": []
+          }
+        ],
+        "collation_aprem": [
+          {
+            "nom": "Banane",
+            "quantite": "90",
+            "glu": 17.73,
+            "prot": 0.9,
+            "lip": 0.27,
+            "fib": 2.43,
+            "cal": 81,
+            "prix": 0.171,
+            "remarques": "Riches en potassium",
+            "id": "a175c631-3fed-4672-800c-96563fb95c16",
+            "url": "https://www.auchan.fr/bananes-prix-bas/pr-C1774822"
+          },
+          {
+            "nom": "100% Whey gold muscle tech",
+            "quantite": "30",
+            "glu": 1.83,
+            "prot": 21.81,
+            "lip": 2.28,
+            "fib": 0,
+            "cal": 118.17,
+            "prix": 0.9209999999999999,
+            "remarques": "",
+            "id": "8a9aec41-9e52-405f-aa6f-70ef3f05bcc0",
+            "url": "https://www.zumub.com/FR/lactoserum/nitro-tech-100-whey-gold-2-49kg"
+          }
+        ],
+        "post_training": [
+          {
+            "nom": "Peptide de collagène",
+            "quantite": "30",
+            "glu": 0.3,
+            "prot": 25.5,
+            "lip": 0,
+            "fib": 0,
+            "cal": 108.24,
+            "prix": 1.332,
+            "remarque": "",
+            "remarques": "",
+            "url": "https://www.prozis.com/fr/fr/prozis/peptiplus-proteine-de-collagene-hydrolyse-900-g"
+          }
+        ],
+        "soir": [
+          {
+            "titre": "Variante 1",
+            "lignes": [
+              {
+                "nom": "Courgettes (surgelé)",
+                "quantite": "150",
+                "glu": 3,
+                "prot": 2.7,
+                "lip": 0.3,
+                "fib": 2.25,
+                "cal": 28.5,
+                "prix": 0.21000000000000005,
+                "remarques": "",
+                "id": "04e0424e-9088-4c38-b6a0-37e62c4b0170",
+                "url": "https://www.auchan.fr/auchan-courgettes-en-rondelles/pr-C1178182"
+              },
+              {
+                "nom": "Steack",
+                "quantite": "100",
+                "glu": 0.4,
+                "prot": 18,
+                "lip": 15,
+                "fib": 0,
+                "cal": 210,
+                "prix": 1,
+                "remarques": "Riche en fer pour augmenter le taux de globule rouge",
+                "id": "75d639c2-44dd-440e-9473-a899c16b6da4",
+                "url": "https://www.auchan.fr/auchan-steaks-haches-pur-boeuf-15-mg/pr-C1164710"
+              },
+              {
+                "nom": "Huile d’olive",
+                "quantite": "10",
+                "glu": 0.03,
+                "prot": 0.03,
+                "lip": 10,
+                "fib": 0.03,
+                "cal": 90,
+                "prix": 0.12,
+                "remarques": "Cuisson moyenne température",
+                "id": "923ac6bb-3d6a-4787-8c34-e48288dc58c9",
+                "url": "https://www.auchan.fr/auchan-huile-d-olive-vierge-extra-origine-espagne/pr-C1227331"
+              },
+              {
+                "nom": "Mélatonine",
+                "quantite": "1",
+                "glu": 0,
+                "prot": 0,
+                "lip": 0,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.0011,
+                "remarques": "",
+                "id": "9d003f14-8f7e-4d55-a43a-37fdedada0cf",
+                "url": "https://www.prozis.com/fr/fr/prozis/melatonine-19-mg-90-gelules"
+              },
+              {
+                "nom": "Gaba",
+                "quantite": "1",
+                "glu": 0,
+                "prot": 0,
+                "lip": 0,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.0022,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.prozis.com/fr/fr/prozis/gaba-750-mg-60-veg-caps"
+              },
+              {
+                "nom": "Oméga 3",
+                "quantite": "1",
+                "glu": 0.005,
+                "prot": 0,
+                "lip": 0.01,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.001,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.prozis.com/fr/fr/prozis/omega-3-360-softgels"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 2",
+            "lignes": [
+              {
+                "nom": "Epinard (surgelé)",
+                "quantite": "150",
+                "glu": 3.6,
+                "prot": 5.1,
+                "lip": 0.3,
+                "fib": 4.05,
+                "cal": 48,
+                "prix": 0.21000000000000005,
+                "remarques": "",
+                "id": "d24138a5-0a5c-4c23-94c0-988948ede4e5",
+                "url": "https://www.auchan.fr/auchan-epinards-haches/pr-C1178255"
+              },
+              {
+                "nom": "Crevettes",
+                "quantite": "100",
+                "glu": 0.5,
+                "prot": 22,
+                "lip": 0.5,
+                "fib": 0,
+                "cal": 95,
+                "prix": 1.32,
+                "remarques": "",
+                "id": "86d37954-45f5-4609-98c8-c403cc0f91da",
+                "url": "https://www.auchan.fr/auchan-le-poissonnier-crevettes-entieres-cuites-refrigerees/pr-C1348288"
+              },
+              {
+                "nom": "Huile d’olive",
+                "quantite": "10",
+                "glu": 0.03,
+                "prot": 0.03,
+                "lip": 10,
+                "fib": 0.03,
+                "cal": 90,
+                "prix": 0.12,
+                "remarques": "Cuisson moyenne température",
+                "id": "6959a303-f5a0-428e-9fe6-d3813e017a7e",
+                "url": "https://www.auchan.fr/auchan-huile-d-olive-vierge-extra-origine-espagne/pr-C1227331"
+              },
+              {
+                "nom": "Mélatonine",
+                "quantite": "1",
+                "glu": 0,
+                "prot": 0,
+                "lip": 0,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.0011,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.prozis.com/fr/fr/prozis/melatonine-19-mg-90-gelules"
+              },
+              {
+                "nom": "Gaba",
+                "quantite": "1",
+                "glu": 0,
+                "prot": 0,
+                "lip": 0,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.0022,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.prozis.com/fr/fr/prozis/gaba-750-mg-60-veg-caps"
+              },
+              {
+                "nom": "Oméga 3",
+                "quantite": "1",
+                "glu": 0.005,
+                "prot": 0,
+                "lip": 0.01,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.001,
+                "remarque": "",
+                "remarques": "okkkk",
+                "url": "https://www.prozis.com/fr/fr/prozis/omega-3-360-softgels"
+              }
+            ]
+          },
+          {
+            "titre": "Variante 3",
+            "lignes": [
+              {
+                "nom": "Ratatouille (surgelé)",
+                "quantite": "150",
+                "glu": 6.9,
+                "prot": 2.1,
+                "lip": 4.95,
+                "fib": 2.55,
+                "cal": 85.5,
+                "prix": 0.57,
+                "remarques": "",
+                "id": "1e4525aa-a474-4f19-83ce-1efd51f5b411",
+                "url": "https://www.auchan.fr/auchan-ratatouille-cuisinee/pr-C1177577"
+              },
+              {
+                "nom": "Saumon",
+                "quantite": "120",
+                "glu": 0.96,
+                "prot": 25.2,
+                "lip": 14.4,
+                "fib": 0.6,
+                "cal": 242.4,
+                "prix": 2.856,
+                "remarques": "Poisson gras",
+                "id": "6a8127c8-ebe5-44d2-a07a-34d98c139810",
+                "url": "https://www.auchan.fr/auchan-paves-de-saumon-d-atlantique-sans-peau-et-sans-aretes/pr-C1173611"
+              },
+              {
+                "nom": "Huile d’olive",
+                "quantite": "10",
+                "glu": 0.03,
+                "prot": 0.03,
+                "lip": 10,
+                "fib": 0.03,
+                "cal": 90,
+                "prix": 0.12,
+                "remarques": "Cuisson moyenne température",
+                "id": "908e984d-d6bf-4740-bb3a-2b4b381fa7c4",
+                "url": "https://www.auchan.fr/auchan-huile-d-olive-vierge-extra-origine-espagne/pr-C1227331"
+              },
+              {
+                "nom": "Oméga 3",
+                "quantite": "1",
+                "glu": 0.005,
+                "prot": 0,
+                "lip": 0.01,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.001,
+                "remarques": "okkkk",
+                "id": "ec590cfa-a653-4a89-a61f-faceaa569f6b",
+                "url": "https://www.prozis.com/fr/fr/prozis/omega-3-360-softgels"
+              },
+              {
+                "nom": "Gaba",
+                "quantite": "1",
+                "glu": 0,
+                "prot": 0,
+                "lip": 0,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.0022,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.prozis.com/fr/fr/prozis/gaba-750-mg-60-veg-caps"
+              },
+              {
+                "nom": "Mélatonine",
+                "quantite": "1",
+                "glu": 0,
+                "prot": 0,
+                "lip": 0,
+                "fib": 0,
+                "cal": 0,
+                "prix": 0.0011,
+                "remarque": "",
+                "remarques": "",
+                "url": "https://www.prozis.com/fr/fr/prozis/melatonine-19-mg-90-gelules"
+              }
+            ]
+          }
+        ],
+        "avant_coucher": []
+      }
+    }
+  ]
+}
