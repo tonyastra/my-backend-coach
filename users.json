@@ -1,0 +1,34 @@
+[
+  {
+    "email": "antho@gmail.com",
+    "password": "$2b$10$XYf3ZMmGKUBbDxBPSprlHeWEp/IdR1ikZfbd.teqr1WbCh/Dvghsa",
+    "security": {
+      "question": "Quel est le nom de votre premier animal ?",
+      "answer": "rex"
+    }
+  },
+  {
+    "email": "celine.maillotte@gmail.com",
+    "password": "$2b$10$ZvzGnirol35Ylactw6cVAucX3Eq8skHLElN6Gc4Z4YTwF1SQKXkz.",
+    "securityQuestion": "Quel est le nom de votre premier animal ?",
+    "securityAnswer": "Tigrou"
+  },
+  {
+    "email": "flobimb@gmail.com",
+    "password": "$2b$10$zZKW07eEw.X0pM8hyiAb.unERu0IarDSCXyVFiba/cg.zJARiBRgG",
+    "securityQuestion": "Dans quelle ville êtes-vous né(e) ?",
+    "securityAnswer": "Lyon"
+  },
+  {
+    "email": "srimbaud07@hotmail.com",
+    "password": "$2b$10$TtlZ/uCPqIETVBosgjFia.V88vClXCDACp192KorQ/17ZOMWq1V6y",
+    "securityQuestion": "Quel est le nom de votre instituteur(trice) en primaire ?",
+    "securityAnswer": "Madame Dupont"
+  },
+  {
+    "email": "axel.carlana@gmail.com",
+    "password": "$2b$10$khodU4EBLayfE2CwhzUszOGFMIm0fpHzUD8gMqLJ5ks4PNZCvutUm",
+    "securityQuestion": "",
+    "securityAnswer": ""
+  }
+]
