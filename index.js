@@ -142,7 +142,7 @@ app.post('/login', (req, res) => {
   // 🆗 Connexion réussie — création d’un token JWT avec rôle "client"
   const token = jwt.sign(
     { email: user.email, role: 'client' },
-    'secret123',
+    process.env.JWT_SECRET,
     { expiresIn: '1h' }
   );
 
