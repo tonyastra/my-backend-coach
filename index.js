@@ -16,8 +16,7 @@ const PORT = process.env.PORT || 3001;
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 const admin = require('firebase-admin');
 
-
-const serviceAccount = require(path.join(__dirname, 'config', 'serviceAccountKey.json'));
+const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
