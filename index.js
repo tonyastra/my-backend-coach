@@ -334,6 +334,7 @@ app.post('/login', async (req, res) => {
 // 🔁 Nouvelle route pour Firestore
 app.post('/register', async (req, res) => {
   console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
+  console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
 
   const {
     email, password,
