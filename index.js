@@ -13,6 +13,26 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+const admin = require('firebase-admin');
+
+
+const serviceAccount = require(path.join(__dirname, 'config', 'serviceAccountKey.json'));
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
@@ -73,6 +93,12 @@ app.get('/protected', authenticateToken, (req, res) => {
   res.json({ message: `Bienvenue, ${req.user.email}. Ceci est une route protégée.` });
 });
 
+
+
+
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Fonction n°1 
 
@@ -110,44 +136,93 @@ function authenticateToken(req, res, next) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 👨‍💼 Route n°3 — Connexion côté coach (et client)
 
-app.post('/login', (req, res) => {
-  // 🧾 Extraction des données reçues (email et mot de passe)
+// app.post('/login', (req, res) => {
+//   // 🧾 Extraction des données reçues (email et mot de passe)
+//   const { email, password } = req.body;
+
+//   // 🔐 Connexion spéciale "coach admin" en dur
+//   if (email === 'coach@admin.com' && password === 'coach123') {
+//     const token = jwt.sign(
+//       { email, role: 'coach' },                        // Payload avec rôle "coach"
+//       process.env.JWT_SECRET,                          // Clé secrète sécurisée
+//       { expiresIn: '1h' }                              // Expiration du token
+//     );
+//     return res.json({ message: "Connexion coach réussie", token });
+//   }
+
+//   // 📂 Sinon, lecture du fichier utilisateurs (clients)
+//   const users = JSON.parse(fs.readFileSync(USERS_FILE));
+//   const user = users.find(u => u.email === email);
+
+//   // ❌ Utilisateur non trouvé
+//   if (!user) {
+//     return res.status(400).json({ message: "Utilisateur non trouvé." });
+//   }
+
+//   // 🔑 Vérification du mot de passe
+//   const passwordMatch = bcrypt.compareSync(password, user.password);
+//   if (!passwordMatch) {
+//     return res.status(401).json({ message: "Mot de passe incorrect." });
+//   }
+
+//   // 🆗 Connexion réussie — création d’un token JWT avec rôle "client"
+//   const token = jwt.sign(
+//     { email: user.email, role: 'client' },
+//     process.env.JWT_SECRET,
+//     { expiresIn: '1h' }
+//   );
+
+//   // 📤 Envoi de la réponse avec le token
+//   res.json({ message: "Connexion réussie", token });
+// });
+
+
+// 🔁 Nouvelle route pour Firestore
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   // 🔐 Connexion spéciale "coach admin" en dur
   if (email === 'coach@admin.com' && password === 'coach123') {
     const token = jwt.sign(
-      { email, role: 'coach' },                        // Payload avec rôle "coach"
-      process.env.JWT_SECRET,                          // Clé secrète sécurisée
-      { expiresIn: '1h' }                              // Expiration du token
+      { email, role: 'coach' },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
     );
     return res.json({ message: "Connexion coach réussie", token });
   }
 
-  // 📂 Sinon, lecture du fichier utilisateurs (clients)
-  const users = JSON.parse(fs.readFileSync(USERS_FILE));
-  const user = users.find(u => u.email === email);
+  try {
+    // 🔍 Requête vers Firestore
+    const usersRef = db.collection('users'); // Assure-toi que ta collection s’appelle bien "users"
+    const snapshot = await usersRef.where('email', '==', email).limit(1).get();
 
-  // ❌ Utilisateur non trouvé
-  if (!user) {
-    return res.status(400).json({ message: "Utilisateur non trouvé." });
+    // ❌ Utilisateur non trouvé
+    if (snapshot.empty) {
+      return res.status(400).json({ message: "Utilisateur non trouvé." });
+    }
+
+    const userDoc = snapshot.docs[0];
+    const user = userDoc.data();
+
+    // 🔑 Vérification du mot de passe
+    const passwordMatch = bcrypt.compareSync(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Mot de passe incorrect." });
+    }
+
+    // 🆗 Connexion réussie — création du token
+    const token = jwt.sign(
+      { email: user.email, role: 'client' },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({ message: "Connexion réussie", token });
+
+  } catch (error) {
+    console.error("🔥 Erreur connexion Firestore :", error);
+    res.status(500).json({ message: "Erreur serveur." });
   }
-
-  // 🔑 Vérification du mot de passe
-  const passwordMatch = bcrypt.compareSync(password, user.password);
-  if (!passwordMatch) {
-    return res.status(401).json({ message: "Mot de passe incorrect." });
-  }
-
-  // 🆗 Connexion réussie — création d’un token JWT avec rôle "client"
-  const token = jwt.sign(
-    { email: user.email, role: 'client' },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  // 📤 Envoi de la réponse avec le token
-  res.json({ message: "Connexion réussie", token });
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// FIN GENERAL ///////////////////////////////////////////////////
@@ -176,10 +251,90 @@ app.post('/login', (req, res) => {
 
 // 🧍‍♂️ Route POST n°1_Client — Inscription d'un client
 
-app.post('/register', (req, res) => {
+// app.post('/register', (req, res) => {
+//   console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
+
+//   // 🧾 Extraction des données envoyées dans la requête
+//   const {
+//     email, password,
+//     securityQuestion, securityAnswer,
+//     profil, mensurationProfil, hygieneVie, objectifs,
+//     medical, physio, nutrition, activite,
+//     psychomotivation, preference
+//   } = req.body;
+
+//   // ❌ Vérifie que l'email et le mot de passe sont bien présents
+//   if (!email || !password) {
+//     return res.status(400).json({ message: 'Email et mot de passe requis.' });
+//   }
+
+//   // 📂 Lecture du fichier des utilisateurs existants
+//   let users = [];
+//   if (fs.existsSync(USERS_FILE)) {
+//     const data = fs.readFileSync(USERS_FILE);
+//     users = JSON.parse(data);
+//   }
+
+//   // ❌ Vérifie si l'utilisateur existe déjà
+//   const userExists = users.find(user => user.email === email);
+//   if (userExists) {
+//     return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+//   }
+
+//   // 🔐 Hachage du mot de passe
+//   const hashedPassword = bcrypt.hashSync(password, 10);
+
+//   // 🆕 Création du nouvel utilisateur de base
+//   const newUser = {
+//     email,
+//     password: hashedPassword,
+//     securityQuestion,
+//     securityAnswer
+//   };
+
+//   // ➕ Ajout à la liste et sauvegarde dans le fichier users.json
+//   users.push(newUser);
+//   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+
+//   // 📁 Création du dossier client individuel
+//   if (!fs.existsSync(dossiersPath)) {
+//     fs.mkdirSync(dossiersPath, { recursive: true });
+//   }
+
+//   // 🧼 Nettoyage de l'email pour l'utiliser comme nom de fichier
+//   const sanitizedEmail = email.replace(/[@.]/g, '_');
+//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+
+//   // 🗃️ Structure du dossier personnel du client
+//   const dossier = {
+//     email,
+//     profil: profil ? [profil] : [],
+//     mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+//     hygieneVie: hygieneVie ? [hygieneVie] : [],
+//     objectifs: objectifs ? [objectifs] : [],
+//     medical: medical ? [medical] : [],
+//     physio: physio ? [physio] : [],
+//     nutrition: nutrition ? [nutrition] : [],
+//     activite: activite ? [activite] : [],
+//     preference: preference ? [preference] : [],
+//     mensurations: [],       // 📝 Historique de mensurations à venir
+//     entrainements: [],      // 🏋️‍♂️ Historique d'entraînements
+//     performances: [],       // 📊 Suivi de performances
+//     dietes: []              // 🍽️ Suivi de régimes/dietes
+//   };
+
+//   // 💾 Sauvegarde du dossier client dans un fichier
+//   console.log("📦 Dossier client enregistré :", dossier);
+//   fs.writeFileSync(dossierPath, JSON.stringify(dossier, null, 2));
+
+//   // ✅ Réponse au client
+//   res.status(201).json({ message: 'Utilisateur enregistré avec succès.' });
+// });
+
+// 🔁 Nouvelle route pour Firestore
+app.post('/register', async (req, res) => {
   console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
 
-  // 🧾 Extraction des données envoyées dans la requête
   const {
     email, password,
     securityQuestion, securityAnswer,
@@ -188,73 +343,64 @@ app.post('/register', (req, res) => {
     psychomotivation, preference
   } = req.body;
 
-  // ❌ Vérifie que l'email et le mot de passe sont bien présents
   if (!email || !password) {
     return res.status(400).json({ message: 'Email et mot de passe requis.' });
   }
 
-  // 📂 Lecture du fichier des utilisateurs existants
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    const data = fs.readFileSync(USERS_FILE);
-    users = JSON.parse(data);
+  try {
+    const usersRef = db.collection('users');
+    const snapshot = await usersRef.where('email', '==', email).get();
+
+    if (!snapshot.empty) {
+      return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // Création de l'utilisateur dans Firestore
+    const newUserRef = await usersRef.add({
+      email,
+      password: hashedPassword,
+      security: {
+        question: securityQuestion,
+        answer: securityAnswer
+      }
+    });
+
+    // Structure du dossier personnel (Firestore: sous-collection ou doc dédié)
+    const dossier = {
+      email,
+      profil: profil ? [profil] : [],
+      mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+      hygieneVie: hygieneVie ? [hygieneVie] : [],
+      objectifs: objectifs ? [objectifs] : [],
+      medical: medical ? [medical] : [],
+      physio: physio ? [physio] : [],
+      nutrition: nutrition ? [nutrition] : [],
+      activite: activite ? [activite] : [],
+      preference: preference ? [preference] : [],
+      mensurations: [],
+      entrainements: [],
+      performances: [],
+      dietes: []
+    };
+
+    // Enregistrement du dossier client dans une collection "dossiers"
+    await db.collection('dossiers').doc(newUserRef.id).set(dossier);
+
+    res.status(201).json({ message: 'Utilisateur enregistré avec succès.' });
+
+  } catch (error) {
+    console.error("❌ Erreur lors de l'inscription :", error);
+    res.status(500).json({ message: "Erreur lors de l'inscription." });
   }
-
-  // ❌ Vérifie si l'utilisateur existe déjà
-  const userExists = users.find(user => user.email === email);
-  if (userExists) {
-    return res.status(409).json({ message: 'Utilisateur déjà existant.' });
-  }
-
-  // 🔐 Hachage du mot de passe
-  const hashedPassword = bcrypt.hashSync(password, 10);
-
-  // 🆕 Création du nouvel utilisateur de base
-  const newUser = {
-    email,
-    password: hashedPassword,
-    securityQuestion,
-    securityAnswer
-  };
-
-  // ➕ Ajout à la liste et sauvegarde dans le fichier users.json
-  users.push(newUser);
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-
-  // 📁 Création du dossier client individuel
-  if (!fs.existsSync(dossiersPath)) {
-    fs.mkdirSync(dossiersPath, { recursive: true });
-  }
-
-  // 🧼 Nettoyage de l'email pour l'utiliser comme nom de fichier
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-  const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-  // 🗃️ Structure du dossier personnel du client
-  const dossier = {
-    email,
-    profil: profil ? [profil] : [],
-    mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
-    hygieneVie: hygieneVie ? [hygieneVie] : [],
-    objectifs: objectifs ? [objectifs] : [],
-    medical: medical ? [medical] : [],
-    physio: physio ? [physio] : [],
-    nutrition: nutrition ? [nutrition] : [],
-    activite: activite ? [activite] : [],
-    preference: preference ? [preference] : [],
-    mensurations: [],       // 📝 Historique de mensurations à venir
-    entrainements: [],      // 🏋️‍♂️ Historique d'entraînements
-    performances: [],       // 📊 Suivi de performances
-    dietes: []              // 🍽️ Suivi de régimes/dietes
-  };
-
-  // 💾 Sauvegarde du dossier client dans un fichier
-  console.log("📦 Dossier client enregistré :", dossier);
-  fs.writeFileSync(dossierPath, JSON.stringify(dossier, null, 2));
-
-  // ✅ Réponse au client
-  res.status(201).json({ message: 'Utilisateur enregistré avec succès.' });
 });
+
+
+
+
+
+
 
 ////////////////////////////////////////// QUESTION SECRETE ///////////////////////////////////////////////////
 
