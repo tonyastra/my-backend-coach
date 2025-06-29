@@ -333,7 +333,6 @@ app.post('/login', async (req, res) => {
 // 🔁 Nouvelle route pour Firestore
 app.post('/register', async (req, res) => {
   console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
-  console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
 
   const {
     email, password,
@@ -347,18 +346,22 @@ app.post('/register', async (req, res) => {
     return res.status(400).json({ message: 'Email et mot de passe requis.' });
   }
 
-  try {
-    const usersRef = db.collection('users');
-    const snapshot = await usersRef.where('email', '==', email).get();
+  // Fonction pour transformer l'email en ID Firestore
+  const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+  const userId = emailToId(email);
 
-    if (!snapshot.empty) {
+  try {
+    const userDocRef = db.collection('users').doc(userId);
+    const userDoc = await userDocRef.get();
+
+    if (userDoc.exists) {
       return res.status(409).json({ message: 'Utilisateur déjà existant.' });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // Création de l'utilisateur dans Firestore
-    const newUserRef = await usersRef.add({
+    // Créer le document utilisateur dans users collection
+    await userDocRef.set({
       email,
       password: hashedPassword,
       security: {
@@ -367,8 +370,8 @@ app.post('/register', async (req, res) => {
       }
     });
 
-    // Structure du dossier personnel (Firestore: sous-collection ou doc dédié)
-    const dossier = {
+    // Construire le dossier_client
+    const dossierClient = {
       email,
       profil: profil ? [profil] : [],
       mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
@@ -385,8 +388,8 @@ app.post('/register', async (req, res) => {
       dietes: []
     };
 
-    // Enregistrement du dossier client dans une collection "dossiers"
-    await db.collection('dossiers').doc(newUserRef.id).set(dossier);
+    // Créer la sous-collection dossier_client avec un document userId
+    await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
 
     res.status(201).json({ message: 'Utilisateur enregistré avec succès.' });
 
@@ -409,7 +412,45 @@ app.post('/register', async (req, res) => {
 // ⚠️ Vérifie que l’email est fourni et que le fichier utilisateurs existe
 // ❌ Renvoie 404 si utilisateur ou question secrète absente
 // ✅ Renvoie la question secrète pour l’utilisateur trouvé
-app.post('/verify-security-question', (req, res) => {
+// app.post('/verify-security-question', (req, res) => {
+//   console.log('🔥 Requête reçue sur /verify-security-question');
+
+//   const { email } = req.body;
+//   console.log('📩 Email reçu :', email);
+
+//   if (!email) {
+//     console.log('⛔️ Email manquant');
+//     return res.status(400).json({ message: 'Email requis' });
+//   }
+
+//   let users = [];
+//   if (fs.existsSync(USERS_FILE)) {
+//     const fileContent = fs.readFileSync(USERS_FILE, 'utf8');
+//     users = JSON.parse(fileContent);
+//     console.log('📚 Utilisateurs chargés :', users.length);
+//   } else {
+//     console.log('❌ USERS_FILE introuvable :', USERS_FILE);
+//   }
+
+//   const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+//   console.log('👤 Utilisateur trouvé :', user ? '✅' : '❌');
+
+//   if (!user) {
+//     return res.status(404).json({ message: 'Aucun utilisateur trouvé avec cet email.' });
+//   }
+
+//   if (!user.security || !user.security.question) {
+//     console.log('❌ Pas de question secrète définie pour cet utilisateur');
+//     return res.status(404).json({ message: 'Aucune question trouvée pour cet utilisateur.' });
+//   }
+
+//   console.log('✅ Question retournée :', user.security.question);
+//   return res.json({ question: user.security.question });
+// });
+
+// ✅ Nouvelle route pour Firestore : /verify-security-question
+
+app.post('/verify-security-question', async (req, res) => {
   console.log('🔥 Requête reçue sur /verify-security-question');
 
   const { email } = req.body;
@@ -420,30 +461,33 @@ app.post('/verify-security-question', (req, res) => {
     return res.status(400).json({ message: 'Email requis' });
   }
 
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    const fileContent = fs.readFileSync(USERS_FILE, 'utf8');
-    users = JSON.parse(fileContent);
-    console.log('📚 Utilisateurs chargés :', users.length);
-  } else {
-    console.log('❌ USERS_FILE introuvable :', USERS_FILE);
+  try {
+    // 🔎 Recherche de l'utilisateur dans Firestore
+    const usersRef = db.collection('users');
+    const snapshot = await usersRef.where('email', '==', email.toLowerCase()).get();
+
+    if (snapshot.empty) {
+      console.log('❌ Aucun utilisateur trouvé avec cet email');
+      return res.status(404).json({ message: 'Aucun utilisateur trouvé avec cet email.' });
+    }
+
+    const userDoc = snapshot.docs[0];
+    const userData = userDoc.data();
+
+    if (!userData.security || !userData.security.question) {
+      console.log('❌ Pas de question secrète définie pour cet utilisateur');
+      return res.status(404).json({ message: 'Aucune question trouvée pour cet utilisateur.' });
+    }
+
+    console.log('✅ Question retournée :', userData.security.question);
+    return res.json({ question: userData.security.question });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération de l\'utilisateur :', error);
+    return res.status(500).json({ message: 'Erreur serveur' });
   }
-
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  console.log('👤 Utilisateur trouvé :', user ? '✅' : '❌');
-
-  if (!user) {
-    return res.status(404).json({ message: 'Aucun utilisateur trouvé avec cet email.' });
-  }
-
-  if (!user.security || !user.security.question) {
-    console.log('❌ Pas de question secrète définie pour cet utilisateur');
-    return res.status(404).json({ message: 'Aucune question trouvée pour cet utilisateur.' });
-  }
-
-  console.log('✅ Question retournée :', user.security.question);
-  return res.json({ question: user.security.question });
 });
+
 
 ///////////////////////////////////////// MAJ MDP QUESTION SECRETE ///////////////////////////////////////////////////
 
