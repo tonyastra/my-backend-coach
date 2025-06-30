@@ -434,79 +434,89 @@ app.post('/dossier/change-password', authenticateToken, async (req, res) => {
 // ✅ Route Firestore : Récupération du dossier du client connecté (via req.user.uid)
 app.get('/dossier', authenticateToken, async (req, res) => {
   try {
-    // Fonction pour transformer l'email en ID Firestore
-    const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+    if (!req.user || !req.user.role) {
+      return res.status(400).json({ message: 'Utilisateur non authentifié.' });
+    }
 
-    // Récupération de l'ID utilisateur
-    let userId;
-    if (req.user.uid) {
-      userId = req.user.uid;
-    } else if (req.user.email) {
-      userId = emailToId(req.user.email);
+    if (req.user.role === 'client') {
+      // Cas client : dossier personnel
+      const userId = req.user.uid;
+      const userRef = db.collection('users').doc(userId);
+      const dossierRef = userRef.collection('dossier_client').doc(userId);
+      const dossierDoc = await dossierRef.get();
+
+      if (!dossierDoc.exists) {
+        return res.status(404).json({ message: 'Dossier client non trouvé.' });
+      }
+
+      return res.json(dossierDoc.data());
+
+    } else if (req.user.role === 'coach') {
+      // Cas coach : récupérer tous les clients avec email + nom/prénom simplifiés
+
+      const usersSnapshot = await db.collection('users').get();
+
+      if (usersSnapshot.empty) {
+        return res.status(404).json({ message: 'Aucun utilisateur trouvé.' });
+      }
+
+      const dossiers = [];
+
+      for (const userDoc of usersSnapshot.docs) {
+        const userId = userDoc.id;
+        const userData = userDoc.data();
+
+        // Prend juste email + prénom + nom dans userData, évite d’aller chercher dossier_client ici
+        dossiers.push({
+          userId,
+          email: userData.email || null,
+          prenom: userData.prenom || 'Prénom inconnu',
+          nom: userData.nom || 'Nom inconnu',
+        });
+      }
+
+      return res.json(dossiers);
+
     } else {
-      return res.status(400).json({ message: 'Identifiant utilisateur introuvable.' });
+      return res.status(403).json({ message: 'Rôle utilisateur non autorisé.' });
     }
-
-    console.log("📂 Recherche Firestore du dossier client pour :", userId);
-
-    // Référence vers le document utilisateur
-    const userRef = db.collection('users').doc(userId);
-    const userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      console.warn("🚫 Utilisateur introuvable :", userId);
-      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-    }
-
-    // Référence vers la sous-collection dossier_client et le document userId
-    const dossierRef = userRef.collection('dossier_client').doc(userId);
-    const dossierDoc = await dossierRef.get();
-
-    if (!dossierDoc.exists) {
-      console.warn("🚫 Dossier client introuvable pour :", userId);
-      return res.status(404).json({ message: 'Dossier client non trouvé.' });
-    }
-
-    // Envoi du contenu du dossier client
-    res.json(dossierDoc.data());
 
   } catch (error) {
-    console.error("💥 Erreur Firestore lors de la récupération du dossier client :", error);
-    res.status(500).json({ message: 'Erreur lors de la récupération du dossier client.' });
+    console.error("Erreur récupération dossier :", error);
+    res.status(500).json({ message: 'Erreur serveur.' });
   }
 });
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Route POST n°1 BIS // CoachListClient.jsx – Génération du token client
-app.post('/api/generate-client-token', authenticateToken, (req, res) => {
-  console.log("🔐 [Backend] /api/generate-client-token appelé");
+app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
+  console.log("Backend /api/generate-client-token appelé");
 
-  const requestingUser = req.user; // { email, role, uid }
-  console.log("🔍 [Backend] utilisateur demandeur (coach):", requestingUser);
+  const requestingUser = req.user;
 
-  // Modification : suppression de la récupération de clientEmail depuis req.body
-  // On utilise directement req.user.uid (client authentifié)
-  
-  // Vérification rôle coach obligatoire
   if (requestingUser.role !== 'coach') {
-    console.log("⛔️ [Backend] accès refusé : utilisateur n'est pas coach");
     return res.status(403).json({ message: 'Accès refusé : vous devez être coach.' });
   }
 
-  // Utilisation du uid au lieu d’email pour le payload client
+  const { clientId } = req.body;
+  if (!clientId) {
+    return res.status(400).json({ message: "clientId requis." });
+  }
+
+  // Vérifie que client existe
+  const userDoc = await db.collection('users').doc(clientId).get();
+  if (!userDoc.exists) {
+    return res.status(404).json({ message: 'Client non trouvé.' });
+  }
+
   const clientPayload = {
-    uid: requestingUser.uid, // <-- ligne modifiée
+    uid: clientId,
     role: 'client',
   };
 
-  const tokenClient = jwt.sign(
-    clientPayload,
-    process.env.JWT_SECRET || 'secret123',
-    { expiresIn: '45m' }
-  );
+  const tokenClient = jwt.sign(clientPayload, process.env.JWT_SECRET || 'secret123', { expiresIn: '45m' });
 
-  console.log("✅ [Backend] Token client généré:", tokenClient);
+  console.log("Token client généré pour :", clientId);
 
   res.json({ tokenClient });
 });
