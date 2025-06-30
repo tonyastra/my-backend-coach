@@ -449,7 +449,6 @@ app.post('/register', async (req, res) => {
 // });
 
 // ✅ Nouvelle route pour Firestore : /verify-security-question
-
 app.post('/verify-security-question', async (req, res) => {
   console.log('🔥 Requête reçue sur /verify-security-question');
 
@@ -496,54 +495,99 @@ app.post('/verify-security-question', async (req, res) => {
 // ⚠️ Bloque après 3 tentatives erronées (compte temporairement bloqué)
 // 🔐 Hash du nouveau mot de passe avec bcrypt avant sauvegarde
 // 📂 Met à jour le fichier USERS_FILE avec le nouveau mot de passe hashé
+// app.post('/reset-password', async (req, res) => {
+//   console.log('🚦 Requête reçue: POST /reset-password');
+//   const { email, answer, newPassword } = req.body;
+//   console.log('📩 Requête de reset reçue pour:', email);
+
+//   if (!email || !answer || !newPassword) {
+//     return res.status(400).json({ message: 'Champs manquants' });
+//   }
+
+//   let users = [];
+//   if (fs.existsSync(USERS_FILE)) {
+//     users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+//   }
+
+//   console.log('📚 Emails existants:', users.map(u => u.email));
+
+//   const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+//   if (!user) {
+//     console.log('❌ Utilisateur non trouvé');
+//     return res.status(404).json({ message: 'Utilisateur introuvable.' });
+//   }
+
+//   if (!user.securityAnswer) {
+//     return res.status(400).json({ message: 'Aucune réponse de sécurité enregistrée.' });
+//   }
+
+//   if (!attempts[email]) attempts[email] = 0;
+//   if (attempts[email] >= 3) {
+//     return res.status(403).json({ message: 'Trop de tentatives. Compte temporairement bloqué.' });
+//   }
+
+//   if (user.securityAnswer.toLowerCase() !== answer.toLowerCase()) {
+//     attempts[email]++;
+//     console.log('❌ Réponse incorrecte. Tentative :', attempts[email]);
+//     return res.status(403).json({ message: 'Réponse incorrecte.' });
+//   }
+
+//   // Réponse correcte
+//   attempts[email] = 0;
+//   const hashedPassword = await bcrypt.hash(newPassword, 10);
+//   user.password = hashedPassword;
+
+//   const updatedUsers = users.map(u => (u.email === user.email ? user : u));
+//   fs.writeFileSync(USERS_FILE, JSON.stringify(updatedUsers, null, 2));
+
+//   console.log('✅ Mot de passe mis à jour avec succès');
+//   res.json({ message: 'Mot de passe mis à jour avec succès.' });
+// });
+
+
+// ✅ Route Firestore : Réinitialisation du mot de passe via question secrète
 app.post('/reset-password', async (req, res) => {
   console.log('🚦 Requête reçue: POST /reset-password');
+
   const { email, answer, newPassword } = req.body;
-  console.log('📩 Requête de reset reçue pour:', email);
+  console.log('📩 Tentative de reset pour :', email);
 
   if (!email || !answer || !newPassword) {
     return res.status(400).json({ message: 'Champs manquants' });
   }
 
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+  try {
+    const userId = email.toLowerCase().replace(/[@.]/g, '_');
+    const userDocRef = db.collection('users').doc(userId);
+    const userDoc = await userDocRef.get();
+
+    if (!userDoc.exists) {
+      console.log('❌ Utilisateur introuvable');
+      return res.status(404).json({ message: 'Utilisateur introuvable.' });
+    }
+
+    const userData = userDoc.data();
+
+    if (!userData.security || !userData.security.answer) {
+      return res.status(400).json({ message: 'Aucune réponse de sécurité enregistrée.' });
+    }
+
+    if (userData.security.answer.toLowerCase() !== answer.toLowerCase()) {
+      console.log('❌ Réponse incorrecte');
+      return res.status(403).json({ message: 'Réponse incorrecte.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await userDocRef.update({ password: hashedPassword });
+
+    console.log('✅ Mot de passe mis à jour avec succès');
+    res.json({ message: 'Mot de passe mis à jour avec succès.' });
+
+  } catch (error) {
+    console.error('❌ Erreur lors du reset password :', error);
+    res.status(500).json({ message: "Erreur serveur lors de la mise à jour du mot de passe." });
   }
-
-  console.log('📚 Emails existants:', users.map(u => u.email));
-
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-  if (!user) {
-    console.log('❌ Utilisateur non trouvé');
-    return res.status(404).json({ message: 'Utilisateur introuvable.' });
-  }
-
-  if (!user.securityAnswer) {
-    return res.status(400).json({ message: 'Aucune réponse de sécurité enregistrée.' });
-  }
-
-  if (!attempts[email]) attempts[email] = 0;
-  if (attempts[email] >= 3) {
-    return res.status(403).json({ message: 'Trop de tentatives. Compte temporairement bloqué.' });
-  }
-
-  if (user.securityAnswer.toLowerCase() !== answer.toLowerCase()) {
-    attempts[email]++;
-    console.log('❌ Réponse incorrecte. Tentative :', attempts[email]);
-    return res.status(403).json({ message: 'Réponse incorrecte.' });
-  }
-
-  // Réponse correcte
-  attempts[email] = 0;
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  user.password = hashedPassword;
-
-  const updatedUsers = users.map(u => (u.email === user.email ? user : u));
-  fs.writeFileSync(USERS_FILE, JSON.stringify(updatedUsers, null, 2));
-
-  console.log('✅ Mot de passe mis à jour avec succès');
-  res.json({ message: 'Mot de passe mis à jour avec succès.' });
 });
 
 ////////////////////////////////////////// MAJ MDP SIMPLE ///////////////////////////////////////////////////
@@ -553,6 +597,42 @@ app.post('/reset-password', async (req, res) => {
 // ⚠️ Refuse la modification si le mot de passe actuel est incorrect
 // 🔐 Hash le nouveau mot de passe avec bcrypt avant sauvegarde
 // 📂 Met à jour le fichier USERS_FILE avec le nouveau mot de passe hashé
+// app.post('/dossier/:email/change-password', async (req, res) => {
+//   const email = req.params.email.toLowerCase();
+//   const { currentPassword, newPassword } = req.body;
+
+//   if (!currentPassword || !newPassword) {
+//     return res.status(400).json({ message: 'Champs manquants' });
+//   }
+
+//   let users = [];
+//   if (fs.existsSync(USERS_FILE)) {
+//     users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+//   }
+
+//   const user = users.find(u => u.email.toLowerCase() === email);
+//   if (!user) {
+//     return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+//   }
+
+//   // Vérification du mot de passe actuel
+//   const validPassword = await bcrypt.compare(currentPassword, user.password);
+//   if (!validPassword) {
+//     return res.status(403).json({ message: 'Mot de passe actuel incorrect.' });
+//   }
+
+//   // Hash du nouveau mot de passe
+//   const hashedPassword = await bcrypt.hash(newPassword, 10);
+//   user.password = hashedPassword;
+
+//   // Sauvegarde des données mises à jour dans USERS_FILE
+//   const updatedUsers = users.map(u => (u.email === user.email ? user : u));
+//   fs.writeFileSync(USERS_FILE, JSON.stringify(updatedUsers, null, 2));
+
+//   return res.json({ message: 'Mot de passe changé avec succès.' });
+// });
+
+// ✅ Route Firestore : Changement de mot de passe avec vérification de l'ancien mot de passe
 app.post('/dossier/:email/change-password', async (req, res) => {
   const email = req.params.email.toLowerCase();
   const { currentPassword, newPassword } = req.body;
@@ -561,31 +641,35 @@ app.post('/dossier/:email/change-password', async (req, res) => {
     return res.status(400).json({ message: 'Champs manquants' });
   }
 
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+  try {
+    const userId = email.replace(/[@.]/g, '_');
+    const userDocRef = db.collection('users').doc(userId);
+    const userDoc = await userDocRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    }
+
+    const userData = userDoc.data();
+
+    // Vérification du mot de passe actuel
+    const validPassword = await bcrypt.compare(currentPassword, userData.password);
+    if (!validPassword) {
+      return res.status(403).json({ message: 'Mot de passe actuel incorrect.' });
+    }
+
+    // Hash du nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Mise à jour dans Firestore
+    await userDocRef.update({ password: hashedPassword });
+
+    return res.json({ message: 'Mot de passe changé avec succès.' });
+
+  } catch (error) {
+    console.error('❌ Erreur lors du changement de mot de passe :', error);
+    return res.status(500).json({ message: "Erreur serveur lors du changement de mot de passe." });
   }
-
-  const user = users.find(u => u.email.toLowerCase() === email);
-  if (!user) {
-    return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-  }
-
-  // Vérification du mot de passe actuel
-  const validPassword = await bcrypt.compare(currentPassword, user.password);
-  if (!validPassword) {
-    return res.status(403).json({ message: 'Mot de passe actuel incorrect.' });
-  }
-
-  // Hash du nouveau mot de passe
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  user.password = hashedPassword;
-
-  // Sauvegarde des données mises à jour dans USERS_FILE
-  const updatedUsers = users.map(u => (u.email === user.email ? user : u));
-  fs.writeFileSync(USERS_FILE, JSON.stringify(updatedUsers, null, 2));
-
-  return res.json({ message: 'Mot de passe changé avec succès.' });
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -607,35 +691,68 @@ app.post('/dossier/:email/change-password', async (req, res) => {
 // Route GET n°1 // CoachListClient.jsx
 
 // 🔍 Route GET pour récupérer tous les dossiers clients côté coach
-app.get('/dossiers', (req, res) => {
-  const dossiersDir = path.join(__dirname, 'data', 'dossiers');
+// app.get('/dossiers', (req, res) => {
+//   const dossiersDir = path.join(__dirname, 'data', 'dossiers');
 
-  // 🔁 Lecture du dossier contenant tous les fichiers clients
-  fs.readdir(dossiersDir, (err, files) => {
-    if (err) {
-      console.error('❌ Erreur lecture du dossier clients :', err);
-      return res.status(500).json({ message: 'Erreur serveur lors de la lecture des dossiers clients.' });
+//   // 🔁 Lecture du dossier contenant tous les fichiers clients
+//   fs.readdir(dossiersDir, (err, files) => {
+//     if (err) {
+//       console.error('❌ Erreur lecture du dossier clients :', err);
+//       return res.status(500).json({ message: 'Erreur serveur lors de la lecture des dossiers clients.' });
+//     }
+
+//     // 🧹 Filtrage uniquement des fichiers .json (chaque fichier représente un client)
+//     const dossiers = files
+//       .filter(file => file.endsWith('.json'))
+//       .map(file => {
+//         const filePath = path.join(dossiersDir, file);
+
+//         try {
+//           const content = fs.readFileSync(filePath, 'utf-8');
+//           return JSON.parse(content);
+//         } catch (err) {
+//           console.error(`⚠️ Erreur parsing JSON pour le fichier ${file} :`, err);
+//           return null; // En cas d'erreur, on retourne null
+//         }
+//       })
+//       .filter(dossier => dossier !== null); // 🔐 On supprime les éléments null du tableau final
+
+//     // ✅ Réponse : envoi de la liste complète des dossiers
+//     res.json(dossiers);
+//   });
+// });
+
+// ✅ Route Firestore : Récupération de tous les dossiers clients (depuis chaque sous-collection dossier_client)
+app.get('/dossiers', async (req, res) => {
+  console.log('📥 Requête reçue : GET /dossiers');
+
+  try {
+    const usersSnapshot = await db.collection('users').get();
+    const dossiers = [];
+
+    for (const userDoc of usersSnapshot.docs) {
+      const userId = userDoc.id;
+      const dossierSnapshot = await db
+        .collection('users')
+        .doc(userId)
+        .collection('dossier_client')
+        .doc(userId)
+        .get();
+
+      if (dossierSnapshot.exists) {
+        dossiers.push(dossierSnapshot.data());
+      } else {
+        console.warn(`⚠️ Aucun dossier_client pour l'utilisateur ${userId}`);
+      }
     }
 
-    // 🧹 Filtrage uniquement des fichiers .json (chaque fichier représente un client)
-    const dossiers = files
-      .filter(file => file.endsWith('.json'))
-      .map(file => {
-        const filePath = path.join(dossiersDir, file);
-
-        try {
-          const content = fs.readFileSync(filePath, 'utf-8');
-          return JSON.parse(content);
-        } catch (err) {
-          console.error(`⚠️ Erreur parsing JSON pour le fichier ${file} :`, err);
-          return null; // En cas d'erreur, on retourne null
-        }
-      })
-      .filter(dossier => dossier !== null); // 🔐 On supprime les éléments null du tableau final
-
-    // ✅ Réponse : envoi de la liste complète des dossiers
+    console.log(`✅ ${dossiers.length} dossiers récupérés`);
     res.json(dossiers);
-  });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des dossiers :', error);
+    res.status(500).json({ message: 'Erreur serveur lors de la récupération des dossiers.' });
+  }
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
