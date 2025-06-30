@@ -804,32 +804,69 @@ app.post('/api/generate-client-token', authenticateToken, (req, res) => {
 // Route GET n°2 // Récupération des informations complètes d’un client
 // 📄 Récupère le dossier JSON complet d’un client via son email
 
-app.get('/dossier/:email', (req, res) => {
+// app.get('/dossier/:email', (req, res) => {
+//   const { email } = req.params;
+
+//   // 🧼 Sécurisation du nom de fichier en remplaçant les caractères spéciaux
+//   const sanitizedEmail = email.replace(/[@.]/g, '_');
+//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+
+//   console.log("📂 Recherche du fichier client :", dossierPath);
+
+//   // ❌ Vérification de l'existence du fichier
+//   if (!fs.existsSync(dossierPath)) {
+//     console.warn("🚫 Fichier introuvable pour :", sanitizedEmail);
+//     return res.status(404).json({ message: 'Dossier non trouvé.' });
+//   }
+
+//   try {
+//     // 📖 Lecture et parsing du fichier JSON
+//     const data = fs.readFileSync(dossierPath, 'utf-8');
+//     const dossier = JSON.parse(data);
+
+//     // ✅ Renvoi du contenu complet du dossier client
+//     res.json(dossier);
+
+//   } catch (err) {
+//     console.error("💥 Erreur lecture/parsing du dossier client :", err);
+//     res.status(500).json({ message: "Erreur lors de la récupération du dossier client." });
+//   }
+// });
+
+// 🔥 Récupération du dossier client depuis Firestore
+app.get('/dossier/:email', async (req, res) => {
   const { email } = req.params;
+  const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
 
-  // 🧼 Sécurisation du nom de fichier en remplaçant les caractères spéciaux
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-  const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-  console.log("📂 Recherche du fichier client :", dossierPath);
-
-  // ❌ Vérification de l'existence du fichier
-  if (!fs.existsSync(dossierPath)) {
-    console.warn("🚫 Fichier introuvable pour :", sanitizedEmail);
-    return res.status(404).json({ message: 'Dossier non trouvé.' });
-  }
+  console.log("📂 Recherche Firestore du dossier client pour :", sanitizedEmail);
 
   try {
-    // 📖 Lecture et parsing du fichier JSON
-    const data = fs.readFileSync(dossierPath, 'utf-8');
-    const dossier = JSON.parse(data);
+    // 🔎 Référence vers le document utilisateur
+    const userRef = db.collection('users').doc(sanitizedEmail);
+    const userDoc = await userRef.get();
 
-    // ✅ Renvoi du contenu complet du dossier client
-    res.json(dossier);
+    if (!userDoc.exists) {
+      console.warn("🚫 Utilisateur introuvable :", sanitizedEmail);
+      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    }
 
-  } catch (err) {
-    console.error("💥 Erreur lecture/parsing du dossier client :", err);
-    res.status(500).json({ message: "Erreur lors de la récupération du dossier client." });
+    // 🔎 Référence vers la sous-collection dossier_client et le document avec le même ID
+    const dossierRef = userRef.collection('dossier_client').doc(sanitizedEmail);
+    const dossierDoc = await dossierRef.get();
+
+    if (!dossierDoc.exists) {
+      console.warn("🚫 Dossier client introuvable pour :", sanitizedEmail);
+      return res.status(404).json({ message: 'Dossier client non trouvé.' });
+    }
+
+    const dossierData = dossierDoc.data();
+
+    // ✅ Envoi du contenu du dossier client
+    res.json(dossierData);
+
+  } catch (error) {
+    console.error("💥 Erreur Firestore lors de la récupération du dossier client :", error);
+    res.status(500).json({ message: 'Erreur lors de la récupération du dossier client.' });
   }
 });
 
@@ -838,30 +875,61 @@ app.get('/dossier/:email', (req, res) => {
 // Route GET n°3 // Récupération des entrainements d’un client
 // 🏋️‍♂️ Renvoie uniquement le tableau des entrainements du client
 
-app.get('/dossier/:email/entrainements', (req, res) => {
+// app.get('/dossier/:email/entrainements', (req, res) => {
+//   const { email } = req.params;
+
+//   // 🧼 Nettoyage de l'email pour un nom de fichier safe
+//   const sanitizedEmail = email.replace(/[@.]/g, '_');
+//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+
+//   // ❌ Vérifie si le fichier existe
+//   if (!fs.existsSync(dossierPath)) {
+//     console.warn("❌ Dossier introuvable pour :", sanitizedEmail);
+//     return res.status(404).json({ message: "Dossier non trouvé." });
+//   }
+
+//   try {
+//     // 📖 Lecture du fichier JSON
+//     const data = fs.readFileSync(dossierPath, 'utf-8');
+//     const dossier = JSON.parse(data);
+
+//     // ✅ Envoi uniquement des entrainements
+//     res.json(dossier.entrainements || []);
+
+//   } catch (err) {
+//     console.error("💥 Erreur lecture/parsing entrainements :", err);
+//     res.status(500).json({ message: "Erreur serveur lors de la récupération des entrainements." });
+//   }
+// });
+
+// 🔥 Récupération des entraînements d’un client depuis Firestore
+app.get('/dossier/:email/entrainements', async (req, res) => {
   const { email } = req.params;
+  const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
 
-  // 🧼 Nettoyage de l'email pour un nom de fichier safe
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-  const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-  // ❌ Vérifie si le fichier existe
-  if (!fs.existsSync(dossierPath)) {
-    console.warn("❌ Dossier introuvable pour :", sanitizedEmail);
-    return res.status(404).json({ message: "Dossier non trouvé." });
-  }
+  console.log("📂 Recherche des entraînements pour :", sanitizedEmail);
 
   try {
-    // 📖 Lecture du fichier JSON
-    const data = fs.readFileSync(dossierPath, 'utf-8');
-    const dossier = JSON.parse(data);
+    // 🔎 Référence vers le document utilisateur
+    const userRef = db.collection('users').doc(sanitizedEmail);
 
-    // ✅ Envoi uniquement des entrainements
-    res.json(dossier.entrainements || []);
+    // 🔎 Référence vers le dossier client (dans la sous-collection)
+    const dossierRef = userRef.collection('dossier_client').doc(sanitizedEmail);
+    const dossierDoc = await dossierRef.get();
 
-  } catch (err) {
-    console.error("💥 Erreur lecture/parsing entrainements :", err);
-    res.status(500).json({ message: "Erreur serveur lors de la récupération des entrainements." });
+    if (!dossierDoc.exists) {
+      console.warn("❌ Dossier client introuvable pour :", sanitizedEmail);
+      return res.status(404).json({ message: "Dossier client non trouvé." });
+    }
+
+    const dossierData = dossierDoc.data();
+
+    // ✅ Envoi uniquement du tableau des entraînements
+    res.json(dossierData.entrainements || []);
+
+  } catch (error) {
+    console.error("💥 Erreur lors de la récupération des entraînements :", error);
+    res.status(500).json({ message: "Erreur serveur lors de la récupération des entraînements." });
   }
 });
 
@@ -869,38 +937,80 @@ app.get('/dossier/:email/entrainements', (req, res) => {
 // Route GET n°4 // Récupération des diètes d’un client
 // 🍽️ Renvoie uniquement le tableau des diètes du client
 
-app.get('/dossier/:email/dietes', (req, res) => {
+// app.get('/dossier/:email/dietes', (req, res) => {
+//   const rawEmail = req.params.email;
+
+//   // 🔓 Décodage d’un email encodé dans l’URL (ex: %40 pour @)
+//   const decodedEmail = decodeURIComponent(rawEmail);
+
+//   // 🧼 Remplacement des caractères spéciaux pour générer un nom de fichier valide
+//   const sanitizedEmail = decodedEmail.replace(/[@.]/g, '_');
+//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+
+//   // ❌ Vérifie l’existence du fichier
+//   if (!fs.existsSync(dossierPath)) {
+//     console.error('❌ Fichier introuvable:', dossierPath);
+//     return res.status(404).json({ message: "Dossier non trouvé." });
+//   }
+
+//   try {
+//     // 📖 Lecture du fichier
+//     const data = fs.readFileSync(dossierPath, 'utf-8');
+
+//     // 🚫 Vérifie si le fichier est vide
+//     if (!data || data.trim().length === 0) {
+//       console.error('📛 Fichier JSON vide !');
+//       return res.status(400).json({ message: "Fichier vide." });
+//     }
+
+//     // 🔍 Parse du JSON
+//     const dossier = JSON.parse(data);
+
+//     // 🚫 Vérifie si la clé "dietes" existe
+//     if (!dossier.dietes) {
+//       console.error('🚫 Clé "dietes" manquante dans le dossier');
+//       return res.status(400).json({ message: 'Clé "dietes" absente dans le dossier.' });
+//     }
+
+//     // ✅ Réponse avec les diètes
+//     res.json(dossier.dietes);
+
+//   } catch (err) {
+//     console.error('💥 Erreur lecture/parse JSON:', err.message);
+//     return res.status(400).json({ message: "Erreur traitement dossier.", error: err.message });
+//   }
+// });
+// 🔥 Récupération des diètes d’un client depuis Firestore
+app.get('/dossier/:email/dietes', async (req, res) => {
   const rawEmail = req.params.email;
 
-  // 🔓 Décodage d’un email encodé dans l’URL (ex: %40 pour @)
+  // 🔓 Décodage de l’email encodé dans l’URL
   const decodedEmail = decodeURIComponent(rawEmail);
 
-  // 🧼 Remplacement des caractères spéciaux pour générer un nom de fichier valide
-  const sanitizedEmail = decodedEmail.replace(/[@.]/g, '_');
-  const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+  // 🧼 Transformation de l’email pour correspondre à l’ID Firestore
+  const sanitizedEmail = decodedEmail.toLowerCase().replace(/[@.]/g, '_');
 
-  // ❌ Vérifie l’existence du fichier
-  if (!fs.existsSync(dossierPath)) {
-    console.error('❌ Fichier introuvable:', dossierPath);
-    return res.status(404).json({ message: "Dossier non trouvé." });
-  }
+  console.log("📂 Requête de récupération des diètes pour :", sanitizedEmail);
 
   try {
-    // 📖 Lecture du fichier
-    const data = fs.readFileSync(dossierPath, 'utf-8');
+    const dossierRef = db
+      .collection('users')
+      .doc(sanitizedEmail)
+      .collection('dossier_client')
+      .doc(sanitizedEmail);
 
-    // 🚫 Vérifie si le fichier est vide
-    if (!data || data.trim().length === 0) {
-      console.error('📛 Fichier JSON vide !');
-      return res.status(400).json({ message: "Fichier vide." });
+    const dossierSnap = await dossierRef.get();
+
+    if (!dossierSnap.exists) {
+      console.error('❌ Document Firestore introuvable pour :', sanitizedEmail);
+      return res.status(404).json({ message: "Dossier non trouvé." });
     }
 
-    // 🔍 Parse du JSON
-    const dossier = JSON.parse(data);
+    const dossier = dossierSnap.data();
 
-    // 🚫 Vérifie si la clé "dietes" existe
+    // 🚫 Vérifie si la clé "dietes" est absente ou vide
     if (!dossier.dietes) {
-      console.error('🚫 Clé "dietes" manquante dans le dossier');
+      console.error('🚫 Clé "dietes" absente dans le document Firestore');
       return res.status(400).json({ message: 'Clé "dietes" absente dans le dossier.' });
     }
 
@@ -908,8 +1018,8 @@ app.get('/dossier/:email/dietes', (req, res) => {
     res.json(dossier.dietes);
 
   } catch (err) {
-    console.error('💥 Erreur lecture/parse JSON:', err.message);
-    return res.status(400).json({ message: "Erreur traitement dossier.", error: err.message });
+    console.error('💥 Erreur récupération/parse Firestore :', err.message);
+    return res.status(500).json({ message: "Erreur serveur lors du traitement du dossier.", error: err.message });
   }
 });
 
@@ -918,47 +1028,124 @@ app.get('/dossier/:email/dietes', (req, res) => {
 // Route GET n°5 // Récupération des mensurations d’un client
 // 📏 Renvoie uniquement le tableau des mensurations du dossier client
 
-app.get('/dossier/:email/mensurations', (req, res) => {
-  const { email } = req.params;
+// app.get('/dossier/:email/mensurations', (req, res) => {
+//   const { email } = req.params;
 
-  // 🧼 Sanitize l'email pour créer un nom de fichier sécurisé
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-  const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+//   // 🧼 Sanitize l'email pour créer un nom de fichier sécurisé
+//   const sanitizedEmail = email.replace(/[@.]/g, '_');
+//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
 
-  // ❌ Vérifie que le fichier du dossier client existe
-  if (!fs.existsSync(dossierPath)) {
-    console.warn(`🚫 Dossier introuvable pour : ${sanitizedEmail}`);
-    return res.status(404).json({ message: "Dossier non trouvé." });
-  }
+//   // ❌ Vérifie que le fichier du dossier client existe
+//   if (!fs.existsSync(dossierPath)) {
+//     console.warn(`🚫 Dossier introuvable pour : ${sanitizedEmail}`);
+//     return res.status(404).json({ message: "Dossier non trouvé." });
+//   }
+
+//   try {
+//     // 📖 Lecture et parsing du fichier
+//     const data = fs.readFileSync(dossierPath);
+//     const dossier = JSON.parse(data);
+
+//     // ✅ Envoi des mensurations seulement
+//     res.json(dossier.mensurations);
+//   } catch (err) {
+//     console.error('💥 Erreur lors de la lecture du fichier JSON :', err.message);
+//     res.status(500).json({ message: "Erreur lors de la récupération des mensurations." });
+//   }
+// });
+
+// 🔥 Récupération des mensurations d’un client depuis Firestore
+app.get('/dossier/:email/mensurations', async (req, res) => {
+  const rawEmail = req.params.email;
+
+  // 🔓 Décodage et nettoyage de l’email
+  const decodedEmail = decodeURIComponent(rawEmail);
+  const sanitizedEmail = decodedEmail.toLowerCase().replace(/[@.]/g, '_');
+
+  console.log(`📦 Requête mensurations pour : ${sanitizedEmail}`);
 
   try {
-    // 📖 Lecture et parsing du fichier
-    const data = fs.readFileSync(dossierPath);
-    const dossier = JSON.parse(data);
+    const dossierRef = db
+      .collection('users')
+      .doc(sanitizedEmail)
+      .collection('dossier_client')
+      .doc(sanitizedEmail);
 
-    // ✅ Envoi des mensurations seulement
+    const dossierSnap = await dossierRef.get();
+
+    // ❌ Vérifie que le document existe
+    if (!dossierSnap.exists) {
+      console.warn(`🚫 Dossier introuvable pour : ${sanitizedEmail}`);
+      return res.status(404).json({ message: "Dossier non trouvé." });
+    }
+
+    const dossier = dossierSnap.data();
+
+    // 🚫 Vérifie que la clé "mensurations" est bien présente
+    if (!dossier.mensurations) {
+      console.warn(`❌ Clé "mensurations" absente pour : ${sanitizedEmail}`);
+      return res.status(400).json({ message: 'Clé "mensurations" absente dans le dossier.' });
+    }
+
+    // ✅ Envoie des mensurations
     res.json(dossier.mensurations);
+
   } catch (err) {
-    console.error('💥 Erreur lors de la lecture du fichier JSON :', err.message);
-    res.status(500).json({ message: "Erreur lors de la récupération des mensurations." });
+    console.error('💥 Erreur Firestore - récupération des mensurations :', err.message);
+    res.status(500).json({ message: "Erreur lors de la récupération des mensurations.", error: err.message });
   }
 });
 
 ////////////////////////////////////////// SUIVI DIETES ///////////////////////////////////////////////////////
 
-app.get('/dossier/:email/suividiete', (req, res) => {
-  const email = req.params.email;
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-  const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+// app.get('/dossier/:email/suividiete', (req, res) => {
+//   const email = req.params.email;
+//   const sanitizedEmail = email.replace(/[@.]/g, '_');
+//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
 
-  if (!fs.existsSync(dossierPath)) {
-    return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+//   if (!fs.existsSync(dossierPath)) {
+//     return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+//   }
+
+//   const clientData = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
+//   const suivi = clientData.suiviDiete || {};
+
+//   res.json(suivi);
+// });
+
+// 🔥 Récupération du suivi diète d’un client depuis Firestore
+app.get('/dossier/:email/suividiete', async (req, res) => {
+  const rawEmail = req.params.email;
+  const decodedEmail = decodeURIComponent(rawEmail);
+  const sanitizedEmail = decodedEmail.toLowerCase().replace(/[@.]/g, '_');
+
+  console.log(`📥 Requête suivi diète pour : ${sanitizedEmail}`);
+
+  try {
+    const dossierRef = db
+      .collection('users')
+      .doc(sanitizedEmail)
+      .collection('dossier_client')
+      .doc(sanitizedEmail);
+
+    const dossierSnap = await dossierRef.get();
+
+    // ❌ Si aucun document trouvé
+    if (!dossierSnap.exists) {
+      console.warn(`🚫 Utilisateur non trouvé : ${sanitizedEmail}`);
+      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+    }
+
+    const clientData = dossierSnap.data();
+    const suivi = clientData.suiviDiete || {}; // ✅ Retourne un objet vide si inexistant
+
+    console.log(`✅ Suivi diète récupéré pour ${sanitizedEmail}`);
+    res.json(suivi);
+
+  } catch (err) {
+    console.error(`💥 Erreur Firestore - suivi diète :`, err.message);
+    res.status(500).json({ error: 'Erreur lors de la récupération du suivi diète.' });
   }
-
-  const clientData = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
-  const suivi = clientData.suiviDiete || {};
-
-  res.json(suivi);
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -980,71 +1167,146 @@ app.get('/dossier/:email/suividiete', (req, res) => {
 // 🔒 Protégée par un token (authenticateToken)
 // 📸 Permet l’upload de photos : face, dos, profil droit et gauche
 
+// app.post(
+//   '/dossier/:email/mensurations',
+//   authenticateToken,
+//   upload.fields([
+//     { name: 'photoFace' }, 
+//     { name: 'photoDos' },
+//     { name: 'photoProfilD' }, 
+//     { name: 'photoProfilG' }
+//   ]),
+//   (req, res) => {
+//     const rawEmail = req.params.email;
+
+//     const tokenEmail = req.user?.email;
+
+//     if (!tokenEmail || tokenEmail !== rawEmail) {
+//       console.warn(`❌ Accès interdit. Email dans le token (${tokenEmail}) ≠ cible (${rawEmail})`);
+//       return res.status(403).json({ message: 'Accès interdit : token ne correspond pas à l’email cible.' });
+//     }
+
+//     const sanitizedEmail = rawEmail.replace(/[@.]/g, '_');
+//     const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+
+//     // 🔍 Vérification de l’existence du dossier client
+//     if (!fs.existsSync(dossierPath)) {
+//       console.warn(`❌ Dossier client introuvable : ${sanitizedEmail}`);
+//       return res.status(404).json({ message: 'Dossier client introuvable.' });
+//     }
+
+//     // 📖 Lecture du fichier client
+//     const dossier = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
+
+//     // 🆕 Création de la nouvelle entrée mensuration
+//     const newEntry = {
+//       date: req.body.date,
+//       poids: req.body.poids || '',
+//       poitrine: req.body.poitrine || '',
+//       taille: req.body.taille || '',
+//       hanches: req.body.hanches || '',
+//       brasD: req.body.brasD || '',
+//       brasG: req.body.brasG || '',
+//       cuisseD: req.body.cuisseD || '',
+//       cuisseG: req.body.cuisseG || '',
+//       molletD: req.body.molletD || '',
+//       molletG: req.body.molletG || '',
+//       photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
+//       photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
+//       photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
+//       photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
+//     };
+
+//     // 🧹 Nettoyage (supprime les null éventuels) + ajout de la nouvelle entrée en début de tableau
+//     dossier.mensurations = dossier.mensurations.filter(Boolean);
+//     dossier.mensurations.unshift(newEntry);
+
+//     // 💾 Écriture du fichier mis à jour
+//     fs.writeFileSync(dossierPath, JSON.stringify(dossier, null, 2));
+
+//     // ✅ Réponse succès
+//     res.status(201).json({
+//       message: 'Mensuration ajoutée avec succès.',
+//       data: newEntry
+//     });
+//   }
+// );
+
+// 🔥 Ajout d’une mensuration dans Firestore
 app.post(
   '/dossier/:email/mensurations',
   authenticateToken,
   upload.fields([
-    { name: 'photoFace' }, 
+    { name: 'photoFace' },
     { name: 'photoDos' },
-    { name: 'photoProfilD' }, 
+    { name: 'photoProfilD' },
     { name: 'photoProfilG' }
   ]),
-  (req, res) => {
-    const rawEmail = req.params.email;
-
+  async (req, res) => {
+    const rawEmail = req.params.email.toLowerCase();
     const tokenEmail = req.user?.email;
 
+    // ❌ Vérification du token utilisateur
     if (!tokenEmail || tokenEmail !== rawEmail) {
-      console.warn(`❌ Accès interdit. Email dans le token (${tokenEmail}) ≠ cible (${rawEmail})`);
-      return res.status(403).json({ message: 'Accès interdit : token ne correspond pas à l’email cible.' });
+      console.warn(`❌ Accès interdit : token (${tokenEmail}) ≠ cible (${rawEmail})`);
+      return res.status(403).json({ message: 'Accès interdit : token invalide.' });
     }
 
     const sanitizedEmail = rawEmail.replace(/[@.]/g, '_');
-    const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
+    const dossierRef = db
+      .collection('users')
+      .doc(sanitizedEmail)
+      .collection('dossier_client')
+      .doc(sanitizedEmail);
 
-    // 🔍 Vérification de l’existence du dossier client
-    if (!fs.existsSync(dossierPath)) {
-      console.warn(`❌ Dossier client introuvable : ${sanitizedEmail}`);
-      return res.status(404).json({ message: 'Dossier client introuvable.' });
+    try {
+      const docSnap = await dossierRef.get();
+
+      if (!docSnap.exists) {
+        console.warn(`❌ Dossier introuvable pour : ${sanitizedEmail}`);
+        return res.status(404).json({ message: 'Dossier client introuvable.' });
+      }
+
+      const existingData = docSnap.data() || {};
+      const currentMensurations = existingData.mensurations || [];
+
+      // 🆕 Création d'une nouvelle entrée mensuration
+      const newEntry = {
+        date: req.body.date,
+        poids: req.body.poids || '',
+        poitrine: req.body.poitrine || '',
+        taille: req.body.taille || '',
+        hanches: req.body.hanches || '',
+        brasD: req.body.brasD || '',
+        brasG: req.body.brasG || '',
+        cuisseD: req.body.cuisseD || '',
+        cuisseG: req.body.cuisseG || '',
+        molletD: req.body.molletD || '',
+        molletG: req.body.molletG || '',
+        photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
+        photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
+        photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
+        photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
+      };
+
+      // 🧹 Suppression des mensurations vides puis ajout au début
+      const updatedMensurations = [newEntry, ...currentMensurations.filter(Boolean)];
+
+      // 📝 Mise à jour dans Firestore
+      await dossierRef.update({ mensurations: updatedMensurations });
+
+      // ✅ Réponse
+      res.status(201).json({
+        message: 'Mensuration ajoutée avec succès.',
+        data: newEntry
+      });
+
+    } catch (err) {
+      console.error(`💥 Erreur Firestore - ajout mensuration :`, err.message);
+      res.status(500).json({ message: "Erreur serveur lors de l’ajout de mensuration." });
     }
-
-    // 📖 Lecture du fichier client
-    const dossier = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
-
-    // 🆕 Création de la nouvelle entrée mensuration
-    const newEntry = {
-      date: req.body.date,
-      poids: req.body.poids || '',
-      poitrine: req.body.poitrine || '',
-      taille: req.body.taille || '',
-      hanches: req.body.hanches || '',
-      brasD: req.body.brasD || '',
-      brasG: req.body.brasG || '',
-      cuisseD: req.body.cuisseD || '',
-      cuisseG: req.body.cuisseG || '',
-      molletD: req.body.molletD || '',
-      molletG: req.body.molletG || '',
-      photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
-      photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
-      photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
-      photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
-    };
-
-    // 🧹 Nettoyage (supprime les null éventuels) + ajout de la nouvelle entrée en début de tableau
-    dossier.mensurations = dossier.mensurations.filter(Boolean);
-    dossier.mensurations.unshift(newEntry);
-
-    // 💾 Écriture du fichier mis à jour
-    fs.writeFileSync(dossierPath, JSON.stringify(dossier, null, 2));
-
-    // ✅ Réponse succès
-    res.status(201).json({
-      message: 'Mensuration ajoutée avec succès.',
-      data: newEntry
-    });
   }
 );
-
 
 
 
