@@ -434,11 +434,22 @@ app.post('/dossier/change-password', authenticateToken, async (req, res) => {
 // ✅ Route Firestore : Récupération du dossier du client connecté (via req.user.uid)
 app.get('/dossier', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.uid; // <-- On part du principe que l'ID doc Firestore est l'UID Firebase
+    // Fonction pour transformer l'email en ID Firestore
+    const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+
+    // Récupération de l'ID utilisateur
+    let userId;
+    if (req.user.uid) {
+      userId = req.user.uid;
+    } else if (req.user.email) {
+      userId = emailToId(req.user.email);
+    } else {
+      return res.status(400).json({ message: 'Identifiant utilisateur introuvable.' });
+    }
 
     console.log("📂 Recherche Firestore du dossier client pour :", userId);
 
-    // 🔎 Référence vers le document utilisateur
+    // Référence vers le document utilisateur
     const userRef = db.collection('users').doc(userId);
     const userDoc = await userRef.get();
 
@@ -447,7 +458,7 @@ app.get('/dossier', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Utilisateur non trouvé.' });
     }
 
-    // 🔎 Référence vers la sous-collection dossier_client et le document avec le même ID
+    // Référence vers la sous-collection dossier_client et le document userId
     const dossierRef = userRef.collection('dossier_client').doc(userId);
     const dossierDoc = await dossierRef.get();
 
@@ -456,10 +467,8 @@ app.get('/dossier', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Dossier client non trouvé.' });
     }
 
-    const dossierData = dossierDoc.data();
-
-    // ✅ Envoi du contenu du dossier client
-    res.json(dossierData);
+    // Envoi du contenu du dossier client
+    res.json(dossierDoc.data());
 
   } catch (error) {
     console.error("💥 Erreur Firestore lors de la récupération du dossier client :", error);
@@ -652,18 +661,13 @@ app.get('/dossier/suividiete', authenticateToken, async (req, res) => {
   }
 });
 
+////////////////////////////////////////// SUIVI PERFORMANCES ///////////////////////////////////////////////////////
 
-app.post('/dossier/performances', authenticateToken, async (req, res) => {
+app.get('/SuiviPerformanceClient', authenticateToken, async (req, res) => {
   try {
     const email = req.user.email.toLowerCase();
-    const { updates } = req.body;
-
-    // 🧪 Vérification des données
-    if (!Array.isArray(updates) || updates.length === 0) {
-      return res.status(400).json({ error: 'Aucune mise à jour fournie.' });
-    }
-
     const sanitizedEmail = email.replace(/[@.]/g, '_');
+
     const dossierRef = db
       .collection('users')
       .doc(sanitizedEmail)
@@ -676,35 +680,16 @@ app.post('/dossier/performances', authenticateToken, async (req, res) => {
     }
 
     const clientData = docSnap.data() || {};
-    const performances = Array.isArray(clientData.performances) ? [...clientData.performances] : [];
+    const performances = Array.isArray(clientData.performances) ? clientData.performances : [];
 
-    // 🔁 Mise à jour des performances
-    updates.forEach(update => {
-      const perf = performances.find(p => p.id === update.id);
-      if (perf) {
-        perf.charges = update.charges.filter(c =>
-          c.date &&
-          !isNaN(new Date(c.date)) &&
-          c.charge !== undefined &&
-          c.charge !== null &&
-          c.charge !== ''
-        );
-        console.log(`✅ Charges mises à jour pour performance ID ${update.id}`);
-      } else {
-        console.warn(`⚠️ Performance non trouvée pour ID : ${update.id}`);
-      }
-    });
-
-    // 💾 Sauvegarde
-    await dossierRef.update({ performances });
-
-    res.status(200).json({ message: 'Charges mises à jour avec succès.' });
+    res.status(200).json({ performances });
 
   } catch (err) {
-    console.error("💥 Erreur Firestore SuiviPerformanceClient:", err.message);
+    console.error("💥 Erreur Firestore lors de la récupération des performances :", err.message);
     res.status(500).json({ error: 'Erreur interne serveur.' });
   }
 });
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// POST AJOUTER DES INFOS ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
