@@ -739,13 +739,6 @@ app.post(
   }
 );
 
-
-///////////////// stand by iciiiii
-
-
-
-
-
 ///////////////////////////////////////// ENTRAINEMENTS /////////////////////////////////////////////////////
 
 // Route POST n°2 // Enregistrement d’un ou plusieurs entraînements pour un client
@@ -754,119 +747,18 @@ app.post(
 // 🏋️‍♂️ Gère les types d’entraînements classiques et cross-training (avec circuits)
 // 🔄 Met à jour les listes entrainements et performances dans le dossier client
 // ⚠️ Nécessite que le dossier client existe sinon renvoie 404
-// app.post('/RouteEnregistrementTraing', (req, res) => {
-//   console.log('Body reçu:', req.body);
-//   try {
-//     const { email, entrainements } = req.body;
-
-//     // Validation des données reçues
-//     if (!email) return res.status(400).json({ error: 'Email requis.' });
-//     if (!Array.isArray(entrainements) || entrainements.length === 0) {
-//       return res.status(400).json({ error: 'Entraînement vide.' });
-//     }
-
-//     const sanitizedEmail = email.replace(/[@.]/g, '_');
-//     const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-//     if (!fs.existsSync(dossierPath)) {
-//       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-//     }
-
-//     const clientData = JSON.parse(fs.readFileSync(dossierPath));
-//     clientData.entrainements = clientData.entrainements || [];
-//     clientData.performances = clientData.performances || [];
-
-//     entrainements.forEach((entraînement) => {
-//       const {
-//         date,
-//         muscle1,
-//         muscle2,
-//         muscle3,
-//         typeTraining = '',
-//         exercices = [],
-//         noteTraining = '',
-//       } = entraînement;
-
-//       if (typeTraining === 'cross-training') {
-//         const newId = uuidv4();
-
-//         // Formatage spécifique pour circuits cross-training
-//         const circuitsFormates = exercices.map((circuit) => ({
-//           nom: circuit.nom,
-//           tours: circuit.tours,
-//           on: circuit.on,
-//           off: circuit.off,
-//           exercices: circuit.exercices,
-//         }));
-
-//         clientData.entrainements.push({
-//           id: newId,
-//           date,
-//           muscle1,
-//           muscle2,
-//           muscle3,
-//           typeTraining,
-//           exercices: circuitsFormates,
-//           noteTraining
-//         });
-//       } else {
-//         const newId = uuidv4();
-
-//         // Entraînement classique musculation
-//         clientData.entrainements.push({
-//           id: newId,
-//           date,
-//           muscle1,
-//           muscle2,
-//           muscle3,
-//           typeTraining,
-//           exercices,
-//           noteTraining,
-//         });
-
-//         // Ajout des performances associées à chaque exercice
-//         exercices.forEach((exo) => {
-//           const perfId = uuidv4();
-
-//           clientData.performances.push({
-//             id: perfId,
-//             jourS: date,
-//             nom: exo.nom,
-//             series: exo.series,
-//             reps: exo.repetitions,
-//             charges: [
-//               {
-//                 date: new Date().toISOString().split('T')[0],
-//                 charge: 0
-//               }
-//             ]
-//           });
-//         });
-//       }
-//     });
-
-//     fs.writeFileSync(dossierPath, JSON.stringify(clientData, null, 2));
-//     res.status(201).json({ message: 'Entraînement enregistré avec succès.' });
-
-//   } catch (err) {
-//     console.error("Erreur serveur RouteEnregistrementTraing:", err);
-//     res.status(500).json({ error: 'Erreur interne serveur.' });
-//   }
-// });
-
-// 🔥 Route Firestore : Enregistrement des entraînements
-app.post('/RouteEnregistrementTraing', async (req, res) => {
+app.post('/RouteEnregistrementTraing', authenticateToken, async (req, res) => {
   console.log('📥 Body reçu:', req.body);
   try {
-    const { email, entrainements } = req.body;
+    const email = req.user.email.toLowerCase();
+    const { entrainements } = req.body;
 
     // 🧪 Validation
-    if (!email) return res.status(400).json({ error: 'Email requis.' });
     if (!Array.isArray(entrainements) || entrainements.length === 0) {
       return res.status(400).json({ error: 'Entraînement vide.' });
     }
 
-    const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
+    const sanitizedEmail = email.replace(/[@.]/g, '_');
     const dossierRef = db
       .collection('users')
       .doc(sanitizedEmail)
@@ -901,7 +793,6 @@ app.post('/RouteEnregistrementTraing', async (req, res) => {
       const newId = uuidv4();
 
       if (typeTraining === 'cross-training') {
-        // Format spécial pour le cross-training
         const circuitsFormates = exercices.map((circuit) => ({
           nom: circuit.nom,
           tours: circuit.tours,
@@ -922,7 +813,6 @@ app.post('/RouteEnregistrementTraing', async (req, res) => {
         });
 
       } else {
-        // Entraînement muscu classique
         nouveauxEntrainements.push({
           id: newId,
           date,
@@ -934,7 +824,6 @@ app.post('/RouteEnregistrementTraing', async (req, res) => {
           noteTraining,
         });
 
-        // Ajout des performances pour chaque exo
         exercices.forEach((exo) => {
           const perfId = uuidv4();
           nouvellesPerformances.push({
@@ -954,13 +843,11 @@ app.post('/RouteEnregistrementTraing', async (req, res) => {
       }
     });
 
-    // 📝 Mise à jour dans Firestore
     await dossierRef.update({
       entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
       performances: [...nouvellesPerformances, ...performancesActuelles],
     });
 
-    // ✅ Réponse OK
     res.status(201).json({ message: 'Entraînement enregistré avec succès.' });
 
   } catch (err) {
@@ -976,71 +863,17 @@ app.post('/RouteEnregistrementTraing', async (req, res) => {
 // 🔄 Si id fourni, met à jour la diète existante, sinon crée une nouvelle avec un id timestamp
 // ⚠️ Vérifie que le dossier client existe sinon renvoie 404
 // 📝 Met à jour le fichier JSON du client avec la nouvelle liste de diètes
-// app.post('/CoachDieteGenerator', (req, res) => {
-//   try {
-//     const { email, id, date, diete, kcalObjectif, mode } = req.body;
-
-//     if (!email) {
-//       return res.status(400).json({ error: 'Email requis.' });
-//     }
-
-//     if (!Array.isArray(diete) && typeof diete !== 'object') {
-//       return res.status(400).json({ error: 'Diete vide ou invalide.' });
-//     }
-
-//     const sanitizedEmail = email.replace(/[@.]/g, '_');
-//     const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-//     if (!fs.existsSync(dossierPath)) {
-//       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-//     }
-
-//     const clientData = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
-//     if (!Array.isArray(clientData.dietes)) {
-//       clientData.dietes = [];
-//     }
-
-//     if (id) {
-//       // Trouver et mettre à jour la diète existante
-//       const index = clientData.dietes.findIndex(d => d.id === id);
-//       if (index !== -1) {
-//         clientData.dietes[index] = { id, date, kcalObjectif, repas: diete };
-//       } else {
-//         // Si non trouvée, ajouter nouvelle
-//         clientData.dietes.push({ id, date, kcalObjectif, repas: diete });
-//       }
-//     } else {
-//       // Pas d'id, créer nouvelle diète avec id timestamp
-//       const newId = Date.now().toString();
-//       clientData.dietes.push({ id: newId, date, kcalObjectif, repas: diete });
-//     }
-
-//     fs.writeFileSync(dossierPath, JSON.stringify(clientData, null, 2));
-
-//     console.log("Diète sauvegardée avec succès !");
-//     res.status(201).json({ message: 'Diète sauvegardée avec succès.' });
-
-//   } catch (err) {
-//     console.error("Erreur serveur CoachDieteGenerator:", err);
-//     res.status(500).json({ error: 'Erreur interne serveur.' });
-//   }
-// });
-
-// ✅ Nouvelle version Firestore – Ajout ou mise à jour d’une diète dans Firestore (remplace l'ancienne version filesystem)
-app.post('/CoachDieteGenerator', async (req, res) => {
+app.post('/CoachDieteGenerator', authenticateToken, async (req, res) => {
   try {
-    const { email, id, date, diete, kcalObjectif, mode } = req.body;
+    const email = req.user.email.toLowerCase();
+    const { id, date, diete, kcalObjectif, mode } = req.body;
 
     // 🛡️ Validation des données reçues
-    if (!email) {
-      return res.status(400).json({ error: 'Email requis.' });
-    }
-
     if (!Array.isArray(diete) && typeof diete !== 'object') {
       return res.status(400).json({ error: 'Diète vide ou invalide.' });
     }
 
-    const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
+    const sanitizedEmail = email.replace(/[@.]/g, '_');
     const dossierRef = db
       .collection('users')
       .doc(sanitizedEmail)
@@ -1059,18 +892,17 @@ app.post('/CoachDieteGenerator', async (req, res) => {
     if (id) {
       // 🔄 Mise à jour de la diète existante
       const index = dietes.findIndex(d => d.id === id);
-      const updated = { id, date, kcalObjectif, repas: diete };
+      const updated = { id, date, kcalObjectif, repas: diete, mode };
 
       if (index !== -1) {
         dietes[index] = updated;
       } else {
         dietes.push(updated);
       }
-
     } else {
       // ➕ Ajout d’une nouvelle diète
       const newId = Date.now().toString();
-      dietes.push({ id: newId, date, kcalObjectif, repas: diete });
+      dietes.push({ id: newId, date, kcalObjectif, repas: diete, mode });
     }
 
     // 📥 Sauvegarde dans Firestore
@@ -1085,8 +917,6 @@ app.post('/CoachDieteGenerator', async (req, res) => {
   }
 });
 
-
-
 ///////////////////////////////////////////// PERFORMANCES /////////////////////////////////////////////////////
 
 // Route POST n°4 // Mise à jour des charges dans les performances d’un client
@@ -1094,63 +924,17 @@ app.post('/CoachDieteGenerator', async (req, res) => {
 // 🔄 Pour chaque update, remplace les charges de la performance correspondante par les nouvelles valides
 // ⚠️ Vérifie que le dossier client existe sinon renvoie 404
 // 📝 Enregistre les modifications dans le fichier JSON du client
-// app.post('/SuiviPerformanceClient', (req, res) => {
-//   try {
-//     const { email, updates } = req.body;
-
-//     if (!email) return res.status(400).json({ error: 'Email requis.' });
-//     if (!Array.isArray(updates) || updates.length === 0) {
-//       return res.status(400).json({ error: 'Aucune mise à jour fournie.' });
-//     }
-
-//     const sanitizedEmail = email.replace(/[@.]/g, '_');
-//     const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-//     if (!fs.existsSync(dossierPath)) {
-//       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-//     }
-
-//     const clientData = JSON.parse(fs.readFileSync(dossierPath));
-
-//     updates.forEach(update => {
-//       const perf = clientData.performances.find(p => p.id === update.id);
-//       if (perf) {
-//         // Remplace les anciennes charges par les nouvelles valides
-//         perf.charges = update.charges.filter(c =>
-//           c.date &&
-//           !isNaN(new Date(c.date)) &&
-//           c.charge !== undefined &&
-//           c.charge !== null &&
-//           c.charge !== ''
-//         );
-
-//         console.log(`Charges mises à jour pour performance ID ${update.id}`);
-//       } else {
-//         console.warn(`Performance non trouvée pour ID : ${update.id}`);
-//       }
-//     });
-
-//     fs.writeFileSync(dossierPath, JSON.stringify(clientData, null, 2));
-//     res.status(200).json({ message: 'Charges mises à jour avec succès.' });
-//   } catch (err) {
-//     console.error("Erreur serveur SuiviPerformanceClient:", err);
-//     res.status(500).json({ error: 'Erreur interne serveur.' });
-//   }
-// });
-
-// ✅ Nouvelle version Firestore – Mise à jour des charges de performances dans Firestore
-
-app.post('/SuiviPerformanceClient', async (req, res) => {
+app.post('/SuiviPerformanceClient', authenticateToken, async (req, res) => {
   try {
-    const { email, updates } = req.body;
+    const email = req.user.email.toLowerCase();
+    const { updates } = req.body;
 
-    // 🧪 Vérifications de base
-    if (!email) return res.status(400).json({ error: 'Email requis.' });
+    // 🧪 Vérification des données
     if (!Array.isArray(updates) || updates.length === 0) {
       return res.status(400).json({ error: 'Aucune mise à jour fournie.' });
     }
 
-    const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
+    const sanitizedEmail = email.replace(/[@.]/g, '_');
     const dossierRef = db
       .collection('users')
       .doc(sanitizedEmail)
@@ -1169,7 +953,6 @@ app.post('/SuiviPerformanceClient', async (req, res) => {
     updates.forEach(update => {
       const perf = performances.find(p => p.id === update.id);
       if (perf) {
-        // Filtrage des charges valides
         perf.charges = update.charges.filter(c =>
           c.date &&
           !isNaN(new Date(c.date)) &&
@@ -1183,7 +966,7 @@ app.post('/SuiviPerformanceClient', async (req, res) => {
       }
     });
 
-    // 💾 Sauvegarde dans Firestore
+    // 💾 Sauvegarde
     await dossierRef.update({ performances });
 
     res.status(200).json({ message: 'Charges mises à jour avec succès.' });
@@ -1198,66 +981,12 @@ app.post('/SuiviPerformanceClient', async (req, res) => {
 // Routes POST n°5 // 
 
 // 📌 Initialiser la journée de suiviDiete si elle n'existe pas
-// app.post('/dossier/:email/suividiete/init', (req, res) => {
-//   const email = req.params.email;
-//   if (!email) return res.status(400).json({ error: 'Email requis.' });
+app.post('/dossier/suividiete/init', authenticateToken, async (req, res) => {
+  const email = req.user.email.toLowerCase();
 
-//   const sanitizedEmail = email.replace(/[@.]/g, '_');
-//   const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-//   if (!fs.existsSync(dossierPath)) {
-//     return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-//   }
-
-//   const clientData = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
-//   const currentDate = new Date().toISOString().split('T')[0];
-
-//   if (!clientData.suiviDiete) {
-//     clientData.suiviDiete = {};
-//   }
-
-//   if (clientData.suiviDiete[currentDate]) {
-//     return res.status(200).json({ message: 'Journée déjà initialisée.' });
-//   }
-
-//   const repasTypes = [
-//     'matin',
-//     'collation_matin',
-//     'midi',
-//     'collation_aprem',
-//     'post_training',
-//     'soir',
-//     'avant_coucher',
-//   ];
-
-//   const nouveauJour = {
-//     commentaireJournee: ''
-//   };
-
-//   repasTypes.forEach(type => {
-//     nouveauJour[type] = {
-//       commentaire: '',
-//       aliments: []
-//     };
-//   });
-
-//   clientData.suiviDiete[currentDate] = nouveauJour;
-
-//   fs.writeFileSync(dossierPath, JSON.stringify(clientData, null, 2), 'utf-8');
-
-//   return res.status(200).json({
-//     message: 'Journée ajoutée dans suiviDiete',
-//     date: currentDate,
-//     structure: nouveauJour
-//   });
-// });
-
-// ✅ Nouvelle version Firestore – Initialisation d'une journée dans le suivi diététique
-app.post('/dossier/:email/suividiete/init', async (req, res) => {
-  const email = req.params.email;
   if (!email) return res.status(400).json({ error: 'Email requis.' });
 
-  const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
+  const sanitizedEmail = email.replace(/[@.]/g, '_');
   const dossierRef = db
     .collection('users')
     .doc(sanitizedEmail)
@@ -1332,73 +1061,19 @@ app.post('/dossier/:email/suividiete/init', async (req, res) => {
 // Route PUT n°1 // Mise à jour d’une diète spécifique dans le dossier client
 // 🔒 Protégée (idéalement à sécuriser avec un token)
 // 🥗 Met à jour la diète identifiée par son ID dans le dossier JSON du client
-// 🗃️ Modifie la date, repas, objectif kcal et mode d’alimentation
+// 🗃️ Modifie la date, repas, objectif kcal
 
-// app.put('/CoachDossierDiete', (req, res) => {
-//   try {
-//     const { id, email, date, diete, kcalObjectif, mode } = req.body;
-
-//     // Validation des données reçues
-//     if (!id) return res.status(400).json({ error: 'ID de la diète requis pour la mise à jour.' });
-//     if (!email) return res.status(400).json({ error: 'Email requis.' });
-//     if (!diete) return res.status(400).json({ error: 'Diète vide ou invalide.' });
-
-//     // Nettoyage de l'email pour correspondre au nom du fichier JSON
-//     const sanitizedEmail = email.replace(/[@.]/g, '_');
-//     const dossierPath = path.join(dossiersPath, `${sanitizedEmail}.json`);
-
-//     // Vérification de l'existence du dossier client
-//     if (!fs.existsSync(dossierPath)) {
-//       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-//     }
-
-//     // Lecture du dossier client
-//     const clientData = JSON.parse(fs.readFileSync(dossierPath, 'utf-8'));
-//     if (!Array.isArray(clientData.dietes)) {
-//       clientData.dietes = [];
-//     }
-
-//     // Recherche de la diète par son ID
-//     const index = clientData.dietes.findIndex(d => d.id === id);
-
-//     if (index !== -1) {
-//       // Mise à jour de la diète existante
-//       clientData.dietes[index] = {
-//         id,          // on conserve l'ID d'origine
-//         date,
-//         repas: diete,
-//         kcalObjectif,
-//         mode
-//       };
-//     } else {
-//       // Si la diète n'existe pas, on renvoie une erreur 404
-//       return res.status(404).json({ error: 'Diète non trouvée pour cet ID.' });
-//     }
-
-//     // Sauvegarde du dossier mis à jour
-//     fs.writeFileSync(dossierPath, JSON.stringify(clientData, null, 2));
-
-//     console.log("✅ Diète mise à jour avec succès !");
-//     res.status(200).json({ message: 'Diète mise à jour avec succès.' });
-
-//   } catch (err) {
-//     console.error("💥 Erreur serveur CoachDossierDiete:", err);
-//     res.status(500).json({ error: 'Erreur interne serveur.' });
-//   }
-// });
-
-// ✅ Nouvelle version Firestore – Mise à jour d’une diète existante dans le dossier client
-
-app.put('/CoachDossierDiete', async (req, res) => {
+app.put('/CoachDossierDiete', authenticateToken, async (req, res) => {
   try {
-    const { id, email, date, diete, kcalObjectif, mode } = req.body;
+    const email = req.user.email.toLowerCase();
+    const { id, date, diete, kcalObjectif } = req.body;
 
     // 🛡️ Validation
     if (!id) return res.status(400).json({ error: 'ID de la diète requis pour la mise à jour.' });
     if (!email) return res.status(400).json({ error: 'Email requis.' });
     if (!diete) return res.status(400).json({ error: 'Diète vide ou invalide.' });
 
-    const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
+    const sanitizedEmail = email.replace(/[@.]/g, '_');
 
     const dossierRef = db
       .collection('users')
@@ -1427,7 +1102,6 @@ app.put('/CoachDossierDiete', async (req, res) => {
       date,
       repas: diete,
       kcalObjectif,
-      mode
     };
 
     await dossierRef.update({ dietes });
@@ -1447,36 +1121,8 @@ app.put('/CoachDossierDiete', async (req, res) => {
 // 🏋️‍♂️ Remplace complètement la liste des entraînements dans le dossier client
 // 📂 Le dossier client est identifié par l’email (nettoyé pour nom de fichier)
 // 🔒 À sécuriser idéalement par un middleware d’authentification
-// app.put('/CoachDossierEntrainements/:email', (req, res) => {
-//   const email = req.params.email;
-//   const { entrainements } = req.body;
-
-//   if (!email || !entrainements || !Array.isArray(entrainements)) {
-//     return res.status(400).json({ error: 'Email ou entraînements invalides' });
-//   }
-
-//   const fileName = email.replace(/[@.]/g, '_') + '.json'; // Sécurise le nom de fichier
-//   const filePath = path.join(__dirname, 'data', 'dossiers', fileName);
-
-//   try {
-//     if (!fs.existsSync(filePath)) {
-//       return res.status(404).json({ error: "Fichier utilisateur introuvable" });
-//     }
-
-//     const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-//     data.entrainements = entrainements;
-//     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-
-//     return res.json({ message: 'Entraînements mis à jour avec succès' });
-//   } catch (error) {
-//     console.error("Erreur lors de la mise à jour :", error);
-//     return res.status(500).json({ error: "Erreur serveur : " + error.message });
-//   }
-// });
-
-// ✅ Nouvelle version Firestore – Remplacement complet des entraînements d’un utilisateur
-app.put('/CoachDossierEntrainements/:email', async (req, res) => {
-  const email = req.params.email;
+app.put('/CoachDossierEntrainements', authenticateToken, async (req, res) => {
+  const email = req.user.email;
   const { entrainements } = req.body;
 
   // 🔍 Validation des données
@@ -1507,21 +1153,6 @@ app.put('/CoachDossierEntrainements/:email', async (req, res) => {
     return res.status(500).json({ error: "Erreur Firestore : " + error.message });
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////// PROFIL /////////////////////////////////////////////////////
