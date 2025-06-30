@@ -651,6 +651,60 @@ app.get('/dossier/suividiete', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la récupération du suivi diète.' });
   }
 });
+
+
+app.post('/dossier/performances', authenticateToken, async (req, res) => {
+  try {
+    const email = req.user.email.toLowerCase();
+    const { updates } = req.body;
+
+    // 🧪 Vérification des données
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return res.status(400).json({ error: 'Aucune mise à jour fournie.' });
+    }
+
+    const sanitizedEmail = email.replace(/[@.]/g, '_');
+    const dossierRef = db
+      .collection('users')
+      .doc(sanitizedEmail)
+      .collection('dossier_client')
+      .doc(sanitizedEmail);
+
+    const docSnap = await dossierRef.get();
+    if (!docSnap.exists) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+    }
+
+    const clientData = docSnap.data() || {};
+    const performances = Array.isArray(clientData.performances) ? [...clientData.performances] : [];
+
+    // 🔁 Mise à jour des performances
+    updates.forEach(update => {
+      const perf = performances.find(p => p.id === update.id);
+      if (perf) {
+        perf.charges = update.charges.filter(c =>
+          c.date &&
+          !isNaN(new Date(c.date)) &&
+          c.charge !== undefined &&
+          c.charge !== null &&
+          c.charge !== ''
+        );
+        console.log(`✅ Charges mises à jour pour performance ID ${update.id}`);
+      } else {
+        console.warn(`⚠️ Performance non trouvée pour ID : ${update.id}`);
+      }
+    });
+
+    // 💾 Sauvegarde
+    await dossierRef.update({ performances });
+
+    res.status(200).json({ message: 'Charges mises à jour avec succès.' });
+
+  } catch (err) {
+    console.error("💥 Erreur Firestore SuiviPerformanceClient:", err.message);
+    res.status(500).json({ error: 'Erreur interne serveur.' });
+  }
+});
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// POST AJOUTER DES INFOS ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
