@@ -178,7 +178,10 @@ function authenticateToken(req, res, next) {
 
 // 🔁 Nouvelle route pour Firestore
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+
+  // 🧼 Nettoyage de l'email pour éviter les erreurs de saisie
+  email = email.trim().toLowerCase();
 
   // 🔐 Connexion spéciale "coach admin" en dur
   if (email === 'coach@admin.com' && password === 'coach123') {
@@ -191,11 +194,10 @@ app.post('/login', async (req, res) => {
   }
 
   try {
-    // 🔍 Requête vers Firestore
-    const usersRef = db.collection('users'); // Assure-toi que ta collection s’appelle bien "users"
+    // 🔍 Recherche utilisateur dans Firestore
+    const usersRef = db.collection('users');
     const snapshot = await usersRef.where('email', '==', email).limit(1).get();
 
-    // ❌ Utilisateur non trouvé
     if (snapshot.empty) {
       return res.status(400).json({ message: "Utilisateur non trouvé." });
     }
@@ -203,15 +205,20 @@ app.post('/login', async (req, res) => {
     const userDoc = snapshot.docs[0];
     const user = userDoc.data();
 
-    // 🔑 Vérification du mot de passe
-    const passwordMatch = bcrypt.compareSync(password, user.password);
+    // 🔑 Vérification du mot de passe (version async non bloquante)
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
     if (!passwordMatch) {
       return res.status(401).json({ message: "Mot de passe incorrect." });
     }
 
-    // 🆗 Connexion réussie — création du token
+    // ✅ Authentification réussie — génération du token
     const token = jwt.sign(
-      { email: user.email, role: 'client' },
+      {
+        email: user.email,
+        role: 'client',
+        uid: userDoc.id // ID Firestore utile pour les accès directs plus tard
+      },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -219,7 +226,7 @@ app.post('/login', async (req, res) => {
     res.json({ message: "Connexion réussie", token });
 
   } catch (error) {
-    console.error("🔥 Erreur connexion Firestore :", error);
+    console.error("🔥 Erreur lors de la connexion :", error);
     res.status(500).json({ message: "Erreur serveur." });
   }
 });
