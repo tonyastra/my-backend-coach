@@ -439,7 +439,7 @@ app.get('/dossier', authenticateToken, async (req, res) => {
     }
 
     if (req.user.role === 'client') {
-      // Cas client : dossier personnel
+      // Dossier personnel client
       const userId = req.user.uid;
       const userRef = db.collection('users').doc(userId);
       const dossierRef = userRef.collection('dossier_client').doc(userId);
@@ -452,41 +452,53 @@ app.get('/dossier', authenticateToken, async (req, res) => {
       return res.json(dossierDoc.data());
 
     } else if (req.user.role === 'coach') {
-      // Cas coach : récupérer tous les clients avec email + nom/prénom simplifiés
-
+      console.log('Role coach détecté, récupération des utilisateurs...');
       const usersSnapshot = await db.collection('users').get();
+      console.log(`Nombre d'utilisateurs récupérés : ${usersSnapshot.size}`);
 
       if (usersSnapshot.empty) {
+        console.log('Aucun utilisateur trouvé dans la collection users.');
         return res.status(404).json({ message: 'Aucun utilisateur trouvé.' });
       }
 
-      const dossiers = [];
+    const dossiers = [];
 
-      for (const userDoc of usersSnapshot.docs) {
-        const userId = userDoc.id;
-        const userData = userDoc.data();
+    for (const userDoc of usersSnapshot.docs) {
+      const userId = userDoc.id;
 
-        // Prend juste email + prénom + nom dans userData, évite d’aller chercher dossier_client ici
-        dossiers.push({
-          userId,
-          email: userData.email || null,
-          prenom: userData.prenom || 'Prénom inconnu',
-          nom: userData.nom || 'Nom inconnu',
-        });
-      }
+      const dossierDoc = await db.collection('users').doc(userId)
+                               .collection('dossier_client').doc(userId).get();
 
+      if (!dossierDoc.exists) continue;
+
+      const dossierData = dossierDoc.data();
+      console.log(`Dossier ${userId} :`, dossierData);
+
+      const email = dossierData.email || null;
+      const profil = dossierData.profil || [];
+      const objectifCli = dossierData.objectifs || [];
+
+      console.log(`Profil pour ${userId} :`, profil);
+
+      dossiers.push({
+        userId,
+        email,
+        prenom: profil?.[0]?.prenom || 'Prénom inconnu',
+        nom: profil?.[0]?.nom || 'Nom inconnu',
+        objectifs: objectifCli?.[0]?.objectif || 'objectif inconnu',
+      });
+    }
+      console.log('Dossiers compilés envoyés au front :', dossiers);
       return res.json(dossiers);
 
     } else {
       return res.status(403).json({ message: 'Rôle utilisateur non autorisé.' });
     }
-
   } catch (error) {
     console.error("Erreur récupération dossier :", error);
-    res.status(500).json({ message: 'Erreur serveur.' });
+    return res.status(500).json({ message: 'Erreur serveur.' });
   }
-});
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+});//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Route POST n°1 BIS // CoachListClient.jsx – Génération du token client
 app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
