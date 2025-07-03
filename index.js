@@ -26,12 +26,6 @@ const db = admin.firestore();
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
-
-
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
@@ -92,648 +86,221 @@ app.get('/protected', authenticateToken, (req, res) => {
   res.json({ message: `Bienvenue, ${req.user.email}. Ceci est une route protégée.` });
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////// GENERATION DES TOKENS ///////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * 🛡️ MIDDLEWARE : AUTHENTIFICATION PAR TOKEN JWT
+ * 
+ * Vérifie la présence et la validité d’un token JWT dans les headers `Authorization`.
+ * Si valide → attache les infos utilisateur à `req.user` et appelle `next()`
+ * Sinon → réponse 401 ou 403 selon le cas.
+ */
 
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// Fonction n°1 
-
-// 🔐 Middleware d’authentification token
+// Middleware d’authentification JWT
 function authenticateToken(req, res, next) {
+  // 🔍 Récupération du header Authorization
   const authHeader = req.headers['authorization'];
   console.log("🧾 [auth] Authorization Header:", authHeader);
 
+  // ✂️ Extraction du token depuis "Bearer <token>"
   const token = authHeader && authHeader.split(' ')[1];
   console.log("🔐 [auth] Token extrait :", token);
 
+  // ❌ Aucun token trouvé → accès refusé
   if (!token) {
     console.log("❌ [auth] Aucun token fourni !");
     return res.sendStatus(401); // Unauthorized
   }
 
+  // ✅ Vérification du token JWT
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
+      // ⏱️ Token expiré → réponse explicite
       if (err.name === 'TokenExpiredError') {
         console.log("❌ [auth] Token expiré !");
         return res.status(403).json({ message: 'Token expiré, veuillez vous reconnecter.' });
       }
+
+      // ❌ Autre erreur → token invalide
       console.log("❌ [auth] Erreur vérification token :", err.message);
       return res.sendStatus(403); // Forbidden
     }
 
     console.log("✅ [auth] Token valide, utilisateur :", user);
-    req.user = user;
-    next();
+
+    // 🚨 Vérification que la payload contient un ID utilisateur valide
+    if (!user || (!user.uid && !user.id && !user.userId)) {
+      console.log("❌ Payload JWT ne contient pas d'identifiant utilisateur valide");
+      return res.status(401).json({ message: "Token invalide : pas d'identifiant utilisateur." });
+    }
+
+    req.user = user; // On attache la payload décodée à req.user
+    next(); // 👣 Passage au middleware ou route suivant(e)
   });
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////// CONNEXION GENERAL ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 👨‍💼 Route n°3 — Connexion côté coach (et client)
 
+/**
+ * 🔐 ROUTE : AUTHENTIFICATION (LOGIN) UTILISATEUR
+ * 
+ * Cette route permet :
+ * - La connexion d’un client (stocké en base)
+ * - Une connexion spéciale "coach" avec un compte en dur
+ * 
+ * Retourne un token JWT pour les requêtes sécurisées par la suite.
+ */
 app.post('/login', async (req, res) => {
   let { email, password } = req.body;
 
-  // 🧼 Nettoyage de l'email pour éviter les erreurs de saisie
+  // 🧼 Nettoyage de l'email pour éviter les erreurs de saisie (majuscule, espace, etc.)
   email = email.trim().toLowerCase();
 
-  // 🔐 Connexion spéciale "coach admin" en dur
+  // 💼 CAS SPÉCIAL : Connexion d’un coach "admin" en dur (pas stocké en base)
   if (email === 'coach@admin.com' && password === 'coach123') {
-    const token = jwt.sign(
-      { email, role: 'coach' },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+      const token = jwt.sign(
+        { email, role: 'coach', uid: 'coach_admin_com' },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
     return res.json({ message: "Connexion coach réussie", token });
   }
 
   try {
-    // 🔍 Recherche utilisateur dans Firestore
+    // 🔍 Requête Firestore pour chercher l'utilisateur avec l'email fourni
     const usersRef = db.collection('users');
     const snapshot = await usersRef.where('email', '==', email).limit(1).get();
 
+    // ❌ Aucun utilisateur trouvé
     if (snapshot.empty) {
       return res.status(400).json({ message: "Utilisateur non trouvé." });
     }
 
+    // ✅ Utilisateur trouvé
     const userDoc = snapshot.docs[0];
     const user = userDoc.data();
 
-    // 🔑 Vérification du mot de passe (version async non bloquante)
+    // 🔑 Vérification du mot de passe (hashé vs saisie utilisateur)
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.status(401).json({ message: "Mot de passe incorrect." });
     }
 
-    // ✅ Authentification réussie — génération du token
+    // ✅ Connexion réussie → Génération d’un token JWT
     const token = jwt.sign(
       {
         email: user.email,
         role: 'client',
-        uid: userDoc.id // ID Firestore utile pour les accès directs plus tard
+        uid: userDoc.id // 🆔 ID Firestore (formatté depuis l'email, ex: john_doe_gmail_com)
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
+    // 📦 Réponse avec token pour le frontend
     res.json({ message: "Connexion réussie", token });
 
   } catch (error) {
+    // 🔥 Erreur serveur lors de la connexion
     console.error("🔥 Erreur lors de la connexion :", error);
     res.status(500).json({ message: "Erreur serveur." });
   }
 });
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////// FIN GENERAL ///////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////// COTE CLIENT ///////////////////////////////////////////////////
+/////////////////////////////////////// AFFICHAGE UNIVERSEL (GET)///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 🧍‍♂️ Route POST n°1_Client — Inscription d'un client
+/**
+ * 📂 ROUTE : RÉCUPÉRATION D'UN DOSSIER CLIENT
+ * 
+ * Cette route permet de récupérer un dossier client depuis Firestore.
+ * - 🔐 Requiert un token JWT valide (coach ou client)
+ * - 🔍 Si aucun `targetUserId` n’est précisé dans la query, l’utilisateur accède à son propre dossier
+ * - 🛡️ Un client ne peut accéder qu’à SON propre dossier
+ * - ✅ Un coach peut accéder à n’importe quel dossier
+ */
 
-app.post('/register', async (req, res) => {
-  console.log("📥 Requête reçue pour l'inscription d'un nouveau client");
-
-  const {
-    email, password,
-    securityQuestion, securityAnswer,
-    profil, mensurationProfil, hygieneVie, objectifs,
-    medical, physio, nutrition, activite,
-    preference
-  } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email et mot de passe requis.' });
-  }
-
-  // Fonction pour transformer l'email en ID Firestore
-  const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
-  const userId = emailToId(email);
-
+app.get('/dossiers', authenticateToken, async (req, res) => {
   try {
-    const userDocRef = db.collection('users').doc(userId);
-    const userDoc = await userDocRef.get();
+    const requesterRole = req.user.role;
+    const requesterId = req.user.uid || req.user.id || req.user.userId;
 
-    if (userDoc.exists) {
-      return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+    if (!requesterRole || !requesterId) {
+      return res.status(401).json({ message: "Utilisateur non authentifié." });
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
-
-    // Créer le document utilisateur dans users collection
-    await userDocRef.set({
-      email,
-      password: hashedPassword,
-      security: {
-        question: securityQuestion,
-        answer: securityAnswer
-      }
-    });
-
-    // Construire le dossier_client
-    const dossierClient = {
-      email,
-      profil: profil ? [profil] : [],
-      mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
-      hygieneVie: hygieneVie ? [hygieneVie] : [],
-      objectifs: objectifs ? [objectifs] : [],
-      medical: medical ? [medical] : [],
-      physio: physio ? [physio] : [],
-      nutrition: nutrition ? [nutrition] : [],
-      activite: activite ? [activite] : [],
-      preference: preference ? [preference] : [],
-      mensurations: [],
-      entrainements: [],
-      performances: [],
-      dietes: []
-    };
-
-    // Créer la sous-collection dossier_client avec un document userId
-    await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
-
-    res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
-
-  } catch (error) {
-    console.error("❌ Erreur lors de l'inscription :", error);
-    res.status(500).json({ message: "Erreur lors de l'inscription." });
-  }
-});
-
-////////////////////////////////////////// QUESTION SECRETE ///////////////////////////////////////////////////
-
-// Route POST n°2_Client // Vérifie et retourne la question secrète d’un utilisateur
-// 🔍 Reçoit l’email et recherche l’utilisateur dans USERS_FILE
-// ⚠️ Vérifie que l’email est fourni et que le fichier utilisateurs existe
-// ❌ Renvoie 404 si utilisateur ou question secrète absente
-// ✅ Renvoie la question secrète pour l’utilisateur trouvé
-app.post('/verify-security-question', async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ message: 'Email requis.' });
-  }
-
-  try {
-    const usersRef = db.collection('users');
-    const snapshot = await usersRef.where('email', '==', email.trim().toLowerCase()).limit(1).get();
-
-    if (snapshot.empty) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-    }
-
-    const userDoc = snapshot.docs[0];
-    const user = userDoc.data();
-
-    if (!user.security || !user.security.question) {
-      return res.status(404).json({ message: 'Aucune question trouvée pour cet utilisateur.' });
-    }
-
-    console.log('✅ Question retournée :', user.security.question);
-    return res.json({ question: user.security.question });
-
-  } catch (error) {
-    console.error('❌ Erreur lors de la récupération de la question :', error);
-    res.status(500).json({ message: 'Erreur serveur.' });
-  }
-});
-
-
-///////////////////////////////////////// MAJ MDP QUESTION SECRETE ///////////////////////////////////////////////////
-
-// Route POST n°3_Client // Réinitialise le mot de passe après vérification de la réponse à la question secrète
-// 🔒 Vérifie email, réponse à la question secrète et nouveau mot de passe
-// ⚠️ Bloque après 3 tentatives erronées (compte temporairement bloqué)
-// 🔐 Hash du nouveau mot de passe avec bcrypt avant sauvegarde
-// 📂 Met à jour le fichier USERS_FILE avec le nouveau mot de passe hashé
-app.post('/reset-password', async (req, res) => {
-  console.log('🚦 Requête reçue: POST /reset-password');
-
-  // Récupérer email depuis le body, pas depuis req.user
-  const { email, answer, newPassword } = req.body;
-
-  if (!email || !answer || !newPassword) {
-    return res.status(400).json({ message: 'Champs manquants' });
-  }
-
-  try {
-    // Adaptation si tu utilises email pour construire l’ID Firestore
-    const userId = email.toLowerCase().replace(/[@.]/g, '_');
-    const userDocRef = db.collection('users').doc(userId);
-    const userDoc = await userDocRef.get();
-
-    if (!userDoc.exists) {
-      console.log('❌ Utilisateur introuvable');
-      return res.status(404).json({ message: 'Utilisateur introuvable.' });
-    }
-
-    const userData = userDoc.data();
-
-    if (!userData.security || !userData.security.answer) {
-      return res.status(400).json({ message: 'Aucune réponse de sécurité enregistrée.' });
-    }
-
-    if (userData.security.answer.toLowerCase() !== answer.toLowerCase()) {
-      console.log('❌ Réponse incorrecte');
-      return res.status(403).json({ message: 'Réponse incorrecte.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await userDocRef.update({ password: hashedPassword });
-
-    console.log('✅ Mot de passe mis à jour avec succès');
-    res.json({ message: 'Mot de passe mis à jour avec succès.' });
-
-  } catch (error) {
-    console.error('❌ Erreur lors du reset password :', error);
-    res.status(500).json({ message: "Erreur serveur lors de la mise à jour du mot de passe." });
-  }
-});
-
-////////////////////////////////////////// MAJ MDP SIMPLE ///////////////////////////////////////////////////
-
-// Route POST n°4_Client // Mise à jour du mot de passe dans le profil client
-// 🔒 Vérifie l’email via paramètre d’URL et valide le mot de passe actuel
-// ⚠️ Refuse la modification si le mot de passe actuel est incorrect
-// 🔐 Hash le nouveau mot de passe avec bcrypt avant sauvegarde
-// 📂 Met à jour le fichier USERS_FILE avec le nouveau mot de passe hashé
-app.post('/dossier/change-password', authenticateToken, async (req, res) => {
-  const email = req.user.email.toLowerCase();
-  const { currentPassword, newPassword } = req.body;
-
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ message: 'Champs manquants' });
-  }
-
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-  }
-
-  const user = users.find(u => u.email.toLowerCase() === email);
-  if (!user) {
-    return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-  }
-
-  const validPassword = await bcrypt.compare(currentPassword, user.password);
-  if (!validPassword) {
-    return res.status(403).json({ message: 'Mot de passe actuel incorrect.' });
-  }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  user.password = hashedPassword;
-
-  const updatedUsers = users.map(u => (u.email.toLowerCase() === user.email.toLowerCase() ? user : u));
-  fs.writeFileSync(USERS_FILE, JSON.stringify(updatedUsers, null, 2));
-
-  return res.json({ message: 'Mot de passe changé avec succès.' });
-});
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////// FIN CLIENT ///////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////// GET RECUPERATION DES INFOS ///////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Route GET n°1 // CoachListClient.jsx
-
-// 🔍 Route GET pour récupérer tous les dossiers clients côté coach
-// ✅ Route Firestore : Récupération du dossier du client connecté (via req.user.uid)
-app.get('/dossier', authenticateToken, async (req, res) => {
-  try {
-    if (!req.user || !req.user.role) {
-      return res.status(400).json({ message: 'Utilisateur non authentifié.' });
-    }
-
-    if (req.user.role === 'client') {
-      // Dossier personnel client
-      const userId = req.user.uid;
-      const userRef = db.collection('users').doc(userId);
-      const dossierRef = userRef.collection('dossier_client').doc(userId);
-      const dossierDoc = await dossierRef.get();
+    if (requesterRole === 'client') {
+      // Client : on récupère juste SON dossier
+      const dossierDoc = await db
+        .collection('users')
+        .doc(requesterId)
+        .collection('dossier_client')
+        .doc(requesterId)
+        .get();
 
       if (!dossierDoc.exists) {
-        return res.status(404).json({ message: 'Dossier client non trouvé.' });
+        return res.status(404).json({ message: "Dossier non trouvé." });
       }
 
       return res.json(dossierDoc.data());
 
-    } else if (req.user.role === 'coach') {
-      console.log('Role coach détecté, récupération des utilisateurs...');
+    } else if (requesterRole === 'coach') {
+      // Coach : on récupère tous les dossiers clients
+
+      // Récupérer tous les users
       const usersSnapshot = await db.collection('users').get();
-      console.log(`Nombre d'utilisateurs récupérés : ${usersSnapshot.size}`);
 
-      if (usersSnapshot.empty) {
-        console.log('Aucun utilisateur trouvé dans la collection users.');
-        return res.status(404).json({ message: 'Aucun utilisateur trouvé.' });
-      }
+      // Pour chaque user, on récupère son dossier_client doc
+      const dossiersPromises = usersSnapshot.docs.map(async userDoc => {
+        const userId = userDoc.id;
+        const dossierDoc = await db
+          .collection('users')
+          .doc(userId)
+          .collection('dossier_client')
+          .doc(userId)
+          .get();
 
-    const dossiers = [];
-
-    for (const userDoc of usersSnapshot.docs) {
-      const userId = userDoc.id;
-
-      const dossierDoc = await db.collection('users').doc(userId)
-                               .collection('dossier_client').doc(userId).get();
-
-      if (!dossierDoc.exists) continue;
-
-      const dossierData = dossierDoc.data();
-      console.log(`Dossier ${userId} :`, dossierData);
-
-      const email = dossierData.email || null;
-      const profil = dossierData.profil || [];
-      const objectifCli = dossierData.objectifs || [];
-
-      console.log(`Profil pour ${userId} :`, profil);
-
-      dossiers.push({
-        userId,
-        email,
-        prenom: profil?.[0]?.prenom || 'Prénom inconnu',
-        nom: profil?.[0]?.nom || 'Nom inconnu',
-        objectifs: objectifCli?.[0]?.objectif || 'objectif inconnu',
+        if (dossierDoc.exists) {
+          return { userId, dossier: dossierDoc.data() };
+        }
+        return null;
       });
-    }
-      console.log('Dossiers compilés envoyés au front :', dossiers);
+
+      const dossiersResults = await Promise.all(dossiersPromises);
+      const dossiers = dossiersResults.filter(d => d !== null);
+
       return res.json(dossiers);
 
     } else {
-      return res.status(403).json({ message: 'Rôle utilisateur non autorisé.' });
+      return res.status(403).json({ message: "Rôle non autorisé." });
     }
-  } catch (error) {
-    console.error("Erreur récupération dossier :", error);
-    return res.status(500).json({ message: 'Erreur serveur.' });
-  }
-});//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Route POST n°1 BIS // CoachListClient.jsx – Génération du token client
-app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
-  console.log("Backend /api/generate-client-token appelé");
-
-  const requestingUser = req.user;
-
-  if (requestingUser.role !== 'coach') {
-    return res.status(403).json({ message: 'Accès refusé : vous devez être coach.' });
-  }
-
-  const { clientId } = req.body;
-  if (!clientId) {
-    return res.status(400).json({ message: "clientId requis." });
-  }
-
-  // Vérifie que client existe
-  const userDoc = await db.collection('users').doc(clientId).get();
-  if (!userDoc.exists) {
-    return res.status(404).json({ message: 'Client non trouvé.' });
-  }
-
-  const clientPayload = {
-    uid: clientId,
-    role: 'client',
-  };
-
-  const tokenClient = jwt.sign(clientPayload, process.env.JWT_SECRET || 'secret123', { expiresIn: '45m' });
-
-  console.log("Token client généré pour :", clientId);
-
-  res.json({ tokenClient });
-});
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// Route GET n°3 // Récupération des entrainements d’un client
-// 🏋️‍♂️ Renvoie uniquement le tableau des entrainements du client
-
-app.get('/dossier/entrainements', authenticateToken, async (req, res) => {
-  try {
-    // Récupération de l'email utilisateur depuis le token (middleware authenticateToken doit définir req.user)
-    const email = req.user.email.toLowerCase();
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-
-    console.log("📂 Recherche des entraînements pour :", sanitizedEmail);
-
-    // Référence vers le document utilisateur
-    const userRef = db.collection('users').doc(sanitizedEmail);
-
-    // Référence vers le dossier client (dans la sous-collection)
-    const dossierRef = userRef.collection('dossier_client').doc(sanitizedEmail);
-    const dossierDoc = await dossierRef.get();
-
-    if (!dossierDoc.exists) {
-      console.warn("❌ Dossier client introuvable pour :", sanitizedEmail);
-      return res.status(404).json({ message: "Dossier client non trouvé." });
-    }
-
-    const dossierData = dossierDoc.data();
-
-    // Envoi uniquement du tableau des entraînements
-    res.json(dossierData.entrainements || []);
 
   } catch (error) {
-    console.error("💥 Erreur lors de la récupération des entraînements :", error);
-    res.status(500).json({ message: "Erreur serveur lors de la récupération des entraînements." });
-  }
-});
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// Route GET n°4 // Récupération des diètes d’un client
-// 🍽️ Renvoie uniquement le tableau des diètes du client
-
-app.get('/dossier/dietes', authenticateToken, async (req, res) => {
-  try {
-    // Récupération de l'email utilisateur depuis le token (middleware authenticateToken doit définir req.user)
-    const email = req.user.email.toLowerCase();
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-
-    console.log("📂 Requête de récupération des diètes pour :", sanitizedEmail);
-
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const dossierSnap = await dossierRef.get();
-
-    if (!dossierSnap.exists) {
-      console.error('❌ Document Firestore introuvable pour :', sanitizedEmail);
-      return res.status(404).json({ message: "Dossier non trouvé." });
-    }
-
-    const dossier = dossierSnap.data();
-
-    if (!dossier.dietes) {
-      console.error('🚫 Clé "dietes" absente dans le document Firestore');
-      return res.status(400).json({ message: 'Clé "dietes" absente dans le dossier.' });
-    }
-
-    res.json(dossier.dietes);
-
-  } catch (err) {
-    console.error('💥 Erreur récupération/parse Firestore :', err.message);
-    return res.status(500).json({ message: "Erreur serveur lors du traitement du dossier.", error: err.message });
-  }
-});
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// Route GET n°5 // Récupération des mensurations d’un client
-// 📏 Renvoie uniquement le tableau des mensurations du dossier client
-
-app.get('/dossier/mensurations', authenticateToken, async (req, res) => {
-  try {
-    const email = req.user.email.toLowerCase();
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-
-    console.log(`📦 Requête mensurations pour : ${sanitizedEmail}`);
-
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const dossierSnap = await dossierRef.get();
-
-    if (!dossierSnap.exists) {
-      console.warn(`🚫 Dossier introuvable pour : ${sanitizedEmail}`);
-      return res.status(404).json({ message: "Dossier non trouvé." });
-    }
-
-    const dossier = dossierSnap.data();
-
-    if (!dossier.mensurations) {
-      console.warn(`❌ Clé "mensurations" absente pour : ${sanitizedEmail}`);
-      return res.status(400).json({ message: 'Clé "mensurations" absente dans le dossier.' });
-    }
-
-    res.json(dossier.mensurations);
-
-  } catch (err) {
-    console.error('💥 Erreur Firestore - récupération des mensurations :', err.message);
-    res.status(500).json({ message: "Erreur lors de la récupération des mensurations.", error: err.message });
-  }
-});
-
-////////////////////////////////////////// SUIVI DIETES ///////////////////////////////////////////////////////
-
-app.get('/dossier/suividiete', authenticateToken, async (req, res) => {
-  try {
-    const email = req.user.email.toLowerCase();
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-
-    console.log(`📥 Requête suivi diète pour : ${sanitizedEmail}`);
-
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const dossierSnap = await dossierRef.get();
-
-    if (!dossierSnap.exists) {
-      console.warn(`🚫 Utilisateur non trouvé : ${sanitizedEmail}`);
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = dossierSnap.data();
-    const suivi = clientData.suiviDiete || {}; // Retourne un objet vide si inexistant
-
-    console.log(`✅ Suivi diète récupéré pour ${sanitizedEmail}`);
-    res.json(suivi);
-
-  } catch (err) {
-    console.error(`💥 Erreur Firestore - suivi diète :`, err.message);
-    res.status(500).json({ error: 'Erreur lors de la récupération du suivi diète.' });
-  }
-});
-
-////////////////////////////////////////// SUIVI PERFORMANCES ///////////////////////////////////////////////////////
-
-app.get('/SuiviPerformanceClient', authenticateToken, async (req, res) => {
-  try {
-    const email = req.user.email.toLowerCase();
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const docSnap = await dossierRef.get();
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = docSnap.data() || {};
-    const performances = Array.isArray(clientData.performances) ? clientData.performances : [];
-
-    res.status(200).json({ performances });
-
-  } catch (err) {
-    console.error("💥 Erreur Firestore lors de la récupération des performances :", err.message);
-    res.status(500).json({ error: 'Erreur interne serveur.' });
+    console.error("Erreur récupération dossiers:", error);
+    return res.status(500).json({ message: "Erreur serveur." });
   }
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////// POST AJOUTER DES INFOS ///////////////////////////////////////////////////
+/////////////////////////////////// ENREGISTREMENT UNIVERSEL (POST) ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////// MENSURATIONS /////////////////////////////////////////////////////
-
-// Route POST n°1 // Ajout d'une nouvelle mensuration dans le dossier client
-// 🔒 Protégée par un token (authenticateToken)
-// 📸 Permet l’upload de photos : face, dos, profil droit et gauche
+/**
+ * 🚀 ROUTE GLOBALE : ENREGISTREMENT DOSSIER CLIENT (Nouveau client ou client connecté)
+ * 
+ * Cette route gère deux cas :
+ * 1. 📦 Cas 1 : Création d’un nouveau client (sans authentification) → section === 'nouveauClient'
+ * 2. 🔐 Cas 2 : Ajout/mise à jour de données client via les autres sections (requiert token JWT)
+ */
 
 app.post(
-  '/dossier/mensurations',
-  authenticateToken,
+  '/dossier/enregistrer',
   upload.fields([
     { name: 'photoFace' },
     { name: 'photoDos' },
@@ -741,399 +308,491 @@ app.post(
     { name: 'photoProfilG' }
   ]),
   async (req, res) => {
-    try {
-      const tokenEmail = req.user?.email;
+    const { section, data } = req.body;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 📦 Cas 1 — Création d’un nouveau client (pas encore connecté)
+     * Aucun token nécessaire ici.
+     */
+    if (section === 'nouveauClient') {
+      try {
+        const {
+          email, password,
+          securityQuestion, securityAnswer,
+          profil, mensurationProfil, hygieneVie, objectifs,
+          medical, physio, nutrition, activite, preference
+        } = typeof data === 'string' ? JSON.parse(data) : data;
 
-      if (!tokenEmail) {
-        console.warn('❌ Token utilisateur absent.');
-        return res.status(403).json({ message: 'Accès interdit : token invalide.' });
+        if (!email || !password) {
+          return res.status(400).json({ message: 'Email et mot de passe requis.' });
+        }
+
+        // 🔧 Génère un userId formaté à partir de l’email
+        const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+        const userId = emailToId(email);
+        const userDocRef = db.collection('users').doc(userId);
+        const userDoc = await userDocRef.get();
+
+        if (userDoc.exists) {
+          return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+        }
+
+        // 🔒 Hash du mot de passe avant enregistrement
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        // 📝 Création de l’utilisateur de base
+        await userDocRef.set({
+          email,
+          password: hashedPassword,
+          security: {
+            question: securityQuestion,
+            answer: securityAnswer
+          }
+        });
+
+        // 🗂️ Création du dossier client initial avec les sections remplies
+        const dossierClient = {
+          email,
+          profil: profil ? [profil] : [],
+          mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+          hygieneVie: hygieneVie ? [hygieneVie] : [],
+          objectifs: objectifs ? [objectifs] : [],
+          medical: medical ? [medical] : [],
+          physio: physio ? [physio] : [],
+          nutrition: nutrition ? [nutrition] : [],
+          activite: activite ? [activite] : [],
+          preference: preference ? [preference] : [],
+          mensurations: [],
+          entrainements: [],
+          performances: [],
+          dietes: []
+        };
+
+        await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
+
+        return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
+
+      } catch (error) {
+        console.error("❌ Erreur inscription nouveau client :", error);
+        return res.status(500).json({ message: "Erreur lors de l'inscription." });
       }
-
-      const sanitizedEmail = tokenEmail.toLowerCase().replace(/[@.]/g, '_');
-      const dossierRef = db
-        .collection('users')
-        .doc(sanitizedEmail)
-        .collection('dossier_client')
-        .doc(sanitizedEmail);
-
-      const docSnap = await dossierRef.get();
-
-      if (!docSnap.exists) {
-        console.warn(`❌ Dossier introuvable pour : ${sanitizedEmail}`);
-        return res.status(404).json({ message: 'Dossier client introuvable.' });
-      }
-
-      const existingData = docSnap.data() || {};
-      const currentMensurations = existingData.mensurations || [];
-
-      const newEntry = {
-        date: req.body.date,
-        poids: req.body.poids || '',
-        poitrine: req.body.poitrine || '',
-        taille: req.body.taille || '',
-        hanches: req.body.hanches || '',
-        brasD: req.body.brasD || '',
-        brasG: req.body.brasG || '',
-        cuisseD: req.body.cuisseD || '',
-        cuisseG: req.body.cuisseG || '',
-        molletD: req.body.molletD || '',
-        molletG: req.body.molletG || '',
-        photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
-        photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
-        photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
-        photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
-      };
-
-      const updatedMensurations = [newEntry, ...currentMensurations.filter(Boolean)];
-
-      await dossierRef.update({ mensurations: updatedMensurations });
-
-      res.status(201).json({
-        message: 'Mensuration ajoutée avec succès.',
-        data: newEntry
-      });
-
-    } catch (err) {
-      console.error(`💥 Erreur Firestore - ajout mensuration :`, err.message);
-      res.status(500).json({ message: "Erreur serveur lors de l’ajout de mensuration." });
     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * ❓ Cas 1.5 — Vérification de la question de sécurité (sans authentification)
+     */
+    if (section === 'verifySecurityQuestion') {
+      try {
+        const { email } = typeof data === 'string' ? JSON.parse(data) : data;
+
+        if (!email) {
+          return res.status(400).json({ message: 'Email requis.' });
+        }
+
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.where('email', '==', email.trim().toLowerCase()).limit(1).get();
+
+        if (snapshot.empty) {
+          return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        const userDoc = snapshot.docs[0];
+        const user = userDoc.data();
+
+        if (!user.security || !user.security.question) {
+          return res.status(404).json({ message: 'Aucune question trouvée pour cet utilisateur.' });
+        }
+
+        return res.json({ question: user.security.question });
+      } catch (error) {
+        console.error('❌ Erreur lors de la récupération de la question :', error);
+        return res.status(500).json({ message: 'Erreur serveur.' });
+      }
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 🔄 Cas 1.75 — Réinitialisation du mot de passe via question de sécurité (sans authentification)
+     */
+    if (section === 'resetPassword') {
+      try {
+        const { email, answer, newPassword } = typeof data === 'string' ? JSON.parse(data) : data;
+
+        if (!email || !answer || !newPassword) {
+          return res.status(400).json({ message: 'Champs manquants' });
+        }
+
+        const userId = email.toLowerCase().replace(/[@.]/g, '_');
+        const userDocRef = db.collection('users').doc(userId);
+        const userDoc = await userDocRef.get();
+
+        if (!userDoc.exists) {
+          return res.status(404).json({ message: 'Utilisateur introuvable.' });
+        }
+
+        const userData = userDoc.data();
+
+        if (!userData.security || !userData.security.answer) {
+          return res.status(400).json({ message: 'Aucune réponse de sécurité enregistrée.' });
+        }
+
+        if (userData.security.answer.toLowerCase() !== answer.toLowerCase()) {
+          return res.status(403).json({ message: 'Réponse incorrecte.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await userDocRef.update({ password: hashedPassword });
+
+        return res.json({ message: 'Mot de passe mis à jour avec succès.' });
+      } catch (error) {
+        console.error('❌ Erreur lors du reset password :', error);
+        return res.status(500).json({ message: "Erreur serveur lors de la mise à jour du mot de passe." });
+      }
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 🔐 Cas 2 — Accès authentifié (client ou coach) pour les autres sections
+     */
+    authenticateToken(req, res, async () => {
+
+
+      try {
+        const userEmail = req.user.email.toLowerCase();
+        const userId = userEmail.replace(/[@.]/g, '_');
+        const dossierRef = db.collection('users').doc(userId).collection('dossier_client').doc(userId);
+
+        if (!section || !data) {
+          return res.status(400).json({ message: 'Section et data sont obligatoires.' });
+        }
+
+        const dossierSnap = await dossierRef.get();
+        if (!dossierSnap.exists) {
+          return res.status(404).json({ message: 'Dossier client introuvable.' });
+        }
+
+        const dossierData = dossierSnap.data();
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * SECTION: changement de mot de passe
+         * 🔒 Permet à un utilisateur connecté de changer son mot de passe en vérifiant l'ancien
+         */
+         if (section === 'changePassword') {
+          const { currentPassword, newPassword } = typeof data === 'string' ? JSON.parse(data) : data;
+
+          if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Champs manquants' });
+          }
+
+          // Récupérer le userDoc
+          const userDocRef = db.collection('users').doc(userId);
+          const userDoc = await userDocRef.get();
+
+          if (!userDoc.exists) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+          }
+
+          const user = userDoc.data();
+
+          // Vérifier le password actuel
+          const validPassword = await bcrypt.compare(currentPassword, user.password);
+          if (!validPassword) {
+            return res.status(403).json({ message: 'Mot de passe actuel incorrect.' });
+          }
+
+          // Hasher et mettre à jour le mot de passe
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
+          await userDocRef.update({ password: hashedPassword });
+
+          return res.json({ message: 'Mot de passe changé avec succès.' });
+        }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * SECTION: mensurations
+         * ➕ Ajoute une nouvelle entrée de mensurations avec upload de photos
+         */
+        if (section === 'mensurations') {
+          const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
+
+          const photos = {
+            photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
+            photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
+            photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
+            photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
+          };
+
+          const newEntry = {
+            date: mensurationData.date || new Date().toISOString().split('T')[0],
+            poids: mensurationData.poids || '',
+            poitrine: mensurationData.poitrine || '',
+            taille: mensurationData.taille || '',
+            hanches: mensurationData.hanches || '',
+            brasD: mensurationData.brasD || '',
+            brasG: mensurationData.brasG || '',
+            cuisseD: mensurationData.cuisseD || '',
+            cuisseG: mensurationData.cuisseG || '',
+            molletD: mensurationData.molletD || '',
+            molletG: mensurationData.molletG || '',
+            ...photos
+          };
+
+          const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
+
+          await dossierRef.update({ mensurations: updatedMensurations });
+
+          return res.status(201).json({ message: 'Mensuration ajoutée.', data: newEntry });
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * SECTION: entrainements
+         * ➕ Ajoute des séances et génère les performances correspondantes
+         */
+        if (section === 'entrainements') {
+          const entrainements = typeof data === 'string' ? JSON.parse(data) : data;
+
+          if (!Array.isArray(entrainements) || entrainements.length === 0) {
+            return res.status(400).json({ message: 'Entraînements invalides.' });
+          }
+
+          const entrainementsActuels = dossierData.entrainements || [];
+          const performancesActuelles = dossierData.performances || [];
+
+          const nouveauxEntrainements = [];
+          const nouvellesPerformances = [];
+
+          entrainements.forEach((entraînement) => {
+            const {
+              date,
+              muscle1, muscle2, muscle3,
+              typeTraining = '',
+              exercices = [],
+              noteTraining = ''
+            } = entraînement;
+
+            const newId = uuidv4();
+
+            if (typeTraining === 'cross-training') {
+              const circuitsFormates = exercices.map((circuit) => ({
+                nom: circuit.nom,
+                tours: circuit.tours,
+                on: circuit.on,
+                off: circuit.off,
+                exercices: circuit.exercices,
+              }));
+
+              nouveauxEntrainements.push({
+                id: newId,
+                date,
+                muscle1,
+                muscle2,
+                muscle3,
+                typeTraining,
+                exercices: circuitsFormates,
+                noteTraining
+              });
+
+            } else {
+              nouveauxEntrainements.push({
+                id: newId,
+                date,
+                muscle1,
+                muscle2,
+                muscle3,
+                typeTraining,
+                exercices,
+                noteTraining
+              });
+
+              exercices.forEach((exo) => {
+                const perfId = uuidv4();
+                nouvellesPerformances.push({
+                  id: perfId,
+                  jourS: date,
+                  nom: exo.nom,
+                  series: exo.series ?? 0,
+                  reps: exo.repetitions ?? 0,
+                  type: exo.type,
+                  charges: [
+                    {
+                      date: new Date().toISOString().split('T')[0],
+                      charge: 0
+                    }
+                  ]
+                });
+              });
+            }
+          });
+
+          await dossierRef.update({
+            entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
+            performances: [...nouvellesPerformances, ...performancesActuelles],
+          });
+
+          return res.status(201).json({ message: 'Entraînements enregistrés.' });
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * SECTION: diete
+         * 🔄 Ajoute ou met à jour une diète dans le dossier client
+         */
+        if (section === 'diete') {
+          const { id, date, diete, kcalObjectif } = typeof data === 'string' ? JSON.parse(data) : data;
+
+          // Validation simple
+          if (!Array.isArray(diete) && typeof diete !== 'object') {
+            return res.status(400).json({ message: 'Diète vide ou invalide.' });
+          }
+
+          const dietes = Array.isArray(dossierData.dietes) ? [...dossierData.dietes] : [];
+
+          if (id) {
+            // Mise à jour d’une diète existante
+            const index = dietes.findIndex(d => d.id === id);
+            const updated = { id, date, kcalObjectif, repas: diete };
+
+            if (index !== -1) {
+              dietes[index] = updated;
+            } else {
+              dietes.push(updated);
+            }
+          } else {
+            // Ajout d’une nouvelle diète
+            const newId = Date.now().toString();
+            dietes.push({ id: newId, date, kcalObjectif, repas: diete });
+          }
+
+          // Sauvegarde dans Firestore
+          await dossierRef.update({ dietes });
+
+          return res.status(201).json({ message: 'Diète sauvegardée avec succès.' });
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+        /**
+         * SECTION: updateCharges
+         * 🔄 Met à jour les charges des performances existantes
+         */
+        if (section === 'updateCharges') {
+          const { updates } = typeof data === 'string' ? JSON.parse(data) : data;
+
+          if (!Array.isArray(updates) || updates.length === 0) {
+            return res.status(400).json({ message: 'Aucune mise à jour de charges fournie.' });
+          }
+
+          const performances = Array.isArray(dossierData.performances)
+            ? [...dossierData.performances]
+            : [];
+
+          updates.forEach(update => {
+            const perf = performances.find(p => p.id === update.id);
+            if (perf) {
+              perf.charges = (update.charges || []).filter(c =>
+                c &&
+                typeof c === 'object' &&
+                'date' in c &&
+                (c.date === '' || !isNaN(new Date(c.date)))
+              );
+
+              console.log(`✅ Charges mises à jour pour performance ID ${update.id}`);
+            } else {
+              console.warn(`⚠️ Performance non trouvée pour ID : ${update.id}`);
+            }
+          });
+
+          await dossierRef.update({ performances });
+
+          return res.status(200).json({ message: 'Charges mises à jour avec succès.' });
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * SECTION: profil
+         * 🔄 Met à jour les informations du profil
+         */
+        if (section === 'profil') {
+          const profilData = typeof data === 'string' ? JSON.parse(data) : data;
+          await dossierRef.update({ profil: profilData });
+          return res.status(201).json({ message: 'Profil mis à jour.' });
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * SECTION SECTION pour initialiser une journée dans suiviDiete
+         */
+        if (section === 'suiviDieteInit') {
+          const currentDate = new Date().toISOString().split('T')[0];
+
+          if (!dossierData.suiviDiete) {
+            dossierData.suiviDiete = {};
+          }
+
+          if (dossierData.suiviDiete[currentDate]) {
+            return res.status(200).json({ message: 'Journée déjà initialisée.' });
+          }
+
+          const repasTypes = [
+            'matin',
+            'collation_matin',
+            'midi',
+            'collation_aprem',
+            'post_training',
+            'soir',
+            'avant_coucher'
+          ];
+
+          const nouveauJour = {
+            commentaireJournee: ''
+          };
+
+          repasTypes.forEach(type => {
+            nouveauJour[type] = {
+              commentaire: '',
+              aliments: []
+            };
+          });
+
+          dossierData.suiviDiete[currentDate] = nouveauJour;
+
+          await dossierRef.update({
+            suiviDiete: dossierData.suiviDiete
+          });
+
+          return res.status(200).json({
+            message: 'Journée ajoutée dans suiviDiete',
+            date: currentDate,
+            structure: nouveauJour
+          });
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        return res.status(400).json({ message: `Section inconnue: ${section}` });
+
+      } catch (err) {
+        console.error('Erreur route dossier/enregistrer :', err);
+        return res.status(500).json({ message: 'Erreur serveur.' });
+      }
+    });
   }
 );
 
-///////////////////////////////////////// ENTRAINEMENTS /////////////////////////////////////////////////////
-
-// Route POST n°2 // Enregistrement d’un ou plusieurs entraînements pour un client
-// 📥 Reçoit un email + tableau d’entrainements dans le corps de la requête
-// 🆔 Génère un nouvel ID UUID pour chaque entraînement et performance créée
-// 🏋️‍♂️ Gère les types d’entraînements classiques et cross-training (avec circuits)
-// 🔄 Met à jour les listes entrainements et performances dans le dossier client
-// ⚠️ Nécessite que le dossier client existe sinon renvoie 404
-app.post('/RouteEnregistrementTraing', authenticateToken, async (req, res) => {
-  console.log('📥 Body reçu:', req.body);
-  try {
-    const email = req.user.email.toLowerCase();
-    const { entrainements } = req.body;
-
-    // 🧪 Validation
-    if (!Array.isArray(entrainements) || entrainements.length === 0) {
-      return res.status(400).json({ error: 'Entraînement vide.' });
-    }
-
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const docSnap = await dossierRef.get();
-
-    if (!docSnap.exists) {
-      console.warn(`❌ Utilisateur non trouvé : ${sanitizedEmail}`);
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = docSnap.data() || {};
-    const entrainementsActuels = clientData.entrainements || [];
-    const performancesActuelles = clientData.performances || [];
-
-    const nouveauxEntrainements = [];
-    const nouvellesPerformances = [];
-
-    entrainements.forEach((entraînement) => {
-      const {
-        date,
-        muscle1,
-        muscle2,
-        muscle3,
-        typeTraining = '',
-        exercices = [],
-        noteTraining = '',
-      } = entraînement;
-
-      const newId = uuidv4();
-
-      if (typeTraining === 'cross-training') {
-        const circuitsFormates = exercices.map((circuit) => ({
-          nom: circuit.nom,
-          tours: circuit.tours,
-          on: circuit.on,
-          off: circuit.off,
-          exercices: circuit.exercices,
-        }));
-
-        nouveauxEntrainements.push({
-          id: newId,
-          date,
-          muscle1,
-          muscle2,
-          muscle3,
-          typeTraining,
-          exercices: circuitsFormates,
-          noteTraining
-        });
-
-      } else {
-        nouveauxEntrainements.push({
-          id: newId,
-          date,
-          muscle1,
-          muscle2,
-          muscle3,
-          typeTraining,
-          exercices,
-          noteTraining,
-        });
-
-        exercices.forEach((exo) => {
-          const perfId = uuidv4();
-          nouvellesPerformances.push({
-            id: perfId,
-            jourS: date,
-            nom: exo.nom,
-            series: exo.series,
-            reps: exo.repetitions,
-            charges: [
-              {
-                date: new Date().toISOString().split('T')[0],
-                charge: 0
-              }
-            ]
-          });
-        });
-      }
-    });
-
-    await dossierRef.update({
-      entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
-      performances: [...nouvellesPerformances, ...performancesActuelles],
-    });
-
-    res.status(201).json({ message: 'Entraînement enregistré avec succès.' });
-
-  } catch (err) {
-    console.error("💥 Erreur Firestore RouteEnregistrementTraing:", err.message);
-    res.status(500).json({ error: 'Erreur interne serveur.' });
-  }
-});
-
-//////////////////////////////////////////// DIETE /////////////////////////////////////////////////////////
-
-// Route POST n°3 // Création ou mise à jour d’une diète dans le dossier client
-// 📥 Reçoit email, id (optionnel), date, diete (objet ou tableau), kcalObjectif, mode
-// 🔄 Si id fourni, met à jour la diète existante, sinon crée une nouvelle avec un id timestamp
-// ⚠️ Vérifie que le dossier client existe sinon renvoie 404
-// 📝 Met à jour le fichier JSON du client avec la nouvelle liste de diètes
-app.post('/CoachDieteGenerator', authenticateToken, async (req, res) => {
-  try {
-    const email = req.user.email.toLowerCase();
-    const { id, date, diete, kcalObjectif, mode } = req.body;
-
-    // 🛡️ Validation des données reçues
-    if (!Array.isArray(diete) && typeof diete !== 'object') {
-      return res.status(400).json({ error: 'Diète vide ou invalide.' });
-    }
-
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const docSnap = await dossierRef.get();
-
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = docSnap.data() || {};
-    const dietes = Array.isArray(clientData.dietes) ? [...clientData.dietes] : [];
-
-    if (id) {
-      // 🔄 Mise à jour de la diète existante
-      const index = dietes.findIndex(d => d.id === id);
-      const updated = { id, date, kcalObjectif, repas: diete, mode };
-
-      if (index !== -1) {
-        dietes[index] = updated;
-      } else {
-        dietes.push(updated);
-      }
-    } else {
-      // ➕ Ajout d’une nouvelle diète
-      const newId = Date.now().toString();
-      dietes.push({ id: newId, date, kcalObjectif, repas: diete, mode });
-    }
-
-    // 📥 Sauvegarde dans Firestore
-    await dossierRef.update({ dietes });
-
-    console.log('✅ Diète sauvegardée avec succès !');
-    res.status(201).json({ message: 'Diète sauvegardée avec succès.' });
-
-  } catch (err) {
-    console.error('💥 Erreur Firestore CoachDieteGenerator:', err.message);
-    res.status(500).json({ error: 'Erreur interne serveur.' });
-  }
-});
-
-///////////////////////////////////////////// PERFORMANCES /////////////////////////////////////////////////////
-
-// Route POST n°4 // Mise à jour des charges dans les performances d’un client
-// 📥 Reçoit email et tableau d’updates { id, charges }
-// 🔄 Pour chaque update, remplace les charges de la performance correspondante par les nouvelles valides
-// ⚠️ Vérifie que le dossier client existe sinon renvoie 404
-// 📝 Enregistre les modifications dans le fichier JSON du client
-app.post('/SuiviPerformanceClient', authenticateToken, async (req, res) => {
-  try {
-    const email = req.user.email.toLowerCase();
-    const { updates } = req.body;
-
-    // 🧪 Vérification des données
-    if (!Array.isArray(updates) || updates.length === 0) {
-      return res.status(400).json({ error: 'Aucune mise à jour fournie.' });
-    }
-
-    const sanitizedEmail = email.replace(/[@.]/g, '_');
-    const dossierRef = db
-      .collection('users')
-      .doc(sanitizedEmail)
-      .collection('dossier_client')
-      .doc(sanitizedEmail);
-
-    const docSnap = await dossierRef.get();
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = docSnap.data() || {};
-    const performances = Array.isArray(clientData.performances) ? [...clientData.performances] : [];
-
-    // 🔁 Mise à jour des performances
-    updates.forEach(update => {
-      const perf = performances.find(p => p.id === update.id);
-      if (perf) {
-        perf.charges = update.charges.filter(c =>
-          c.date &&
-          !isNaN(new Date(c.date)) &&
-          c.charge !== undefined &&
-          c.charge !== null &&
-          c.charge !== ''
-        );
-        console.log(`✅ Charges mises à jour pour performance ID ${update.id}`);
-      } else {
-        console.warn(`⚠️ Performance non trouvée pour ID : ${update.id}`);
-      }
-    });
-
-    // 💾 Sauvegarde
-    await dossierRef.update({ performances });
-
-    res.status(200).json({ message: 'Charges mises à jour avec succès.' });
-
-  } catch (err) {
-    console.error("💥 Erreur Firestore SuiviPerformanceClient:", err.message);
-    res.status(500).json({ error: 'Erreur interne serveur.' });
-  }
-});
-
-//////////////////////////////////////////// SUIVI CLIENT /////////////////////////////////////////////////////////
-// Routes POST n°5 // 
-
-// 📌 Initialiser la journée de suiviDiete si elle n'existe pas
-app.post('/dossier/suividiete/init', authenticateToken, async (req, res) => {
-  const email = req.user.email.toLowerCase();
-
-  if (!email) return res.status(400).json({ error: 'Email requis.' });
-
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-  const dossierRef = db
-    .collection('users')
-    .doc(sanitizedEmail)
-    .collection('dossier_client')
-    .doc(sanitizedEmail);
-
-  try {
-    const docSnap = await dossierRef.get();
-
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = docSnap.data() || {};
-    const currentDate = new Date().toISOString().split('T')[0];
-
-    // ⚙️ Création si la structure n’existe pas
-    if (!clientData.suiviDiete) {
-      clientData.suiviDiete = {};
-    }
-
-    if (clientData.suiviDiete[currentDate]) {
-      return res.status(200).json({ message: 'Journée déjà initialisée.' });
-    }
-
-    const repasTypes = [
-      'matin',
-      'collation_matin',
-      'midi',
-      'collation_aprem',
-      'post_training',
-      'soir',
-      'avant_coucher'
-    ];
-
-    const nouveauJour = {
-      commentaireJournee: ''
-    };
-
-    repasTypes.forEach(type => {
-      nouveauJour[type] = {
-        commentaire: '',
-        aliments: []
-      };
-    });
-
-    clientData.suiviDiete[currentDate] = nouveauJour;
-
-    await dossierRef.update({
-      suiviDiete: clientData.suiviDiete
-    });
-
-    return res.status(200).json({
-      message: 'Journée ajoutée dans suiviDiete',
-      date: currentDate,
-      structure: nouveauJour
-    });
-
-  } catch (err) {
-    console.error('💥 Erreur Firestore suiviDiete/init :', err.message);
-    return res.status(500).json({ error: 'Erreur serveur Firestore.' });
-  }
-});
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////// PUT METTRE A JOUR LES INFOS ///////////////////////////////////////////////////
+/////////////////////////////////////// MISE A JOUR UNIVERSEL (PUT) ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////// DIETE /////////////////////////////////////////////////////////
-
-// Route PUT n°1 // Mise à jour d’une diète spécifique dans le dossier client
-// 🔒 Protégée (idéalement à sécuriser avec un token)
-// 🥗 Met à jour la diète identifiée par son ID dans le dossier JSON du client
-// 🗃️ Modifie la date, repas, objectif kcal
-
-app.put('/CoachDossierDiete', authenticateToken, async (req, res) => {
+/**
+ * 📝 ROUTE PUT /dossiers — MISE À JOUR DU DOSSIER CLIENT
+ * 
+ * Cette route permet à un utilisateur authentifié (client ou coach) de mettre à jour
+ * plusieurs sections de son dossier client : profil, mensurations, objectifs, 
+ * entrainements, dietes, performances.
+ * 
+ * Elle supporte l’upload d’une photo de profil (champ 'photoProfil') via multipart/form-data,
+ * convertie en base64 pour stockage dans Firestore.
+ * 
+ * Chaque section envoyée (en JSON string via multipart) est parsée et fusionnée avec les données existantes.
+ * 
+ * En cas de succès, renvoie les sections mises à jour.
+ * 
+ * 🔐 Cette route est protégée par le middleware `authenticateToken`.
+ */
+app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req, res) => {
   try {
     const email = req.user.email.toLowerCase();
-    const { id, date, diete, kcalObjectif } = req.body;
-
-    // 🛡️ Validation
-    if (!id) return res.status(400).json({ error: 'ID de la diète requis pour la mise à jour.' });
-    if (!email) return res.status(400).json({ error: 'Email requis.' });
-    if (!diete) return res.status(400).json({ error: 'Diète vide ou invalide.' });
-
     const sanitizedEmail = email.replace(/[@.]/g, '_');
 
     const dossierRef = db
@@ -1143,194 +802,216 @@ app.put('/CoachDossierDiete', authenticateToken, async (req, res) => {
       .doc(sanitizedEmail);
 
     const docSnap = await dossierRef.get();
-
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-    }
-
-    const clientData = docSnap.data() || {};
-    const dietes = Array.isArray(clientData.dietes) ? clientData.dietes : [];
-
-    const index = dietes.findIndex(d => d.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({ error: 'Diète non trouvée pour cet ID.' });
-    }
-
-    // ✏️ Mise à jour
-    dietes[index] = {
-      id,
-      date,
-      repas: diete,
-      kcalObjectif,
-    };
-
-    await dossierRef.update({ dietes });
-
-    console.log("✅ Diète mise à jour avec succès !");
-    return res.status(200).json({ message: 'Diète mise à jour avec succès.' });
-
-  } catch (err) {
-    console.error("💥 Erreur Firestore CoachDossierDiete:", err.message);
-    return res.status(500).json({ error: 'Erreur interne Firestore.' });
-  }
-});
-
-///////////////////////////////////////// ENTRAINEMENTS /////////////////////////////////////////////////////
-
-// Route PUT n°2 // Mise à jour des entraînements d’un client
-// 🏋️‍♂️ Remplace complètement la liste des entraînements dans le dossier client
-// 📂 Le dossier client est identifié par l’email (nettoyé pour nom de fichier)
-// 🔒 À sécuriser idéalement par un middleware d’authentification
-app.put('/CoachDossierEntrainements', authenticateToken, async (req, res) => {
-  const email = req.user.email;
-  const { entrainements } = req.body;
-
-  // 🔍 Validation des données
-  if (!email || !Array.isArray(entrainements)) {
-    return res.status(400).json({ error: 'Email ou entraînements invalides' });
-  }
-
-  const sanitizedEmail = email.toLowerCase().replace(/[@.]/g, '_');
-
-  const dossierRef = db
-    .collection('users')
-    .doc(sanitizedEmail)
-    .collection('dossier_client')
-    .doc(sanitizedEmail);
-
-  try {
-    const docSnap = await dossierRef.get();
-
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: "Fichier utilisateur introuvable" });
-    }
-
-    await dossierRef.update({ entrainements });
-
-    return res.json({ message: 'Entraînements mis à jour avec succès' });
-  } catch (error) {
-    console.error("🔥 Erreur Firestore mise à jour entraînements :", error);
-    return res.status(500).json({ error: "Erreur Firestore : " + error.message });
-  }
-});
-
-
-///////////////////////////////////////////// PROFIL /////////////////////////////////////////////////////
-
-// Route PUT n°3 // Mise à jour du profil, mensuration et objectifs d’un client
-// 🔄 Modifie les premières entrées des tableaux profil, mensurationProfil et objectifs
-// 🧾 Les données mises à jour sont extraites du corps de la requête (req.body)
-// 📂 Le dossier client est identifié par l’email (sanitize pour le nom de fichier)
-// ⚠️ Attention : la gestion des photos conserve l’ancienne si aucune nouvelle n’est fournie
-// 🛑 À sécuriser idéalement avec un middleware d’authentification (ex : authenticateToken)
-app.put('/dossier', authenticateToken, async (req, res) => {
-  const email = req.user.email.toLowerCase();
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
-
-  const dossierRef = db
-    .collection('users')
-    .doc(sanitizedEmail)
-    .collection('dossier_client')
-    .doc(sanitizedEmail);
-
-  try {
-    const docSnap = await dossierRef.get();
-
     if (!docSnap.exists) {
       return res.status(404).json({ message: 'Dossier non trouvé.' });
     }
 
-    const dossier = docSnap.data();
+    const dossier = docSnap.data() || {};
+    const updatePayload = {};
 
-    // ⚙️ Mise à jour des différentes sections du dossier
-    const profil = {
-      ...((dossier.profil && dossier.profil[0]) || {}),
-      nom: req.body.nom,
-      prenom: req.body.prenom,
-      age: req.body.age,
-      profession: req.body.profession,
-      telephone: req.body.telephone,
-      photoProfil: req.body.photoProfil || (dossier.profil?.[0]?.photoProfil ?? '')
-    };
+    const sections = ['profil', 'mensurations', 'objectifs', 'entrainements', 'dietes', 'performances', 'suiviDiete'];
 
-    const mensurationProfil = {
-      ...((dossier.mensurationProfil && dossier.mensurationProfil[0]) || {}),
-      taille: req.body.taille,
-      poids: req.body.poids
-    };
+    for (const section of sections) {
+      if (req.body[section]) {
+        let parsedData;
+        if (typeof req.body[section] === 'string') {
+          try {
+            parsedData = JSON.parse(req.body[section]);
+          } catch (e) {
+            console.warn(`JSON invalide pour la section ${section}, on ignore cette section.`);
+            continue;
+          }
+        } else if (typeof req.body[section] === 'object') {
+          parsedData = req.body[section];
+        } else {
+          continue;
+        }
 
-    const objectifs = {
-      ...((dossier.objectifs && dossier.objectifs[0]) || {}),
-      objectif: req.body.objectif
-    };
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (section === 'profil') {
+          const oldProfil = dossier.profil?.[0] || {};
+          oldProfil.taille = oldProfil.taille != null ? oldProfil.taille.toString() : '';
+          oldProfil.poids = oldProfil.poids != null ? oldProfil.poids.toString() : '';
 
-    await dossierRef.update({
-      profil: [profil],
-      mensurationProfil: [mensurationProfil],
-      objectifs: [objectifs]
-    });
+          if (req.file && req.file.buffer) {
+            const base64 = req.file.buffer.toString('base64');
+            const mime = req.file.mimetype;
+            const dataUri = `data:${mime};base64,${base64}`;
+            parsedData.photoProfil = dataUri;
+          } else if (req.file) {
+            console.warn('Upload reçu mais buffer manquant, photoProfil ignorée.');
+          }
 
-    res.json({ message: 'Profil mis à jour avec succès' });
+          updatePayload.profil = [{ ...oldProfil, ...parsedData }];
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        else if (section === 'entrainements') {
+          if (Array.isArray(parsedData)) {
+            updatePayload.entrainements = parsedData;
+          } else {
+            console.warn('Entrainements attendus sous forme de tableau.');
+          }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        else if (section === 'dietes') {
+          if (!Array.isArray(dossier.dietes)) {
+            dossier.dietes = dossier.dietes ? [dossier.dietes] : [];
+          }
+
+          if (Array.isArray(dossier.dietes)) {
+            if (Array.isArray(parsedData)) {
+              updatePayload.dietes = parsedData;
+              console.log('✏️ Remplacement complet de dietes');
+            } else if (parsedData.id) {
+              const dietes = [...dossier.dietes];
+              const index = dietes.findIndex(d => d.id === parsedData.id);
+              if (index !== -1) {
+                dietes[index] = { ...dietes[index], ...parsedData };
+                updatePayload.dietes = dietes;
+                console.log(`✏️ Mise à jour diète id=${parsedData.id}`);
+              } else {
+                console.warn(`⚠️ Diète avec id ${parsedData.id} non trouvée.`);
+              }
+            } else {
+              console.warn('⚠️ Aucune id trouvée pour mise à jour diète.');
+            }
+          } else {
+            console.warn('⚠️ Aucune liste de dietes existante.');
+          }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        else if (section === 'performances') {
+          const oldPerf = dossier.performances?.[0] || {};
+          updatePayload.performances = [{ ...oldPerf, ...parsedData }];
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        else if (section === 'suiviDiete') {
+          const oldSuivi = dossier.suiviDiete || {};
+
+          for (const dateKey in parsedData) {
+            const repasData = parsedData[dateKey];
+
+            if (!oldSuivi[dateKey]) {
+              return res.status(400).json({ error: `Journée ${dateKey} non initialisée.` });
+            }
+
+            for (const repasType in repasData) {
+              const repas = repasData[repasType];
+
+              if (!oldSuivi[dateKey][repasType]) {
+                return res.status(400).json({ error: `Type de repas invalide : ${repasType}` });
+              }
+
+              oldSuivi[dateKey][repasType] = {
+                aliments: repas.aliments || [],
+                commentaire: repas.commentaire || ''
+              };
+            }
+          }
+
+          updatePayload.suiviDiete = oldSuivi;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      } // <-- Fin du `if (req.body[section])`
+    } // <-- Fin du `for (const section of sections)`
+
+    if (Object.keys(updatePayload).length === 0) {
+      return res.status(400).json({ message: 'Aucune donnée valide reçue pour mise à jour.' });
+    }
+
+    await dossierRef.update(updatePayload);
+
+    res.json({ message: 'Dossier mis à jour avec succès', updatedSections: Object.keys(updatePayload) });
+
   } catch (err) {
-    console.error("🔥 Erreur Firestore mise à jour profil :", err);
+    console.error("🔥 Erreur Firestore mise à jour dossier :", err);
     res.status(500).json({ message: 'Erreur serveur lors de la mise à jour.' });
   }
-});
+}); // <-- Fin de app.put
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Routes PUT n°4 // 
-// ✅ Mise à jour d’un repas dans suiviDiete
-app.put('/dossier/suividiete/:date/:repasType', authenticateToken, async (req, res) => {
-  const email = req.user.email.toLowerCase();
-  const sanitizedEmail = email.replace(/[@.]/g, '_');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////// ROUTES SPECIFIQUE ///////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const { date, repasType } = req.params;
-  const { aliments, commentaire } = req.body;
-
-  if (!date || !repasType) {
-    return res.status(400).json({ error: 'Paramètres manquants dans la requête.' });
-  }
-
-  const dossierRef = db
-    .collection('users')
-    .doc(sanitizedEmail)
-    .collection('dossier_client')
-    .doc(sanitizedEmail);
+/**
+ * 🔑 Route POST /api/generate-client-token
+ * 
+ * Génère un token JWT temporaire au nom d’un client, uniquement accessible aux utilisateurs
+ * authentifiés avec le rôle "coach". Ce token permet au coach d’agir ou de se connecter
+ * en tant que client pendant une durée limitée (45 minutes).
+ */
+// Route protégée : seul un coach connecté peut générer un token pour un client
+app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
+  console.log("🔐 [POST] /api/generate-client-token appelée");
 
   try {
-    const docSnap = await dossierRef.get();
+    // Étape 1 — Vérification rôle utilisateur
+    const requestingUser = req.user;
+    console.log("👤 Utilisateur connecté :", requestingUser);
 
-    if (!docSnap.exists) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+    if (requestingUser.role !== 'coach') {
+      console.log("⛔ Rôle invalide :", requestingUser.role);
+      return res.status(403).json({ message: '⛔ Accès refusé : rôle coach requis.' });
     }
 
-    const clientData = docSnap.data();
+    // Étape 2 — Lecture des données envoyées
+    const { clientId, password } = req.body;
+    console.log("📥 Données reçues :", { clientId, password: '********' });
 
-    if (!clientData.suiviDiete || !clientData.suiviDiete[date]) {
-      return res.status(400).json({ error: 'Journée non initialisée.' });
+    if (!clientId || !password) {
+      console.log("⚠️ Données manquantes !");
+      return res.status(400).json({ message: '⚠️ clientId et password requis.' });
     }
 
-    const repasJour = clientData.suiviDiete[date];
+    // Étape 3 — Récupération du coach depuis Firestore
+    const coachId = requestingUser.uid;
+    console.log("🔎 Recherche du coach avec l’ID :", coachId);
 
-    if (!repasJour[repasType]) {
-      return res.status(400).json({ error: `Type de repas invalide : ${repasType}` });
+    const coachDoc = await db.collection('users').doc(coachId).get();
+
+    if (!coachDoc.exists) {
+      console.log(`❌ Aucun document trouvé pour coachId ${coachId}`);
+      return res.status(404).json({ message: '❌ Coach introuvable.' });
     }
 
-    // Mise à jour du repas
-    repasJour[repasType] = {
-      aliments: aliments || [],
-      commentaire: commentaire || ''
-    };
+    const coachData = coachDoc.data();
+    console.log("✅ Coach trouvé :", coachData.email);
 
-    await dossierRef.update({
-      [`suiviDiete.${date}`]: repasJour
-    });
+    // Étape 4 — Vérification mot de passe
+    const isPasswordValid = await bcrypt.compare(password, coachData.password);
+    if (!isPasswordValid) {
+      console.log("🔐 Mot de passe incorrect !");
+      return res.status(401).json({ message: '🔐 Mot de passe incorrect.' });
+    }
 
-    return res.status(200).json({ message: 'Repas mis à jour avec succès.' });
-  } catch (err) {
-    console.error("💥 Erreur Firestore lors de la mise à jour du repas :", err);
-    return res.status(500).json({ error: 'Erreur serveur.' });
+    // Étape 5 — Vérification du client
+    const clientDoc = await db.collection('users').doc(clientId).get();
+    if (!clientDoc.exists) {
+      console.log(`❌ Client avec ID ${clientId} introuvable.`);
+      return res.status(404).json({ message: '❌ Client non trouvé.' });
+    }
+
+    const clientData = clientDoc.data();
+
+    // Étape 6 — Génération du token
+    const tokenClient = jwt.sign({
+      uid: clientId,
+      email: clientData.email,
+      role: 'client'
+    }, process.env.JWT_SECRET || 'secret123', { expiresIn: '45m' });
+
+    console.log(`✅ Token client généré avec succès pour ${clientId}`);
+
+    return res.json({ tokenClient });
+
+  } catch (error) {
+    console.error("❌ Erreur dans /generate-client-token :", error);
+    return res.status(500).json({ message: 'Erreur serveur interne.' });
   }
 });
 
@@ -1339,10 +1020,6 @@ app.put('/dossier/suividiete/:date/:repasType', authenticateToken, async (req, r
 ////////////////////////////////////// FIN DE TOUTES LES ROUTES //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 💥 Gestion des erreurs -> TOUJOURS EN DERNIER !!!!!
 app.use((err, req, res, next) => {
