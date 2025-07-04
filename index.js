@@ -157,58 +157,63 @@ function authenticateToken(req, res, next) {
 app.post('/login', async (req, res) => {
   let { email, password } = req.body;
 
-  // 🧼 Nettoyage de l'email pour éviter les erreurs de saisie (majuscule, espace, etc.)
+  // Nettoyage de l'email
   email = email.trim().toLowerCase();
 
-  // 💼 CAS SPÉCIAL : Connexion d’un coach "admin" en dur (pas stocké en base)
+  // 🎯 Cas spécial : coach admin
   if (email === 'coach@admin.com' && password === 'coach123') {
-      const token = jwt.sign(
-        { email, role: 'coach', uid: 'coach_admin_com' },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-      );
+    const token = jwt.sign(
+      { email, role: 'coach', uid: 'coach_admin_com' },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
     return res.json({ message: "Connexion coach réussie", token });
   }
 
   try {
-    // 🔍 Requête Firestore pour chercher l'utilisateur avec l'email fourni
     const usersRef = db.collection('users');
     const snapshot = await usersRef.where('email', '==', email).limit(1).get();
 
-    // ❌ Aucun utilisateur trouvé
+    // Si aucun utilisateur trouvé → email invalide
     if (snapshot.empty) {
-      return res.status(400).json({ message: "Utilisateur non trouvé." });
+      return res.status(401).json({
+        error: 'email',
+        message: "Adresse e-mail introuvable."
+      });
     }
 
-    // ✅ Utilisateur trouvé
     const userDoc = snapshot.docs[0];
     const user = userDoc.data();
 
-    // 🔑 Vérification du mot de passe (hashé vs saisie utilisateur)
+    // Vérification du mot de passe
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Mot de passe incorrect." });
+      return res.status(401).json({
+        error: 'password',
+        message: "Mot de passe incorrect."
+      });
     }
 
-    // ✅ Connexion réussie → Génération d’un token JWT
+    // Connexion réussie
     const token = jwt.sign(
       {
         email: user.email,
         role: 'client',
-        uid: userDoc.id // 🆔 ID Firestore (formatté depuis l'email, ex: john_doe_gmail_com)
+        uid: userDoc.id
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // 📦 Réponse avec token pour le frontend
-    res.json({ message: "Connexion réussie", token });
+    return res.json({ message: "Connexion réussie", token });
 
   } catch (error) {
-    // 🔥 Erreur serveur lors de la connexion
     console.error("🔥 Erreur lors de la connexion :", error);
-    res.status(500).json({ message: "Erreur serveur." });
+    return res.status(500).json({
+      error: 'server',
+      message: "Erreur serveur. Veuillez réessayer plus tard."
+    });
   }
 });
 
