@@ -29,19 +29,19 @@ const db = admin.firestore();
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
+//const upload = multer({ dest: path.join(__dirname, 'uploads') });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, 'uploads');
-    console.log('📁 Upload path:', uploadPath); // 🔍 ajoute ça
-    cb(null, uploadPath);
+    cb(null, path.join(__dirname, 'uploads'));
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(file.originalname); // ex: .jpg
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + ext);
+    cb(null, uniqueSuffix + ext); // ✅ inclut l'extension
   }
 });
+
+const upload = multer({ storage }); // ✅ Corrige ici
 
 console.log('Upload folder path:', path.join(__dirname, 'uploads'));
 
