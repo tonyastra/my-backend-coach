@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 backend/
 config/serviceAccountKey.json
+/uploads/*
+!/uploads/.gitkeep
