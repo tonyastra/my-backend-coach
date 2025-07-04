@@ -13,6 +13,15 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 
+
+
+
+if (!fs.existsSync(uploadFolderPath)) {
+  fs.mkdirSync(uploadFolderPath, { recursive: true });
+  console.log('Dossier uploads créé:', uploadFolderPath);
+} else {
+  console.log('Dossier uploads déjà existant:', uploadFolderPath);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 const admin = require('firebase-admin');
 
@@ -30,6 +39,7 @@ const db = admin.firestore();
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
 //const upload = multer({ dest: path.join(__dirname, 'uploads') });
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,6 +68,9 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+  console.log('Upload folder path:', path.join(__dirname, 'uploads'));
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Objet en mémoire pour compter le nombre de tentatives de réponse incorrectes
