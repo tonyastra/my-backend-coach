@@ -302,6 +302,7 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
 app.post(
   '/dossier/enregistrer',
   upload.fields([
+    { name: 'photoProfil', maxCount: 1 },
     { name: 'photoFace' },
     { name: 'photoDos' },
     { name: 'photoProfilD' },
@@ -351,8 +352,9 @@ app.post(
         });
 
         // 📸 Ajout du chemin de la photo si elle a été uploadée
-        if (req.file) {
-          const photoPath = `/uploads/${req.file.filename}`;
+        if (req.files && req.files['photoProfil']) {
+          const photoFile = req.files['photoProfil'][0];
+          const photoPath = `/uploads/${photoFile.filename}`;
           profil.photoProfil = photoPath;
         }
 
