@@ -575,8 +575,10 @@ app.post(
 
           entrainements.forEach((entraînement) => {
             const {
-              date,
-              muscle1, muscle2, muscle3,
+              date = '',
+              muscle1 = '',
+              muscle2 = '',
+              muscle3 = '',
               typeTraining = '',
               exercices = [],
               noteTraining = ''
@@ -586,11 +588,11 @@ app.post(
 
             if (typeTraining === 'cross-training') {
               const circuitsFormates = exercices.map((circuit) => ({
-                nom: circuit.nom,
-                tours: circuit.tours,
-                on: circuit.on,
-                off: circuit.off,
-                exercices: circuit.exercices,
+                nom: circuit.nom || '',
+                tours: circuit.tours ?? 0,
+                on: circuit.on ?? 0,
+                off: circuit.off ?? 0,
+                exercices: Array.isArray(circuit.exercices) ? circuit.exercices : []
               }));
 
               nouveauxEntrainements.push({
@@ -618,13 +620,14 @@ app.post(
 
               exercices.forEach((exo) => {
                 const perfId = uuidv4();
+
                 nouvellesPerformances.push({
                   id: perfId,
-                  jourS: date,
-                  nom: exo.nom,
+                  jourS: date || '',
+                  nom: exo.nom || '',
                   series: exo.series ?? 0,
                   reps: exo.repetitions ?? 0,
-                  type: exo.type,
+                  type: exo.type || '',
                   charges: [
                     {
                       date: new Date().toISOString().split('T')[0],
@@ -636,9 +639,15 @@ app.post(
             }
           });
 
+          // 🔍 Pour debug : vérifier que toutes les données sont bien définies
+          console.log('📦 Données envoyées à Firestore :', {
+            entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
+            performances: [...nouvellesPerformances, ...performancesActuelles]
+          });
+
           await dossierRef.update({
             entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
-            performances: [...nouvellesPerformances, ...performancesActuelles],
+            performances: [...nouvellesPerformances, ...performancesActuelles]
           });
 
           return res.status(201).json({ message: 'Entraînements enregistrés.' });
