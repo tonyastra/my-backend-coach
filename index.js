@@ -742,8 +742,9 @@ app.post(
 
           repasTypes.forEach(type => {
             nouveauJour[type] = {
-              commentaire: '',
-              aliments: []
+              aliments: [],
+              repasValide: false,
+              commentaire: ''
             };
           });
 
@@ -908,7 +909,8 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
 
               oldSuivi[dateKey][repasType] = {
                 aliments: repas.aliments || [],
-                commentaire: repas.commentaire || ''
+                commentaire: repas.commentaire || '',
+                repasValide: repas.repasValide === true
               };
             }
           }
