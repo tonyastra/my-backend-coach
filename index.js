@@ -350,6 +350,13 @@ app.post(
           }
         });
 
+        // 📸 Ajout du chemin de la photo si elle a été uploadée
+        if (req.file) {
+          const photoPath = `/uploads/${req.file.filename}`;
+          profil.photoProfil = photoPath;
+        }
+
+
         // 🗂️ Création du dossier client initial avec les sections remplies
         const dossierClient = {
           email,
@@ -834,18 +841,14 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
           oldProfil.taille = oldProfil.taille != null ? oldProfil.taille.toString() : '';
           oldProfil.poids = oldProfil.poids != null ? oldProfil.poids.toString() : '';
 
-          if (req.file && req.file.buffer) {
-            const base64 = req.file.buffer.toString('base64');
-            const mime = req.file.mimetype;
-            const dataUri = `data:${mime};base64,${base64}`;
-            parsedData.photoProfil = dataUri;
-          } else if (req.file) {
-            console.warn('Upload reçu mais buffer manquant, photoProfil ignorée.');
+          if (req.file) {
+            // Ici, req.file.filename est le nom du fichier enregistré dans /uploads
+            const photoPath = `/uploads/${req.file.filename}`;
+            parsedData.photoProfil = photoPath;
           }
 
           updatePayload.profil = [{ ...oldProfil, ...parsedData }];
         }
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else if (section === 'entrainements') {
           if (Array.isArray(parsedData)) {
@@ -1017,11 +1020,17 @@ app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
   }
 });
 
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////// FIN DE TOUTES LES ROUTES //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 💥 Gestion des erreurs -> TOUJOURS EN DERNIER !!!!!
 app.use((err, req, res, next) => {
@@ -1035,4 +1044,11 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
 });
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// FIN DE TOUTES LES ROUTES //////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
