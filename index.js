@@ -13,15 +13,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 
-
-
-
-if (!fs.existsSync(uploadFolderPath)) {
-  fs.mkdirSync(uploadFolderPath, { recursive: true });
-  console.log('Dossier uploads créé:', uploadFolderPath);
-} else {
-  console.log('Dossier uploads déjà existant:', uploadFolderPath);
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 const admin = require('firebase-admin');
 
@@ -38,8 +29,21 @@ const db = admin.firestore();
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
-//const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, 'uploads');
+    console.log('📁 Upload path:', uploadPath); // 🔍 ajoute ça
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + ext);
+  }
+});
 
+console.log('Upload folder path:', path.join(__dirname, 'uploads'));
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -56,20 +60,7 @@ app.use((req, res, next) => {
   next();
 });
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // ex: .jpg, .png
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + ext);
-  }
-});
 
-const upload = multer({ storage });
-
-  console.log('Upload folder path:', path.join(__dirname, 'uploads'));
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
