@@ -644,49 +644,33 @@ app.post(
          * SECTION: mensurations
          * ➕ Ajoute une nouvelle entrée de mensurations avec upload de photos
          */
-        // if (section === 'mensurations') {
-        //   const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
-
-        //   const photos = {
-        //     photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
-        //     photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
-        //     photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
-        //     photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
-        //   };
-
-        //   const newEntry = {
-        //     date: mensurationData.date || new Date().toISOString().split('T')[0],
-        //     poids: mensurationData.poids || '',
-        //     poitrine: mensurationData.poitrine || '',
-        //     taille: mensurationData.taille || '',
-        //     hanches: mensurationData.hanches || '',
-        //     brasD: mensurationData.brasD || '',
-        //     brasG: mensurationData.brasG || '',
-        //     cuisseD: mensurationData.cuisseD || '',
-        //     cuisseG: mensurationData.cuisseG || '',
-        //     molletD: mensurationData.molletD || '',
-        //     molletG: mensurationData.molletG || '',
-        //     ...photos
-        //   };
-
-        //   const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
-
-        //   await dossierRef.update({ mensurations: updatedMensurations });
-
-        //   return res.status(201).json({ message: 'Mensuration ajoutée.', data: newEntry });
-        // }
         if (section === 'mensurations') {
           try {
             const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
 
-            // Récupérer les chemins locaux des photos uploadées par multer
-            const photos = {
-              photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
-              photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
-              photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
-              photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
-            };
+            // Fonction pour upload un fichier sur Firebase Storage
+            async function uploadFileToFirebase(file, folder) {
+              if (!file) return null;
+              const destination = `${folder}/${Date.now()}_${file.originalname}`;
+              await bucket.upload(file.path, {
+                destination,
+                public: true,
+                metadata: { contentType: file.mimetype }
+              });
+              // Supprimer le fichier local après upload
+              fs.unlink(file.path, (err) => {
+                if (err) console.warn('Erreur suppression fichier local:', err);
+              });
+              return `https://storage.googleapis.com/${bucket.name}/${destination}`;
+            }
 
+            // Upload photos et récupérer URL
+            const photoFaceUrl = await uploadFileToFirebase(req.files['photoFace'] ? req.files['photoFace'][0] : null, 'mensurations');
+            const photoDosUrl = await uploadFileToFirebase(req.files['photoDos'] ? req.files['photoDos'][0] : null, 'mensurations');
+            const photoProfilDUrl = await uploadFileToFirebase(req.files['photoProfilD'] ? req.files['photoProfilD'][0] : null, 'mensurations');
+            const photoProfilGUrl = await uploadFileToFirebase(req.files['photoProfilG'] ? req.files['photoProfilG'][0] : null, 'mensurations');
+
+            // Construire la nouvelle entrée mensuration avec URLs photos
             const newEntry = {
               date: mensurationData.date || new Date().toISOString().split('T')[0],
               poids: mensurationData.poids || '',
@@ -699,15 +683,22 @@ app.post(
               cuisseG: mensurationData.cuisseG || '',
               molletD: mensurationData.molletD || '',
               molletG: mensurationData.molletG || '',
-              ...photos
+              photoFace: photoFaceUrl,
+              photoDos: photoDosUrl,
+              photoProfilD: photoProfilDUrl,
+              photoProfilG: photoProfilGUrl
             };
 
-            // Récupérer le doc dossier client (assure-toi d'avoir dossierRef défini avant)
-            const dossierRef = db.collection('users').doc(/* userId ici à récupérer */).collection('dossier_client').doc(/* id dossier */);
+            const userEmail = req.user.email.toLowerCase();
+            const userId = userEmail.replace(/[@.]/g, '_');
+            const dossierId = userId;
+            const dossierRef = db.collection('users').doc(userId).collection('dossier_client').doc(dossierId);
 
-            // Charger les données existantes pour merger les mensurations
             const dossierSnap = await dossierRef.get();
-            const dossierData = dossierSnap.exists ? dossierSnap.data() : { mensurations: [] };
+            if (!dossierSnap.exists) {
+              return res.status(404).json({ message: 'Dossier introuvable.' });
+            }
+            const dossierData = dossierSnap.data();
 
             const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
 
