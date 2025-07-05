@@ -674,6 +674,7 @@ app.post(
 
             // Construire la nouvelle entrée mensuration avec URLs photos
             const newEntry = {
+              id: uuidv4,
               date: mensurationData.date || new Date().toISOString().split('T')[0],
               poids: mensurationData.poids || '',
               poitrine: mensurationData.poitrine || '',
