@@ -776,23 +776,46 @@ app.post(
                 noteTraining
               });
 
-              exercices.forEach((exo) => {
-                const perfId = uuidv4();
+              // exercices.forEach((exo) => {
+              //   const perfId = uuidv4();
 
-                nouvellesPerformances.push({
-                  id: perfId,
-                  jourS: date || '',
-                  nom: exo.nom || '',
-                  series: exo.series ?? 0,
-                  reps: exo.repetitions ?? 0,
-                  type: exo.type || '',
-                  charges: [
-                    {
-                      date: new Date().toISOString().split('T')[0],
-                      charge: 0
-                    }
-                  ]
-                });
+              //   nouvellesPerformances.push({
+              //     id: perfId,
+              //     jourS: date || '',
+              //     nom: exo.nom || '',
+              //     series: exo.series ?? 0,
+              //     reps: exo.repetitions ?? 0,
+              //     type: exo.type || '',
+              //     charges: [
+              //       {
+              //         date: new Date().toISOString().split('T')[0],
+              //         charge: 0
+              //       }
+              //     ]
+              //   });
+              // });
+              const perfId = uuidv4();
+
+              nouvellesPerformances.push({
+                id: perfId,
+                jourS: date || '',
+                groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
+                type: exo.type || '',
+                perfJour: exercices
+                  .filter(exo => exo.nom)
+                  .map(exo => ({
+                    id: uuidv4(),
+                    exercice: exo.nom,
+                    series: exo.series?.length
+                      ? exo.series.map(serie => ({
+                          reps: serie.reps ?? 0,
+                          charge: serie.charge ?? 0
+                        }))
+                      : [{
+                          reps: exo.repetitions ?? 0,
+                          charge: 0
+                        }]
+                  }))
               });
             }
           });
@@ -1069,10 +1092,25 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else if (section === 'performances') {
-          const oldPerf = dossier.performances?.[0] || {};
-          updatePayload.performances = [{ ...oldPerf, ...parsedData }];
-        }
+          const oldPerformances = dossier.performances || [];
 
+          // parsedData peut être un tableau ou un objet unique — on normalise en tableau
+          const newPerformances = Array.isArray(parsedData) ? parsedData : [parsedData];
+
+          // On crée un map des performances nouvelles par id pour update rapide
+          const newPerfMap = new Map(newPerformances.map(p => [p.id, p]));
+
+          // On reconstruit la liste : on update celles existantes, on ajoute les nouvelles
+          const updatedPerformances = [
+            // performances existantes mises à jour si elles correspondent
+            ...oldPerformances.map(p => newPerfMap.has(p.id) ? { ...p, ...newPerfMap.get(p.id) } : p),
+
+            // performances nouvelles qui n'existent pas encore dans l'ancien tableau
+            ...newPerformances.filter(p => !oldPerformances.some(old => old.id === p.id))
+          ];
+
+          updatePayload.performances = updatedPerformances;
+        }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else if (section === 'suiviDiete') {
           const oldSuivi = dossier.suiviDiete || {};
