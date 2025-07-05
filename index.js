@@ -19,7 +19,7 @@ const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSO
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    storageBucket: 'app-tf-coaching.firebasestorage.app',
 
 });
 
