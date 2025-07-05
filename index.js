@@ -1117,6 +1117,92 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
   }
 }); // <-- Fin de app.put
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////// ROUTES DELETE ///////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * 🗑️ Route DELETE /dossiers/supprimer
+ * 
+ * Permet de supprimer un élément spécifique d'une section du dossier client (ex: mensurations, diètes, entraînements).
+ * L'utilisateur doit être authentifié. Seules certaines sections sont autorisées à la suppression.
+ * 
+ * 🔒 Authentification requise (token JWT)
+ * 📦 Body attendu :
+ *    - section : nom de la section (ex: "dietes", "mensurations")
+ *    - id      : identifiant unique de l’élément à supprimer
+ * 
+ * ✅ Exemples de sections gérées : mensurations, dietes, entrainements
+ * 🔁 Extensible facilement en ajoutant des sections dans la liste autorisée
+ * 
+ * 🕵️‍♂️ Vérifie que le document existe avant de tenter une suppression
+ */
+app.delete('/dossiers/supprimer', authenticateToken, async (req, res) => {
+  console.log('🛑 DELETE /dossiers/supprimer appelé');
+  console.log('User:', req.user.email);
+  console.log('Body:', req.body);
+
+  try {
+    const email = req.user.email.toLowerCase();
+    const sanitizedEmail = email.replace(/[@.]/g, '_');
+
+    const { section, id } = req.body;
+
+    console.log(`Section demandée: ${section}, id: ${id}`);
+
+    if (!section || !id) {
+      console.log('⚠️ Section ou ID manquants');
+      return res.status(400).json({ message: 'Section et ID sont requis.' });
+    }
+
+    const sectionsAutorisees = ['mensurations', 'dietes', 'entrainements'];
+    if (!sectionsAutorisees.includes(section)) {
+      console.log(`⚠️ Section ${section} non autorisée`);
+      return res.status(400).json({ message: `Section ${section} non gérée.` });
+    }
+
+    const dossierRef = db
+      .collection('users')
+      .doc(sanitizedEmail)
+      .collection('dossier_client')
+      .doc(sanitizedEmail);
+
+    const docSnap = await dossierRef.get();
+
+    if (!docSnap.exists) {
+      console.log('⚠️ Dossier non trouvé');
+      return res.status(404).json({ message: 'Dossier non trouvé.' });
+    }
+
+    const dossier = docSnap.data() || {};
+    const sectionData = dossier[section];
+
+    if (!Array.isArray(sectionData)) {
+      console.log(`⚠️ La section ${section} n'est pas un tableau`);
+      return res.status(400).json({ message: `La section ${section} n'est pas un tableau.` });
+    }
+
+    const newSectionData = sectionData.filter(item => item.id !== id && item._id !== id);
+
+    if (newSectionData.length === sectionData.length) {
+      console.log(`⚠️ Élément avec l'ID ${id} non trouvé dans ${section}`);
+      return res.status(404).json({ message: `Élément avec l'ID ${id} non trouvé dans ${section}.` });
+    }
+
+    const updatePayload = { [section]: newSectionData };
+
+    await dossierRef.update(updatePayload);
+
+    console.log(`✅ Élément supprimé avec succès de la section ${section}`);
+    res.status(200).json({ message: `Élément supprimé avec succès de la section ${section}.` });
+
+  } catch (err) {
+    console.error("🔥 Erreur Firestore suppression :", err);
+    res.status(500).json({ message: 'Erreur serveur lors de la suppression.' });
+  }
+});
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////// ROUTES SPECIFIQUE ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
