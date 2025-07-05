@@ -29,22 +29,18 @@ const db = admin.firestore();
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
-//const upload = multer({ dest: path.join(__dirname, 'uploads') });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, 'uploads'));
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // ex: .jpg
+    const ext = path.extname(file.originalname); // ex: .jpg, .png
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + ext); // ✅ inclut l'extension
+    cb(null, uniqueSuffix + ext);
   }
 });
 
-const upload = multer({ storage }); // ✅ Corrige ici
-
-console.log('Upload folder path:', path.join(__dirname, 'uploads'));
-
+const upload = multer({ storage });
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 🧱 Middlewares
@@ -83,9 +79,29 @@ app.post('/api/send-pdf', (req, res) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// Middleware pour servir les fichiers statiques d’images uploadées
-// 🚀 Permet d’accéder aux images via l’URL /uploads/nom_du_fichier
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+//////////////////: Fire base Storage 
+app.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    const localFilePath = req.file.path;
+    const destination = `photos-profil/${req.file.filename}`;
+
+    await bucket.upload(localFilePath, {
+      destination,
+      public: true, // ou false selon si tu veux un lien direct ou non
+      metadata: {
+        cacheControl: 'public, max-age=31536000',
+      },
+    });
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
+    res.json({ url: publicUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors de l'upload");
+  }
+});
+/////////////////: Fire base Storage 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -307,9 +323,15 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
   }
 });
 
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// ENREGISTREMENT UNIVERSEL (POST) ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 /**
  * 🚀 ROUTE GLOBALE : ENREGISTREMENT DOSSIER CLIENT (Nouveau client ou client connecté)
@@ -321,91 +343,174 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
 
 app.post(
   '/dossier/enregistrer',
-  upload.fields([
-    { name: 'photoProfil', maxCount: 1 },
-    { name: 'photoFace' },
-    { name: 'photoDos' },
-    { name: 'photoProfilD' },
-    { name: 'photoProfilG' }
-  ]),
-  async (req, res) => {
+    upload.fields([
+      { name: 'photoProfil', maxCount: 1 },
+      { name: 'photoFace' },
+      { name: 'photoDos' },
+      { name: 'photoProfilD' },
+      { name: 'photoProfilG' }
+    ]),
+    async (req, res) => {
     const { section, data } = req.body;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 📦 Cas 1 — Création d’un nouveau client (pas encore connecté)
      * Aucun token nécessaire ici.
      */
-    if (section === 'nouveauClient') {
-      try {
-        const {
-          email, password,
-          securityQuestion, securityAnswer,
-          profil, mensurationProfil, hygieneVie, objectifs,
-          medical, physio, nutrition, activite, preference
-        } = typeof data === 'string' ? JSON.parse(data) : data;
+    // if (section === 'nouveauClient') {
+    //   try {
+    //     const {
+    //       email, password,
+    //       securityQuestion, securityAnswer,
+    //       profil, mensurationProfil, hygieneVie, objectifs,
+    //       medical, physio, nutrition, activite, preference
+    //     } = typeof data === 'string' ? JSON.parse(data) : data;
 
-        if (!email || !password) {
-          return res.status(400).json({ message: 'Email et mot de passe requis.' });
-        }
+    //     if (!email || !password) {
+    //       return res.status(400).json({ message: 'Email et mot de passe requis.' });
+    //     }
 
-        // 🔧 Génère un userId formaté à partir de l’email
-        const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
-        const userId = emailToId(email);
-        const userDocRef = db.collection('users').doc(userId);
-        const userDoc = await userDocRef.get();
+    //     // 🔧 Génère un userId formaté à partir de l’email
+    //     const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+    //     const userId = emailToId(email);
+    //     const userDocRef = db.collection('users').doc(userId);
+    //     const userDoc = await userDocRef.get();
 
-        if (userDoc.exists) {
-          return res.status(409).json({ message: 'Utilisateur déjà existant.' });
-        }
+    //     if (userDoc.exists) {
+    //       return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+    //     }
 
-        // 🔒 Hash du mot de passe avant enregistrement
-        const hashedPassword = bcrypt.hashSync(password, 10);
+    //     // 🔒 Hash du mot de passe avant enregistrement
+    //     const hashedPassword = bcrypt.hashSync(password, 10);
 
-        // 📝 Création de l’utilisateur de base
-        await userDocRef.set({
-          email,
-          password: hashedPassword,
-          security: {
-            question: securityQuestion,
-            answer: securityAnswer
+    //     // 📝 Création de l’utilisateur de base
+    //     await userDocRef.set({
+    //       email,
+    //       password: hashedPassword,
+    //       security: {
+    //         question: securityQuestion,
+    //         answer: securityAnswer
+    //       }
+    //     });
+
+    //     // 📸 Ajout du chemin de la photo si elle a été uploadée
+
+    //     if (req.files && req.files['photoProfil']) {
+    //         const photoFile = req.files['photoProfil'][0];
+
+    //         const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
+    //         await bucket.upload(photoFile.path, {
+    //           destination,
+    //           public: true, // Rendre accessible publiquement
+    //           metadata: {
+    //             contentType: photoFile.mimetype
+    //           }
+    //         });
+
+    //         // Obtenir l'URL publique
+    //         const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
+    //         profil.photoProfil = publicUrl;
+    //       }
+
+    //     // 🗂️ Création du dossier client initial avec les sections remplies
+    //     const dossierClient = {
+    //       email,
+    //       profil: profil ? [profil] : [],
+    //       mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+    //       hygieneVie: hygieneVie ? [hygieneVie] : [],
+    //       objectifs: objectifs ? [objectifs] : [],
+    //       medical: medical ? [medical] : [],
+    //       physio: physio ? [physio] : [],
+    //       nutrition: nutrition ? [nutrition] : [],
+    //       activite: activite ? [activite] : [],
+    //       preference: preference ? [preference] : [],
+    //       mensurations: [],
+    //       entrainements: [],
+    //       performances: [],
+    //       dietes: []
+    //     };
+
+    //     await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
+
+    //     return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
+
+    //   } catch (error) {
+    //     console.error("❌ Erreur inscription nouveau client :", error);
+    //     return res.status(500).json({ message: "Erreur lors de l'inscription." });
+    //   }
+    // }
+        if (section === 'nouveauClient') {
+          try {
+            const {
+              email, password,
+              securityQuestion, securityAnswer,
+              profil, mensurationProfil, hygieneVie, objectifs,
+              medical, physio, nutrition, activite, preference
+            } = typeof data === 'string' ? JSON.parse(data) : data;
+
+            if (!email || !password) {
+              return res.status(400).json({ message: 'Email et mot de passe requis.' });
+            }
+
+            const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+            const userId = emailToId(email);
+            const userDocRef = db.collection('users').doc(userId);
+            const userDoc = await userDocRef.get();
+
+            if (userDoc.exists) {
+              return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+            }
+
+            const hashedPassword = bcrypt.hashSync(password, 10);
+
+            await userDocRef.set({
+              email,
+              password: hashedPassword,
+              security: {
+                question: securityQuestion,
+                answer: securityAnswer
+              }
+            });
+
+            // Upload photoProfil sur Firebase Storage + récupérer URL publique
+            if (req.files && req.files['photoProfil']) {
+              const photoFile = req.files['photoProfil'][0];
+              const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
+              await bucket.upload(photoFile.path, {
+                destination,
+                public: true,
+                metadata: { contentType: photoFile.mimetype }
+              });
+              const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
+              profil.photoProfil = publicUrl;
+            }
+
+            // Création du dossier client initial
+            const dossierClient = {
+              email,
+              profil: profil ? [profil] : [],
+              mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+              hygieneVie: hygieneVie ? [hygieneVie] : [],
+              objectifs: objectifs ? [objectifs] : [],
+              medical: medical ? [medical] : [],
+              physio: physio ? [physio] : [],
+              nutrition: nutrition ? [nutrition] : [],
+              activite: activite ? [activite] : [],
+              preference: preference ? [preference] : [],
+              mensurations: [],
+              entrainements: [],
+              performances: [],
+              dietes: []
+            };
+
+            await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
+
+            return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
+          } catch (error) {
+            console.error("❌ Erreur inscription nouveau client :", error);
+            return res.status(500).json({ message: "Erreur lors de l'inscription." });
           }
-        });
-
-        // 📸 Ajout du chemin de la photo si elle a été uploadée
-        if (req.files && req.files['photoProfil']) {
-          const photoFile = req.files['photoProfil'][0];
-          const photoPath = `/uploads/${photoFile.filename}`;
-          profil.photoProfil = photoPath;
         }
-
-
-        // 🗂️ Création du dossier client initial avec les sections remplies
-        const dossierClient = {
-          email,
-          profil: profil ? [profil] : [],
-          mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
-          hygieneVie: hygieneVie ? [hygieneVie] : [],
-          objectifs: objectifs ? [objectifs] : [],
-          medical: medical ? [medical] : [],
-          physio: physio ? [physio] : [],
-          nutrition: nutrition ? [nutrition] : [],
-          activite: activite ? [activite] : [],
-          preference: preference ? [preference] : [],
-          mensurations: [],
-          entrainements: [],
-          performances: [],
-          dietes: []
-        };
-
-        await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
-
-        return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
-
-      } catch (error) {
-        console.error("❌ Erreur inscription nouveau client :", error);
-        return res.status(500).json({ message: "Erreur lors de l'inscription." });
-      }
-    }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * ❓ Cas 1.5 — Vérification de la question de sécurité (sans authentification)
@@ -539,36 +644,80 @@ app.post(
          * SECTION: mensurations
          * ➕ Ajoute une nouvelle entrée de mensurations avec upload de photos
          */
+        // if (section === 'mensurations') {
+        //   const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
+
+        //   const photos = {
+        //     photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
+        //     photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
+        //     photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
+        //     photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
+        //   };
+
+        //   const newEntry = {
+        //     date: mensurationData.date || new Date().toISOString().split('T')[0],
+        //     poids: mensurationData.poids || '',
+        //     poitrine: mensurationData.poitrine || '',
+        //     taille: mensurationData.taille || '',
+        //     hanches: mensurationData.hanches || '',
+        //     brasD: mensurationData.brasD || '',
+        //     brasG: mensurationData.brasG || '',
+        //     cuisseD: mensurationData.cuisseD || '',
+        //     cuisseG: mensurationData.cuisseG || '',
+        //     molletD: mensurationData.molletD || '',
+        //     molletG: mensurationData.molletG || '',
+        //     ...photos
+        //   };
+
+        //   const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
+
+        //   await dossierRef.update({ mensurations: updatedMensurations });
+
+        //   return res.status(201).json({ message: 'Mensuration ajoutée.', data: newEntry });
+        // }
         if (section === 'mensurations') {
-          const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
+          try {
+            const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
 
-          const photos = {
-            photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
-            photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
-            photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
-            photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
-          };
+            // Récupérer les chemins locaux des photos uploadées par multer
+            const photos = {
+              photoFace: req.files['photoFace'] ? `/uploads/${req.files['photoFace'][0].filename}` : null,
+              photoDos: req.files['photoDos'] ? `/uploads/${req.files['photoDos'][0].filename}` : null,
+              photoProfilD: req.files['photoProfilD'] ? `/uploads/${req.files['photoProfilD'][0].filename}` : null,
+              photoProfilG: req.files['photoProfilG'] ? `/uploads/${req.files['photoProfilG'][0].filename}` : null,
+            };
 
-          const newEntry = {
-            date: mensurationData.date || new Date().toISOString().split('T')[0],
-            poids: mensurationData.poids || '',
-            poitrine: mensurationData.poitrine || '',
-            taille: mensurationData.taille || '',
-            hanches: mensurationData.hanches || '',
-            brasD: mensurationData.brasD || '',
-            brasG: mensurationData.brasG || '',
-            cuisseD: mensurationData.cuisseD || '',
-            cuisseG: mensurationData.cuisseG || '',
-            molletD: mensurationData.molletD || '',
-            molletG: mensurationData.molletG || '',
-            ...photos
-          };
+            const newEntry = {
+              date: mensurationData.date || new Date().toISOString().split('T')[0],
+              poids: mensurationData.poids || '',
+              poitrine: mensurationData.poitrine || '',
+              taille: mensurationData.taille || '',
+              hanches: mensurationData.hanches || '',
+              brasD: mensurationData.brasD || '',
+              brasG: mensurationData.brasG || '',
+              cuisseD: mensurationData.cuisseD || '',
+              cuisseG: mensurationData.cuisseG || '',
+              molletD: mensurationData.molletD || '',
+              molletG: mensurationData.molletG || '',
+              ...photos
+            };
 
-          const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
+            // Récupérer le doc dossier client (assure-toi d'avoir dossierRef défini avant)
+            const dossierRef = db.collection('users').doc(/* userId ici à récupérer */).collection('dossier_client').doc(/* id dossier */);
 
-          await dossierRef.update({ mensurations: updatedMensurations });
+            // Charger les données existantes pour merger les mensurations
+            const dossierSnap = await dossierRef.get();
+            const dossierData = dossierSnap.exists ? dossierSnap.data() : { mensurations: [] };
 
-          return res.status(201).json({ message: 'Mensuration ajoutée.', data: newEntry });
+            const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
+
+            await dossierRef.update({ mensurations: updatedMensurations });
+
+            return res.status(201).json({ message: 'Mensuration ajoutée.', data: newEntry });
+          } catch (error) {
+            console.error("❌ Erreur ajout mensuration :", error);
+            return res.status(500).json({ message: "Erreur lors de l'ajout de mensuration." });
+          }
         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
@@ -741,16 +890,6 @@ app.post(
         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
-         * SECTION: profil
-         * 🔄 Met à jour les informations du profil
-         */
-        if (section === 'profil') {
-          const profilData = typeof data === 'string' ? JSON.parse(data) : data;
-          await dossierRef.update({ profil: profilData });
-          return res.status(201).json({ message: 'Profil mis à jour.' });
-        }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /**
          * SECTION SECTION pour initialiser une journée dans suiviDiete
          */
         if (section === 'suiviDieteInit') {
@@ -873,9 +1012,26 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
           oldProfil.poids = oldProfil.poids != null ? oldProfil.poids.toString() : '';
 
           if (req.file) {
-            // Ici, req.file.filename est le nom du fichier enregistré dans /uploads
-            const photoPath = `/uploads/${req.file.filename}`;
-            parsedData.photoProfil = photoPath;
+            // Upload dans Firebase Storage
+            const destination = `photos_profil/${Date.now()}_${req.file.originalname}`;
+            await bucket.upload(req.file.path, {
+              destination,
+              public: true,
+              metadata: {
+                contentType: req.file.mimetype,
+              },
+            });
+
+            // Supprimer fichier local uploadé
+            fs.unlink(req.file.path, (err) => {
+              if (err) console.warn('Erreur suppression fichier local:', err);
+            });
+
+            // URL publique Firebase Storage
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
+
+            // Met à jour la photoProfil dans les données à sauvegarder
+            parsedData.photoProfil = publicUrl;
           }
 
           updatePayload.profil = [{ ...oldProfil, ...parsedData }];
