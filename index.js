@@ -694,49 +694,32 @@ app.post(
                 noteTraining
               });
 
-              // exercices.forEach((exo) => {
-              //   const perfId = uuidv4();
-
-              //   nouvellesPerformances.push({
-              //     id: perfId,
-              //     jourS: date || '',
-              //     nom: exo.nom || '',
-              //     series: exo.series ?? 0,
-              //     reps: exo.repetitions ?? 0,
-              //     type: exo.type || '',
-              //     charges: [
-              //       {
-              //         date: new Date().toISOString().split('T')[0],
-              //         charge: 0
-              //       }
-              //     ]
-              //   });
-              // });
-
-exercices.forEach((exo) => {
-
-    nouvellesPerformances.push({
-      id: newId,
-      jourS: date || '',
-      groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
-      type: exo.type || '',
-      perfJour: exercices
-        .filter(exo => exo.nom)
-        .map(exo => ({
-          id: uuidv4(),
-          exercice: exo.nom,
-          repetitions: exo.repetitions ?? 0, // <-- reps fixées ici
-          chargeList: [{
-            date: new Date().toISOString().split('T')[0],
-            charge: exo.series?.[0]?.charge ?? 0 // <-- charge du jour
-          }]
-        }))
-    });
-
-});
-
+              // Crée une performance par entraînement (et non par exo)
+              const perfId = uuidv4();
+              nouvellesPerformances.push({
+                id: perfId,
+                jourS: date || '',
+                groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
+                typeTraining,
+                perfJour: exercices
+                  .filter(exo => exo.nom)
+                  .map(exo => ({
+                    id: uuidv4(),
+                    exercice: exo.nom,
+                    repetitions: exo.repetitions ?? 0,
+                    series: exo.series ?? 0,
+                    chargeList: [
+                      {
+                        date: new Date().toISOString().split('T')[0],
+                        charge: 0
+                      }
+                    ]
+                  }))
+              });
             }
           });
+
+
 
           // 🔍 Pour debug : vérifier que toutes les données sont bien définies
           console.log('📦 Données envoyées à Firestore :', {
