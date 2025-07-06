@@ -712,29 +712,25 @@ app.post(
               //     ]
               //   });
               // });
-              const perfId = uuidv4();
+const perfId = uuidv4();
 
-              nouvellesPerformances.push({
-                id: perfId,
-                jourS: date || '',
-                groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
-                type: exo.type || '',
-                perfJour: exercices
-                  .filter(exo => exo.nom)
-                  .map(exo => ({
-                    id: uuidv4(),
-                    exercice: exo.nom,
-                    series: exo.series?.length
-                      ? exo.series.map(serie => ({
-                          reps: serie.reps ?? 0,
-                          charge: serie.charge ?? 0
-                        }))
-                      : [{
-                          reps: exo.repetitions ?? 0,
-                          charge: 0
-                        }]
-                  }))
-              });
+nouvellesPerformances.push({
+  id: perfId,
+  jourS: date || '',
+  groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
+  type: exo.type || '',
+  perfJour: exercices
+    .filter(exo => exo.nom)
+    .map(exo => ({
+      id: uuidv4(),
+      exercice: exo.nom,
+      repetitions: exo.repetitions ?? 0, // <-- reps fixées ici
+      chargeList: [{
+        date: new Date().toISOString().split('T')[0],
+        charge: exo.series?.[0]?.charge ?? 0 // <-- charge du jour
+      }]
+    }))
+});
             }
           });
 
@@ -812,24 +808,38 @@ if (section === 'updateCharges') {
     }
 
     update.exercices?.forEach(updatedExo => {
-      const targetExo = perf.perfJour.find(e => e.id === updatedExo.id || e.exercice === updatedExo.exercice);
+      const targetExo = perf.perfJour.find(e =>
+        e.id === updatedExo.id || e.exercice === updatedExo.exercice
+      );
 
-      if (!targetExo || !Array.isArray(targetExo.series)) {
-        console.warn(`⚠️ Exercice non trouvé ou mal formé pour update :`, updatedExo);
+      if (!targetExo) {
+        console.warn(`⚠️ Exercice non trouvé pour update :`, updatedExo);
         return;
       }
 
-      updatedExo.series?.forEach((serieUpdate, index) => {
-        if (!targetExo.series[index]) {
-          // Si l'index n'existe pas, on l'ajoute
-          targetExo.series[index] = {
-            reps: serieUpdate.reps ?? 0,
-            charge: serieUpdate.charge ?? 0
-          };
-        } else {
-          // Sinon on met à jour
-          targetExo.series[index].reps = serieUpdate.reps ?? targetExo.series[index].reps;
-          targetExo.series[index].charge = serieUpdate.charge ?? targetExo.series[index].charge;
+      // On met à jour la chargeList uniquement
+      if (!Array.isArray(targetExo.chargeList)) {
+        targetExo.chargeList = [];
+      }
+
+      updatedExo.chargeList?.forEach((newCharge, idx) => {
+        if (
+          newCharge &&
+          typeof newCharge === 'object' &&
+          'date' in newCharge &&
+          !isNaN(new Date(newCharge.date))
+        ) {
+          if (targetExo.chargeList[idx]) {
+            // Mise à jour de la charge existante
+            targetExo.chargeList[idx].charge = newCharge.charge ?? targetExo.chargeList[idx].charge;
+            targetExo.chargeList[idx].date = newCharge.date;
+          } else {
+            // Nouvelle charge (si index inexistant)
+            targetExo.chargeList.push({
+              date: newCharge.date,
+              charge: newCharge.charge ?? 0
+            });
+          }
         }
       });
     });
