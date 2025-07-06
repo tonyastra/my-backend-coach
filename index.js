@@ -359,160 +359,78 @@ app.post(
      * 📦 Cas 1 — Création d’un nouveau client (pas encore connecté)
      * Aucun token nécessaire ici.
      */
-    // if (section === 'nouveauClient') {
-    //   try {
-    //     const {
-    //       email, password,
-    //       securityQuestion, securityAnswer,
-    //       profil, mensurationProfil, hygieneVie, objectifs,
-    //       medical, physio, nutrition, activite, preference
-    //     } = typeof data === 'string' ? JSON.parse(data) : data;
+      if (section === 'nouveauClient') {
+        try {
+          const {
+            email, password,
+            securityQuestion, securityAnswer,
+            profil, mensurationProfil, hygieneVie, objectifs,
+            medical, physio, nutrition, activite, preference
+          } = typeof data === 'string' ? JSON.parse(data) : data;
 
-    //     if (!email || !password) {
-    //       return res.status(400).json({ message: 'Email et mot de passe requis.' });
-    //     }
-
-    //     // 🔧 Génère un userId formaté à partir de l’email
-    //     const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
-    //     const userId = emailToId(email);
-    //     const userDocRef = db.collection('users').doc(userId);
-    //     const userDoc = await userDocRef.get();
-
-    //     if (userDoc.exists) {
-    //       return res.status(409).json({ message: 'Utilisateur déjà existant.' });
-    //     }
-
-    //     // 🔒 Hash du mot de passe avant enregistrement
-    //     const hashedPassword = bcrypt.hashSync(password, 10);
-
-    //     // 📝 Création de l’utilisateur de base
-    //     await userDocRef.set({
-    //       email,
-    //       password: hashedPassword,
-    //       security: {
-    //         question: securityQuestion,
-    //         answer: securityAnswer
-    //       }
-    //     });
-
-    //     // 📸 Ajout du chemin de la photo si elle a été uploadée
-
-    //     if (req.files && req.files['photoProfil']) {
-    //         const photoFile = req.files['photoProfil'][0];
-
-    //         const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
-    //         await bucket.upload(photoFile.path, {
-    //           destination,
-    //           public: true, // Rendre accessible publiquement
-    //           metadata: {
-    //             contentType: photoFile.mimetype
-    //           }
-    //         });
-
-    //         // Obtenir l'URL publique
-    //         const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
-    //         profil.photoProfil = publicUrl;
-    //       }
-
-    //     // 🗂️ Création du dossier client initial avec les sections remplies
-    //     const dossierClient = {
-    //       email,
-    //       profil: profil ? [profil] : [],
-    //       mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
-    //       hygieneVie: hygieneVie ? [hygieneVie] : [],
-    //       objectifs: objectifs ? [objectifs] : [],
-    //       medical: medical ? [medical] : [],
-    //       physio: physio ? [physio] : [],
-    //       nutrition: nutrition ? [nutrition] : [],
-    //       activite: activite ? [activite] : [],
-    //       preference: preference ? [preference] : [],
-    //       mensurations: [],
-    //       entrainements: [],
-    //       performances: [],
-    //       dietes: []
-    //     };
-
-    //     await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
-
-    //     return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
-
-    //   } catch (error) {
-    //     console.error("❌ Erreur inscription nouveau client :", error);
-    //     return res.status(500).json({ message: "Erreur lors de l'inscription." });
-    //   }
-    // }
-        if (section === 'nouveauClient') {
-          try {
-            const {
-              email, password,
-              securityQuestion, securityAnswer,
-              profil, mensurationProfil, hygieneVie, objectifs,
-              medical, physio, nutrition, activite, preference
-            } = typeof data === 'string' ? JSON.parse(data) : data;
-
-            if (!email || !password) {
-              return res.status(400).json({ message: 'Email et mot de passe requis.' });
-            }
-
-            const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
-            const userId = emailToId(email);
-            const userDocRef = db.collection('users').doc(userId);
-            const userDoc = await userDocRef.get();
-
-            if (userDoc.exists) {
-              return res.status(409).json({ message: 'Utilisateur déjà existant.' });
-            }
-
-            const hashedPassword = bcrypt.hashSync(password, 10);
-
-            await userDocRef.set({
-              email,
-              password: hashedPassword,
-              security: {
-                question: securityQuestion,
-                answer: securityAnswer
-              }
-            });
-
-            // Upload photoProfil sur Firebase Storage + récupérer URL publique
-            if (req.files && req.files['photoProfil']) {
-              const photoFile = req.files['photoProfil'][0];
-              const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
-              await bucket.upload(photoFile.path, {
-                destination,
-                public: true,
-                metadata: { contentType: photoFile.mimetype }
-              });
-              const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
-              profil.photoProfil = publicUrl;
-            }
-
-            // Création du dossier client initial
-            const dossierClient = {
-              email,
-              profil: profil ? [profil] : [],
-              mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
-              hygieneVie: hygieneVie ? [hygieneVie] : [],
-              objectifs: objectifs ? [objectifs] : [],
-              medical: medical ? [medical] : [],
-              physio: physio ? [physio] : [],
-              nutrition: nutrition ? [nutrition] : [],
-              activite: activite ? [activite] : [],
-              preference: preference ? [preference] : [],
-              mensurations: [],
-              entrainements: [],
-              performances: [],
-              dietes: []
-            };
-
-            await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
-
-            return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
-          } catch (error) {
-            console.error("❌ Erreur inscription nouveau client :", error);
-            return res.status(500).json({ message: "Erreur lors de l'inscription." });
+          if (!email || !password) {
+            return res.status(400).json({ message: 'Email et mot de passe requis.' });
           }
+
+          const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+          const userId = emailToId(email);
+          const userDocRef = db.collection('users').doc(userId);
+          const userDoc = await userDocRef.get();
+
+          if (userDoc.exists) {
+            return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+          }
+
+          const hashedPassword = bcrypt.hashSync(password, 10);
+
+          await userDocRef.set({
+            email,
+            password: hashedPassword,
+            security: {
+              question: securityQuestion,
+              answer: securityAnswer
+            }
+          });
+
+          // Upload photoProfil sur Firebase Storage + récupérer URL publique
+          if (req.files && req.files['photoProfil']) {
+            const photoFile = req.files['photoProfil'][0];
+            const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
+            await bucket.upload(photoFile.path, {
+              destination,
+              public: true,
+              metadata: { contentType: photoFile.mimetype }
+            });
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
+            profil.photoProfil = publicUrl;
+          }
+
+          // Création du dossier client initial
+          const dossierClient = {
+            email,
+            profil: profil ? [profil] : [],
+            mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+            hygieneVie: hygieneVie ? [hygieneVie] : [],
+            objectifs: objectifs ? [objectifs] : [],
+            medical: medical ? [medical] : [],
+            physio: physio ? [physio] : [],
+            nutrition: nutrition ? [nutrition] : [],
+            activite: activite ? [activite] : [],
+            preference: preference ? [preference] : [],
+            mensurations: [],
+            entrainements: [],
+            performances: [],
+            dietes: []
+          };
+
+          await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
+
+          return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
+        } catch (error) {
+          console.error("❌ Erreur inscription nouveau client :", error);
+          return res.status(500).json({ message: "Erreur lors de l'inscription." });
         }
+      }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * ❓ Cas 1.5 — Vérification de la question de sécurité (sans authentification)
@@ -874,37 +792,55 @@ app.post(
          * SECTION: updateCharges
          * 🔄 Met à jour les charges des performances existantes
          */
-        if (section === 'updateCharges') {
-          const { updates } = typeof data === 'string' ? JSON.parse(data) : data;
+if (section === 'updateCharges') {
+  const { updates } = typeof data === 'string' ? JSON.parse(data) : data;
 
-          if (!Array.isArray(updates) || updates.length === 0) {
-            return res.status(400).json({ message: 'Aucune mise à jour de charges fournie.' });
-          }
+  if (!Array.isArray(updates) || updates.length === 0) {
+    return res.status(400).json({ message: 'Aucune mise à jour de charges fournie.' });
+  }
 
-          const performances = Array.isArray(dossierData.performances)
-            ? [...dossierData.performances]
-            : [];
+  const performances = Array.isArray(dossierData.performances)
+    ? [...dossierData.performances]
+    : [];
 
-          updates.forEach(update => {
-            const perf = performances.find(p => p.id === update.id);
-            if (perf) {
-              perf.charges = (update.charges || []).filter(c =>
-                c &&
-                typeof c === 'object' &&
-                'date' in c &&
-                (c.date === '' || !isNaN(new Date(c.date)))
-              );
+  updates.forEach(update => {
+    const perf = performances.find(p => p.id === update.id);
 
-              console.log(`✅ Charges mises à jour pour performance ID ${update.id}`);
-            } else {
-              console.warn(`⚠️ Performance non trouvée pour ID : ${update.id}`);
-            }
-          });
+    if (!perf || !Array.isArray(perf.perfJour)) {
+      console.warn(`⚠️ Performance ou perfJour non trouvée pour ID : ${update.id}`);
+      return;
+    }
 
-          await dossierRef.update({ performances });
+    update.exercices?.forEach(updatedExo => {
+      const targetExo = perf.perfJour.find(e => e.id === updatedExo.id || e.exercice === updatedExo.exercice);
 
-          return res.status(200).json({ message: 'Charges mises à jour avec succès.' });
+      if (!targetExo || !Array.isArray(targetExo.series)) {
+        console.warn(`⚠️ Exercice non trouvé ou mal formé pour update :`, updatedExo);
+        return;
+      }
+
+      updatedExo.series?.forEach((serieUpdate, index) => {
+        if (!targetExo.series[index]) {
+          // Si l'index n'existe pas, on l'ajoute
+          targetExo.series[index] = {
+            reps: serieUpdate.reps ?? 0,
+            charge: serieUpdate.charge ?? 0
+          };
+        } else {
+          // Sinon on met à jour
+          targetExo.series[index].reps = serieUpdate.reps ?? targetExo.series[index].reps;
+          targetExo.series[index].charge = serieUpdate.charge ?? targetExo.series[index].charge;
         }
+      });
+    });
+
+    console.log(`✅ Charges mises à jour pour performance ID ${update.id}`);
+  });
+
+  await dossierRef.update({ performances });
+
+  return res.status(200).json({ message: 'Charges mises à jour avec succès.' });
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
          * SECTION SECTION pour initialiser une journée dans suiviDiete
