@@ -174,6 +174,7 @@ function authenticateToken(req, res, next) {
 }
 
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////// CONNEXION GENERAL ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +199,7 @@ app.post('/login', async (req, res) => {
     const token = jwt.sign(
       { email, role: 'coach', uid: 'coach_admin_com' },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '3h' }
     );
     return res.json({ message: "Connexion coach réussie", token });
   }
@@ -236,7 +237,7 @@ app.post('/login', async (req, res) => {
         uid: userDoc.id
       },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '3h' }
     );
 
     return res.json({ message: "Connexion réussie", token });
@@ -359,6 +360,7 @@ app.post(
      * 📦 Cas 1 — Création d’un nouveau client (pas encore connecté)
      * Aucun token nécessaire ici.
      */
+
       if (section === 'nouveauClient') {
         try {
           const {
@@ -636,104 +638,257 @@ app.post(
          * SECTION: entrainements
          * ➕ Ajoute des séances et génère les performances correspondantes
          */
+        // if (section === 'entrainements') {
+        //   const entrainements = typeof data === 'string' ? JSON.parse(data) : data;
+
+        //   if (!Array.isArray(entrainements) || entrainements.length === 0) {
+        //     return res.status(400).json({ message: 'Entraînements invalides.' });
+        //   }
+
+        //   const entrainementsActuels = dossierData.entrainements || [];
+        //   const performancesActuelles = dossierData.performances || [];
+
+        //   const nouveauxEntrainements = [];
+        //   const nouvellesPerformances = [];
+
+        //   entrainements.forEach((entraînement) => {
+        //     const {
+        //       date = '',
+        //       muscle1 = '',
+        //       muscle2 = '',
+        //       muscle3 = '',
+        //       typeTraining = '',
+        //       exercices = [],
+        //       noteTraining = ''
+        //     } = entraînement;
+
+        //     const newId = uuidv4();
+
+        //     if (typeTraining === 'cross-training') {
+        //       const circuitsFormates = exercices.map((circuit) => ({
+        //         nom: circuit.nom || '',
+        //         tours: circuit.tours ?? 0,
+        //         on: circuit.on ?? 0,
+        //         off: circuit.off ?? 0,
+        //         exercices: Array.isArray(circuit.exercices) ? circuit.exercices : []
+        //       }));
+
+        //       nouveauxEntrainements.push({
+        //         id: newId,
+        //         date,
+        //         muscle1,
+        //         muscle2,
+        //         muscle3,
+        //         typeTraining,
+        //         exercices: circuitsFormates,
+        //         noteTraining
+        //       });
+
+        //     } else {
+        //       nouveauxEntrainements.push({
+        //         id: newId,
+        //         date,
+        //         muscle1,
+        //         muscle2,
+        //         muscle3,
+        //         typeTraining,
+        //         exercices,
+        //         noteTraining
+        //       });
+
+        //       // Crée une performance par entraînement (et non par exo)
+        //       const perfId = uuidv4();
+        //       nouvellesPerformances.push({
+        //         id: perfId,
+        //         jourS: date || '',
+        //         groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
+        //         typeTraining,
+        //         perfJour: exercices
+        //           .filter(exo => exo.nom)
+        //           .map(exo => ({
+        //             id: uuidv4(),
+        //             exercice: exo.nom,
+        //             repetitions: exo.repetitions ?? 0,
+        //             series: exo.series ?? 0,
+        //             chargeList: [
+        //               {
+        //                 date: new Date().toISOString().split('T')[0],
+        //                 charge: 0
+        //               }
+        //             ]
+        //           }))
+        //       });
+        //     }
+        //   });
+
+        //   // 🔍 Pour debug : vérifier que toutes les données sont bien définies
+        //   console.log('📦 Données envoyées à Firestore :', {
+        //     entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
+        //     performances: [...nouvellesPerformances, ...performancesActuelles]
+        //   });
+
+        //   await dossierRef.update({
+        //     entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
+        //     performances: [...nouvellesPerformances, ...performancesActuelles]
+        //   });
+
+        //   return res.status(201).json({ message: 'Entraînements enregistrés.' });
+                // }
+
         if (section === 'entrainements') {
-          const entrainements = typeof data === 'string' ? JSON.parse(data) : data;
 
-          if (!Array.isArray(entrainements) || entrainements.length === 0) {
-            return res.status(400).json({ message: 'Entraînements invalides.' });
-          }
+            const programmes = typeof data === 'string' ? JSON.parse(data) : data;
 
-          const entrainementsActuels = dossierData.entrainements || [];
-          const performancesActuelles = dossierData.performances || [];
+            if (!Array.isArray(programmes) || programmes.length === 0) {
+              return res.status(400).json({ message: 'Programmes invalides.' });
+            }
 
-          const nouveauxEntrainements = [];
+            const entrainementsActuels = dossierData.entrainements || [];
+            const performancesActuelles = dossierData.performances || [];
+
+            const joursSemaine = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+            // 🗂️ Index des anciens programmes
+            const programmesParNom = {};
+            entrainementsActuels.forEach(p => {
+              programmesParNom[p.nomProgramme] = p;
+            });
+
+            // 🆕 Traitement des nouveaux programmes
+            programmes.forEach(prog => {
+            const programmeId = prog.id || uuidv4();
+            const nomProgramme = prog.nomProgramme || prog.nom || '';
+            const typeTraining = prog.typeTraining || '';
+
+            if (!programmesParNom[nomProgramme]) {
+              programmesParNom[nomProgramme] = {
+                programmeId,
+                nomProgramme,
+                jours: {}
+              };
+            }
+
+            const cible = programmesParNom[nomProgramme];
+
+            joursSemaine.forEach(jour => {
+              const blocs = prog.jours?.[jour];
+              if (!Array.isArray(blocs) || blocs.length === 0) return;
+
+              if (!Array.isArray(cible.jours[jour])) {
+                cible.jours[jour] = [];
+              }
+
+              blocs.forEach(bloc => {
+                const exercices = bloc.exercices || [];
+                if (!Array.isArray(exercices) || exercices.length === 0) return;
+
+                const blocExiste = cible.jours[jour].some(existing =>
+                  JSON.stringify(existing.exercices) === JSON.stringify(bloc.exercices)
+                );
+
+                if (!blocExiste) {
+                  cible.jours[jour].push({
+                    ...bloc, // on garde tout, y compris on/off/tours etc.
+                    typeTraining: bloc.typeTraining || typeTraining || '',
+                    muscle1: bloc.muscle1 || '',
+                    muscle2: bloc.muscle2 || '',
+                    muscle3: bloc.muscle3 || ''
+                  });
+                }
+              });
+            });
+          });
+
+
+
+
+          // 🧠 Génération des performances (hors cross-training & hors cardio)
           const nouvellesPerformances = [];
 
-          entrainements.forEach((entraînement) => {
-            const {
-              date = '',
-              muscle1 = '',
-              muscle2 = '',
-              muscle3 = '',
-              typeTraining = '',
-              exercices = [],
-              noteTraining = ''
-            } = entraînement;
+          Object.values(programmesParNom).forEach(prog => {
+            Object.entries(prog.jours).forEach(([jour, blocs]) => {
+              blocs.forEach(bloc => {
+                const typeBloc = (bloc.typeTraining || prog.typeTraining || '').toLowerCase();
 
-            const newId = uuidv4();
+                // ⛔ Ignore les blocs non-muscu
+                if (typeBloc === 'cross-training' || typeBloc === 'cardio') return;
 
-            if (typeTraining === 'cross-training') {
-              const circuitsFormates = exercices.map((circuit) => ({
-                nom: circuit.nom || '',
-                tours: circuit.tours ?? 0,
-                on: circuit.on ?? 0,
-                off: circuit.off ?? 0,
-                exercices: Array.isArray(circuit.exercices) ? circuit.exercices : []
-              }));
+                // ⛔ Ignore si format Tabata/EMOM/AMRAP
+                if ('on' in bloc || 'off' in bloc || 'tours' in bloc) return;
 
-              nouveauxEntrainements.push({
-                id: newId,
-                date,
-                muscle1,
-                muscle2,
-                muscle3,
-                typeTraining,
-                exercices: circuitsFormates,
-                noteTraining
-              });
+                // ✅ Gestion des superSets et des exos simples
+                const exosPourPerf = [];
 
-            } else {
-              nouveauxEntrainements.push({
-                id: newId,
-                date,
-                muscle1,
-                muscle2,
-                muscle3,
-                typeTraining,
-                exercices,
-                noteTraining
-              });
+                bloc.exercices.forEach(exo => {
+                  if (exo.superSet && Array.isArray(exo.exercices)) {
+                    exo.exercices.forEach(sub => {
+                      if (sub.nom) exosPourPerf.push(sub);
+                    });
+                  } else if (exo.nom) {
+                    exosPourPerf.push(exo);
+                  }
+                });
 
-              // Crée une performance par entraînement (et non par exo)
-              const perfId = uuidv4();
-              nouvellesPerformances.push({
-                id: perfId,
-                jourS: date || '',
-                groupesMusculaires: [muscle1, muscle2, muscle3].filter(Boolean),
-                typeTraining,
-                perfJour: exercices
-                  .filter(exo => exo.nom)
-                  .map(exo => ({
-                    id: uuidv4(),
+                if (exosPourPerf.length === 0) return;
+
+                nouvellesPerformances.push({
+                  id: uuidv4(),
+                  jourS: jour,
+                  programmeId: prog.programmeId,
+                  nomProgramme: prog.nomProgramme,
+                  typeTraining: typeBloc,
+                  groupesMusculaires: [bloc.muscle1, bloc.muscle2, bloc.muscle3].filter(Boolean),
+                  perfJour: exosPourPerf.map(exo => ({
+                    typeTraining: typeBloc,
+                    id: exo.id || uuidv4(),
                     exercice: exo.nom,
-                    repetitions: exo.repetitions ?? 0,
-                    series: exo.series ?? 0,
-                    chargeList: [
-                      {
-                        date: new Date().toISOString().split('T')[0],
-                        charge: 0
-                      }
-                    ]
+                    repetitions: parseInt(exo.repetitions) || 0,
+                    series: parseInt(exo.series) || 0,
+                    chargeList: [{
+                      date: new Date().toISOString().split('T')[0],
+                      charge: 0
+                    }]
                   }))
+                });
               });
+            });
+          });
+
+          // Regroupement par programmeId
+          const performancesRegroupees = nouvellesPerformances.reduce((acc, perf) => {
+            if (!acc[perf.programmeId]) {
+              acc[perf.programmeId] = {
+                id: uuidv4(),
+                programmeId: perf.programmeId,
+                nomProgramme: perf.nomProgramme,
+                typeTraining: perf.typeTraining,
+                perfProg: []
+              };
             }
-          });
 
+            acc[perf.programmeId].perfProg.push({
+              id: perf.id,
+              groupesMusculaires: perf.groupesMusculaires,
+              typeTraining: perf.typeTraining,
+              jourS: perf.jourS,
+              perfJour: perf.perfJour
+            });
 
+            return acc;
+          }, {});
 
-          // 🔍 Pour debug : vérifier que toutes les données sont bien définies
-          console.log('📦 Données envoyées à Firestore :', {
-            entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
-            performances: [...nouvellesPerformances, ...performancesActuelles]
-          });
+          const performancesFinales = Object.values(performancesRegroupees);
 
+          // 🔥 Mise à jour Firestore
           await dossierRef.update({
-            entrainements: [...nouveauxEntrainements, ...entrainementsActuels],
-            performances: [...nouvellesPerformances, ...performancesActuelles]
+            entrainements: Object.values(programmesParNom),
+            performances: [...performancesFinales, ...performancesActuelles]
           });
 
-          return res.status(201).json({ message: 'Entraînements enregistrés.' });
+          return res.status(201).json({ message: 'Programmes enregistrés avec succès.' });
         }
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
          * SECTION: diete
@@ -794,7 +949,7 @@ if (section === 'updateCharges') {
       return;
     }
 
-    update.exercices?.forEach(updatedExo => {
+    update.perfJour?.forEach(updatedExo => {
       const targetExo = perf.perfJour.find(e =>
         e.id === updatedExo.id || e.exercice === updatedExo.exercice
       );
@@ -804,7 +959,6 @@ if (section === 'updateCharges') {
         return;
       }
 
-      // On met à jour la chargeList uniquement
       if (!Array.isArray(targetExo.chargeList)) {
         targetExo.chargeList = [];
       }
@@ -817,11 +971,9 @@ if (section === 'updateCharges') {
           !isNaN(new Date(newCharge.date))
         ) {
           if (targetExo.chargeList[idx]) {
-            // Mise à jour de la charge existante
             targetExo.chargeList[idx].charge = newCharge.charge ?? targetExo.chargeList[idx].charge;
             targetExo.chargeList[idx].date = newCharge.date;
           } else {
-            // Nouvelle charge (si index inexistant)
             targetExo.chargeList.push({
               date: newCharge.date,
               charge: newCharge.charge ?? 0
@@ -994,7 +1146,6 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
             console.warn('Entrainements attendus sous forme de tableau.');
           }
         }
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else if (section === 'dietes') {
           if (!Array.isArray(dossier.dietes)) {
@@ -1044,6 +1195,7 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
 
           updatePayload.performances = updatedPerformances;
         }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else if (section === 'suiviDiete') {
           const oldSuivi = dossier.suiviDiete || {};
@@ -1246,7 +1398,7 @@ app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
       uid: clientId,
       email: clientData.email,
       role: 'client'
-    }, process.env.JWT_SECRET || 'secret123', { expiresIn: '45m' });
+    }, process.env.JWT_SECRET || 'secret123', { expiresIn: '3h' });
 
     console.log(`✅ Token client généré avec succès pour ${clientId}`);
 
@@ -1289,4 +1441,3 @@ app.listen(PORT, () => {
 ////////////////////////////////////// FIN DE TOUTES LES ROUTES //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
