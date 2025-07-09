@@ -661,13 +661,15 @@ app.post(
             programmes.forEach(prog => {
             const programmeId = prog.id || uuidv4();
             const nomProgramme = prog.nomProgramme || prog.nom || '';
-            const typeTraining = prog.typeTraining || '';
+            //const typeTraining = prog.typeTraining || '';
+            const objectif = prog.objectif || '';
 
 
             if (!programmesParNom[nomProgramme]) {
               programmesParNom[nomProgramme] = {
                 programmeId,
                 nomProgramme,
+                objectif,
                 jours: {}
               };
             }
