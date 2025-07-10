@@ -661,15 +661,17 @@ app.post(
             programmes.forEach(prog => {
             const programmeId = prog.id || uuidv4();
             const nomProgramme = prog.nomProgramme || prog.nom || '';
-            //const typeTraining = prog.typeTraining || '';
-            const objectif = prog.objectif || '';
+            const typeTraining = prog.typeTraining || '';
+            const objectifs = prog.objectif || '';
+            const date = prog.date || '';
 
 
             if (!programmesParNom[nomProgramme]) {
               programmesParNom[nomProgramme] = {
                 programmeId,
+                date,
                 nomProgramme,
-                objectif,
+                objectifs,
                 jours: {}
               };
             }
@@ -699,7 +701,9 @@ app.post(
                     typeTraining: bloc.typeTraining || typeTraining || '',
                     muscle1: bloc.muscle1 || '',
                     muscle2: bloc.muscle2 || '',
-                    muscle3: bloc.muscle3 || ''
+                    muscle3: bloc.muscle3 || '',
+                    ergoDebutFinActif: typeof bloc.ergoDebutFinActif === 'boolean' ? bloc.ergoDebutFinActif : true,
+                    noteEntrainement: bloc.noteEntrainement || '',
                   });
                 }
               });
@@ -766,7 +770,6 @@ app.post(
                 id: uuidv4(),
                 programmeId: perf.programmeId,
                 nomProgramme: perf.nomProgramme,
-                typeTraining: perf.typeTraining,
                 perfProg: []
               };
             }
@@ -793,16 +796,14 @@ app.post(
             if (existingIndex !== -1) {
               // Fusionner perfProg par jour
               newPerf.perfProg.forEach(newJour => {
-                const existingJourIndex = performancesFinales[existingIndex].perfProg.findIndex(
+                const jourExisteDeja = performancesFinales[existingIndex].perfProg.some(
                   j => j.jourS === newJour.jourS
                 );
-
-                if (existingJourIndex !== -1) {
-                  // Écrase ou fusionne les exos de ce jour
-                  performancesFinales[existingIndex].perfProg[existingJourIndex] = newJour;
-                } else {
-                  // Nouveau jour, on l'ajoute
+              
+                if (!jourExisteDeja) {
                   performancesFinales[existingIndex].perfProg.push(newJour);
+                } else {
+                  console.log(`⚠️ Jour "${newJour.jourS}" déjà présent pour ce programme, on ne le rajoute pas.`);
                 }
               });
             } else {
@@ -1007,103 +1008,127 @@ app.put('/dossiers', authenticateToken, upload.single('photoProfil'), async (req
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else if (section === 'entrainements') {
           if (Array.isArray(parsedData)) {
-            updatePayload.entrainements = parsedData;
 
-            // 🔁 Mise à jour des performances existantes liées aux programmes modifiés
+            updatePayload.entrainements = parsedData.map(programme => {
+              const { groupesMusculaires, ...cleanProgramme } = programme;
+              return cleanProgramme;
+            });
+        
             const performancesActuelles = dossier.performances || [];
             const performancesMAJ = [...performancesActuelles]; // Copie pour édition
-
+        
             parsedData.forEach(programme => {
               const programmeId = programme.programmeId || programme.id;
               const performanceExistante = performancesMAJ.find(p => p.programmeId === programmeId);
-
+        
               if (!performanceExistante) return;
-
-              const nouveauPerfProg = [];
-
+        
+              // Copie profonde des performances existantes pour modification
+              const perfProgActuel = performanceExistante.perfProg ? [...performanceExistante.perfProg] : [];
+        
               Object.entries(programme.jours || {}).forEach(([jour, blocs]) => {
                 blocs.forEach(bloc => {
                   const typeBloc = (bloc.typeTraining || programme.typeTraining || '').toLowerCase();
+        
                   if (typeBloc === 'cross-training' || typeBloc === 'cardio') return;
                   if ('on' in bloc || 'off' in bloc || 'tours' in bloc) return;
-
+        
                   const nouveauxExos = [];
-
+        
                   bloc.exercices.forEach(exo => {
-                    if (exo.superSet && Array.isArray(exo.exercices)) {
-                      exo.exercices.forEach(sub => {
-                        if (sub.nom) {
-                          const exoExistant = performanceExistante.perfProg
-                            .flatMap(pp => pp.perfJour)
-                            .find(e => e.id === sub.id);
-
-                          nouveauxExos.push({
-                            typeTraining: typeBloc,
-                            id: sub.id || uuidv4(),
-                            exercice: sub.nom,
-                            typeExo: sub.type || 'musculation',
-                            repetitions: parseInt(sub.repetitions) || 0,
-                            series: parseInt(sub.series) || 0,
-                            chargeList: exoExistant?.chargeList || [{
-                              date: new Date().toISOString().split('T')[0],
-                              charge: 0
-                            }]
-                          });
-                        }
-                      });
-                    } else if (exo.nom) {
-                      const exoExistant = performanceExistante.perfProg
-                        .flatMap(pp => pp.perfJour)
-                        .find(e => e.id === exo.id);
-
+                    const processExo = (e) => {
+                      if (!e.nom) return;
+        
+                      const exoId = e.id || uuidv4();
+        
+                      const exoExistant = perfProgActuel
+                        .flatMap(p => p.perfJour)
+                        .find(pe => pe.id === exoId);
+        
+                      const chargeList = exoExistant?.chargeList || [{
+                        date: new Date().toISOString().split('T')[0],
+                        charge: 0
+                      }];
+        
                       nouveauxExos.push({
-                        id: exo.id || uuidv4(),
-                        exercice: exo.nom,
-                        typeExo: exo.type || 'musculation',
-                        repetitions: parseInt(exo.repetitions) || 0,
-                        series: parseInt(exo.series) || 0,
-                        chargeList: exoExistant?.chargeList || [{
-                          date: new Date().toISOString().split('T')[0],
-                          charge: 0
-                        }]
+                        id: exoId,
+                        exercice: e.nom,
+                        typeExo: e.type || 'musculation',
+                        repetitions: parseInt(e.repetitions) || 0,
+                        series: parseInt(e.series) || 0,
+                        chargeList,
+                        typeTraining: typeBloc,
                       });
+                    };
+        
+                    if (exo.superSet && Array.isArray(exo.exercices)) {
+                      exo.exercices.forEach(processExo);
+                    } else {
+                      processExo(exo);
                     }
                   });
-
+        
                   if (nouveauxExos.length === 0) return;
-
-                  nouveauPerfProg.push({
-                    id: uuidv4(),
-                    groupesMusculaires: [bloc.muscle1, bloc.muscle2, bloc.muscle3].filter(Boolean),
-                    typeTraining: typeBloc,
-                    jourS: jour,
-                    perfJour: nouveauxExos
-                  });
+        
+                  // Recherche d’un bloc existant avec même jour + typeTraining
+                  const blocExistant = perfProgActuel.find(p =>
+                    p.jourS === jour &&
+                    p.typeTraining === typeBloc &&
+                    JSON.stringify(p.groupesMusculaires.sort()) === JSON.stringify([bloc.muscle1, bloc.muscle2, bloc.muscle3].filter(Boolean).sort())
+                  );
+        
+                  if (blocExistant) {
+                    nouveauxExos.forEach(nouveau => {
+                      const indexExistant = blocExistant.perfJour.findIndex(e => e.id === nouveau.id);
+                    
+                      if (indexExistant === -1) {
+                        // L'exo n'existait pas, on l'ajoute
+                        blocExistant.perfJour.push(nouveau);
+                      } else {
+                        const exoActuel = blocExistant.perfJour[indexExistant];
+                    
+                        // Mise à jour uniquement si les données ont changé
+                        const updatedExo = {
+                          ...exoActuel,
+                          exercice: nouveau.exercice,
+                          typeExo: nouveau.typeExo,
+                          repetitions: nouveau.repetitions,
+                          series: nouveau.series,
+                          // on garde chargeList existant sauf si tu veux l'écraser aussi
+                        };
+                    
+                        blocExistant.perfJour[indexExistant] = updatedExo;
+                      }
+                    });
+                  } else {
+                    perfProgActuel.push({
+                      id: uuidv4(),
+                      groupesMusculaires: [bloc.muscle1, bloc.muscle2, bloc.muscle3].filter(Boolean),
+                      typeTraining: typeBloc,
+                      jourS: jour,
+                      perfJour: nouveauxExos
+                    });
+                  }
                 });
               });
-
-              // 🔁 Mettre à jour la structure complète dans performancesMAJ
+        
+              // Mise à jour des performances fusionnées dans la structure finale
               const index = performancesMAJ.findIndex(p => p.programmeId === programmeId);
               if (index !== -1) {
                 performancesMAJ[index] = {
                   ...performanceExistante,
                   nomProgramme: programme.nomProgramme || programme.nom,
                   typeTraining: programme.typeTraining || '',
-                  perfProg: nouveauPerfProg
+                  perfProg: perfProgActuel
                 };
               }
             });
-
-
+        
             updatePayload.performances = performancesMAJ;
-
-
-
           } else {
             console.warn('Entrainements attendus sous forme de tableau.');
           }
         }
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         else if (section === 'performances') {
