@@ -152,7 +152,7 @@ function authenticateToken(req, res, next) {
       // ⏱️ Token expiré → réponse explicite
       if (err.name === 'TokenExpiredError') {
         console.log("❌ [auth] Token expiré !");
-        return res.status(403).json({ message: 'Token expiré, veuillez vous reconnecter.' });
+        return res.redirect('/home'); // ← À remplacer par ton chemin réel
       }
 
       // ❌ Autre erreur → token invalide
