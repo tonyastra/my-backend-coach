@@ -824,9 +824,10 @@ app.post(
         /**
          * SECTION: diete
          * 🔄 Ajoute ou met à jour une diète dans le dossier client
-         */
+         */      
+         
         if (section === 'diete') {
-          const { id, date, diete, kcalObjectif } = typeof data === 'string' ? JSON.parse(data) : data;
+          const { id, date, diete, kcalObjectif, objectGlu, objectPro, objectFib, objectLip, MomTrain, objectifHydratationRepos_L, objectifHydratationTraining_L } = typeof data === 'string' ? JSON.parse(data) : data;
 
           // Validation simple
           if (!Array.isArray(diete) && typeof diete !== 'object') {
@@ -848,7 +849,20 @@ app.post(
           } else {
             // Ajout d’une nouvelle diète
             const newId = Date.now().toString();
-            dietes.push({ id: newId, date, kcalObjectif, repas: diete });
+            dietes.push({ 
+              id: newId, 
+              date, 
+              kcalObjectif, 
+              repas: diete,
+              objectGlu,
+              objectPro,
+              objectFib,
+              objectLip,
+              MomTrain,
+              objectifHydratationRepos_L,
+              objectifHydratationTraining_L,
+            });
+
           }
 
           // Sauvegarde dans Firestore
