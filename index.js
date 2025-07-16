@@ -7,13 +7,8 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-
 const app = express();
-
 const PORT = process.env.PORT || 3001;
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 const admin = require('firebase-admin');
 const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
@@ -26,8 +21,6 @@ admin.initializeApp({
 const db = admin.firestore();
 const bucket = admin.storage().bucket(); // ✅ C’est ça qu’il te manque
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 // 🔧 Configs
 const USERS_FILE = path.join(__dirname, 'users.json');
 const dossiersPath = path.join(__dirname, 'data', 'dossiers');
@@ -57,11 +50,8 @@ app.use((req, res, next) => {
   console.log(`➡️  [${req.method}] ${req.originalUrl}`);
   next();
 });
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Objet en mémoire pour compter le nombre de tentatives de réponse incorrectes
 // à la question secrète par utilisateur (identifié par email).
 // Permet de limiter les tentatives (ex: blocage temporaire après 3 essais).
@@ -73,14 +63,11 @@ const attempts = {};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 🔥 Routes
-
 // Route spéciale non numérotée (technique)
 app.post('/api/send-pdf', (req, res) => {
   console.log('Reçu un PDF avec une taille:', JSON.stringify(req.body).length, 'octets');
   res.send({ status: 'ok' });
 });
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////: Fire base Storage 
 app.post('/upload', upload.single('file'), async (req, res) => {
@@ -104,8 +91,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 /////////////////: Fire base Storage 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Route n°1
 // 👉 Page d’accueil de l’API
@@ -172,8 +157,6 @@ function authenticateToken(req, res, next) {
     next(); // 👣 Passage au middleware ou route suivant(e)
   });
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////// CONNEXION GENERAL ///////////////////////////////////////////////////
@@ -254,7 +237,6 @@ app.post('/login', async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// AFFICHAGE UNIVERSEL (GET)///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * 📂 ROUTE : RÉCUPÉRATION D'UN DOSSIER CLIENT
  * 
@@ -264,7 +246,6 @@ app.post('/login', async (req, res) => {
  * - 🛡️ Un client ne peut accéder qu’à SON propre dossier
  * - ✅ Un coach peut accéder à n’importe quel dossier
  */
-
 app.get('/dossiers', authenticateToken, async (req, res) => {
   try {
     const requesterRole = req.user.role;
@@ -326,16 +307,9 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
   }
 });
 
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// ENREGISTREMENT UNIVERSEL (POST) ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 /**
  * 🚀 ROUTE GLOBALE : ENREGISTREMENT DOSSIER CLIENT (Nouveau client ou client connecté)
  * 
@@ -343,7 +317,6 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
  * 1. 📦 Cas 1 : Création d’un nouveau client (sans authentification) → section === 'nouveauClient'
  * 2. 🔐 Cas 2 : Ajout/mise à jour de données client via les autres sections (requiert token JWT)
  */
-
 app.post(
   '/dossier/enregistrer',
     upload.fields([
@@ -360,7 +333,6 @@ app.post(
      * 📦 Cas 1 — Création d’un nouveau client (pas encore connecté)
      * Aucun token nécessaire ici.
      */
-
       if (section === 'nouveauClient') {
         try {
           const {
@@ -569,7 +541,7 @@ app.post(
         if (section === 'mensurations') {
           try {
             const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
-
+        
             // Fonction pour upload un fichier sur Firebase Storage
             async function uploadFileToFirebase(file, folder) {
               if (!file) return null;
@@ -585,16 +557,39 @@ app.post(
               });
               return `https://storage.googleapis.com/${bucket.name}/${destination}`;
             }
-
-            // Upload photos et récupérer URL
-            const photoFaceUrl = await uploadFileToFirebase(req.files['photoFace'] ? req.files['photoFace'][0] : null, 'mensurations');
-            const photoDosUrl = await uploadFileToFirebase(req.files['photoDos'] ? req.files['photoDos'][0] : null, 'mensurations');
-            const photoProfilDUrl = await uploadFileToFirebase(req.files['photoProfilD'] ? req.files['photoProfilD'][0] : null, 'mensurations');
-            const photoProfilGUrl = await uploadFileToFirebase(req.files['photoProfilG'] ? req.files['photoProfilG'][0] : null, 'mensurations');
-
-            // Construire la nouvelle entrée mensuration avec URLs photos
+        
+            // 🔐 Récupération des infos utilisateur
+            const userEmail = req.user.email.toLowerCase();
+            const userId = userEmail.replace(/[@.]/g, '_');
+            const dossierId = userId;
+            const dossierRef = db.collection('users').doc(userId).collection('dossier_client').doc(dossierId);
+        
+            const dossierSnap = await dossierRef.get();
+            if (!dossierSnap.exists) {
+              return res.status(404).json({ message: 'Dossier introuvable.' });
+            }
+            const dossierData = dossierSnap.data();
+        
+            // 🔍 Chercher ancienne entrée s’il s’agit d’une édition
+            const oldEntry = (dossierData.mensurations || []).find(m => m.id === mensurationData.id) || {};
+        
+            // 📤 Upload fichiers (le cas échéant)
+            const photoFaceUrl = await uploadFileToFirebase(
+              req.files['photoFace'] ? req.files['photoFace'][0] : null, 'mensurations'
+            );
+            const photoDosUrl = await uploadFileToFirebase(
+              req.files['photoDos'] ? req.files['photoDos'][0] : null, 'mensurations'
+            );
+            const photoProfilDUrl = await uploadFileToFirebase(
+              req.files['photoProfilD'] ? req.files['photoProfilD'][0] : null, 'mensurations'
+            );
+            const photoProfilGUrl = await uploadFileToFirebase(
+              req.files['photoProfilG'] ? req.files['photoProfilG'][0] : null, 'mensurations'
+            );
+        
+            // 🧱 Construction de la nouvelle entrée
             const newEntry = {
-              id: uuidv4(),
+              id: mensurationData.id || uuidv4(),
               date: mensurationData.date || new Date().toISOString().split('T')[0],
               poids: mensurationData.poids || '',
               poitrine: mensurationData.poitrine || '',
@@ -606,27 +601,24 @@ app.post(
               cuisseG: mensurationData.cuisseG || '',
               molletD: mensurationData.molletD || '',
               molletG: mensurationData.molletG || '',
-              photoFace: photoFaceUrl,
-              photoDos: photoDosUrl,
-              photoProfilD: photoProfilDUrl,
-              photoProfilG: photoProfilGUrl
+        
+              // ✅ Conserve les anciennes URLs si pas de nouveau fichier
+              photoFace: photoFaceUrl || oldEntry.photoFace || null,
+              photoDos: photoDosUrl || oldEntry.photoDos || null,
+              photoProfilD: photoProfilDUrl || oldEntry.photoProfilD || null,
+              photoProfilG: photoProfilGUrl || oldEntry.photoProfilG || null,
             };
-
-            const userEmail = req.user.email.toLowerCase();
-            const userId = userEmail.replace(/[@.]/g, '_');
-            const dossierId = userId;
-            const dossierRef = db.collection('users').doc(userId).collection('dossier_client').doc(dossierId);
-
-            const dossierSnap = await dossierRef.get();
-            if (!dossierSnap.exists) {
-              return res.status(404).json({ message: 'Dossier introuvable.' });
-            }
-            const dossierData = dossierSnap.data();
-
-            const updatedMensurations = [newEntry, ...(dossierData.mensurations || []).filter(Boolean)];
-
+        
+            // 🧼 Mise à jour des mensurations (remplace si même ID)
+            const updatedMensurations = [
+              newEntry,
+              ...(dossierData.mensurations || []).filter(
+                (m) => m && m.id !== newEntry.id
+              ),
+            ];
+        
             await dossierRef.update({ mensurations: updatedMensurations });
-
+        
             return res.status(201).json({ message: 'Mensuration ajoutée.', data: newEntry });
           } catch (error) {
             console.error("❌ Erreur ajout mensuration :", error);
@@ -934,7 +926,6 @@ app.post(
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// MISE A JOUR UNIVERSEL (PUT) ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * 📝 ROUTE PUT /dossiers — MISE À JOUR DU DOSSIER CLIENT
  * 
@@ -1346,7 +1337,6 @@ app.delete('/dossiers/supprimer', authenticateToken, async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////// ROUTES SPECIFIQUE ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * 🔑 Route POST /api/generate-client-token
  * 
@@ -1424,17 +1414,9 @@ app.post('/api/generate-client-token', authenticateToken, async (req, res) => {
   }
 });
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////// FIN DE TOUTES LES ROUTES //////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 💥 Gestion des erreurs -> TOUJOURS EN DERNIER !!!!!
 app.use((err, req, res, next) => {
@@ -1442,16 +1424,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Erreur interne du serveur.' });
 });
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Route finale : démarrage du serveur
 app.listen(PORT, () => {
   console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
 });
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////// FIN DE TOUTES LES ROUTES //////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
