@@ -324,7 +324,9 @@ app.post(
       { name: 'photoFace' },
       { name: 'photoDos' },
       { name: 'photoProfilD' },
-      { name: 'photoProfilG' }
+      { name: 'photoProfilG' },
+      { name: 'doubleBicepsFace', maxCount: 1 },
+      { name: 'doubleBicepsDos', maxCount: 1 }
     ]),
     async (req, res) => {
     const { section, data } = req.body;
@@ -542,7 +544,7 @@ app.post(
           try {
             const mensurationData = typeof data === 'string' ? JSON.parse(data) : data;
         
-            // Fonction pour upload un fichier sur Firebase Storage
+            // Fonction upload fichier Firebase Storage (inchangée)
             async function uploadFileToFirebase(file, folder) {
               if (!file) return null;
               const destination = `${folder}/${Date.now()}_${file.originalname}`;
@@ -551,14 +553,13 @@ app.post(
                 public: true,
                 metadata: { contentType: file.mimetype }
               });
-              // Supprimer le fichier local après upload
               fs.unlink(file.path, (err) => {
                 if (err) console.warn('Erreur suppression fichier local:', err);
               });
               return `https://storage.googleapis.com/${bucket.name}/${destination}`;
             }
         
-            // 🔐 Récupération des infos utilisateur
+            // Récupération infos utilisateur (inchangée)
             const userEmail = req.user.email.toLowerCase();
             const userId = userEmail.replace(/[@.]/g, '_');
             const dossierId = userId;
@@ -570,10 +571,10 @@ app.post(
             }
             const dossierData = dossierSnap.data();
         
-            // 🔍 Chercher ancienne entrée s’il s’agit d’une édition
+            // Chercher ancienne entrée si édition
             const oldEntry = (dossierData.mensurations || []).find(m => m.id === mensurationData.id) || {};
         
-            // 📤 Upload fichiers (le cas échéant)
+            // Upload des fichiers classiques
             const photoFaceUrl = await uploadFileToFirebase(
               req.files['photoFace'] ? req.files['photoFace'][0] : null, 'mensurations'
             );
@@ -587,7 +588,15 @@ app.post(
               req.files['photoProfilG'] ? req.files['photoProfilG'][0] : null, 'mensurations'
             );
         
-            // 🧱 Construction de la nouvelle entrée
+            // Upload des fichiers double biceps uniquement s'ils sont présents
+            const doubleBicepsFaceUrl = await uploadFileToFirebase(
+              req.files['doubleBicepsFace'] ? req.files['doubleBicepsFace'][0] : null, 'mensurations'
+            );
+            const doubleBicepsDosUrl = await uploadFileToFirebase(
+              req.files['doubleBicepsDos'] ? req.files['doubleBicepsDos'][0] : null, 'mensurations'
+            );
+        
+            // Construction de la nouvelle entrée avec intégration du flag modePrepa
             const newEntry = {
               id: mensurationData.id || uuidv4(),
               date: mensurationData.date || new Date().toISOString().split('T')[0],
@@ -602,19 +611,24 @@ app.post(
               molletD: mensurationData.molletD || '',
               molletG: mensurationData.molletG || '',
         
-              // ✅ Conserve les anciennes URLs si pas de nouveau fichier
+              // Photos classiques (garde l’ancienne url si pas de nouvelle)
               photoFace: photoFaceUrl || oldEntry.photoFace || null,
               photoDos: photoDosUrl || oldEntry.photoDos || null,
               photoProfilD: photoProfilDUrl || oldEntry.photoProfilD || null,
               photoProfilG: photoProfilGUrl || oldEntry.photoProfilG || null,
+        
+              // Photos double biceps (idem, ne remplace que si nouveau fichier)
+              doubleBicepsFace: doubleBicepsFaceUrl || oldEntry.doubleBicepsFace || null,
+              doubleBicepsDos: doubleBicepsDosUrl || oldEntry.doubleBicepsDos || null,
+        
+              // Flag mode prépa
+              modePrepa: mensurationData.modePrepa === true,
             };
         
-            // 🧼 Mise à jour des mensurations (remplace si même ID)
+            // Mise à jour des mensurations (remplace si même ID)
             const updatedMensurations = [
               newEntry,
-              ...(dossierData.mensurations || []).filter(
-                (m) => m && m.id !== newEntry.id
-              ),
+              ...(dossierData.mensurations || []).filter(m => m && m.id !== newEntry.id),
             ];
         
             await dossierRef.update({ mensurations: updatedMensurations });
