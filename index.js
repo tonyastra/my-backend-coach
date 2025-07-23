@@ -64,9 +64,54 @@ const attempts = {};
 
 // 🔥 Routes
 // Route spéciale non numérotée (technique)
-app.post('/api/send-pdf', (req, res) => {
-  console.log('Reçu un PDF avec une taille:', JSON.stringify(req.body).length, 'octets');
-  res.send({ status: 'ok' });
+// app.post('/api/send-pdf', (req, res) => {
+//   console.log('Reçu un PDF avec une taille:', JSON.stringify(req.body).length, 'octets');
+//   res.send({ status: 'ok' });
+// });
+const nodemailer = require('nodemailer');
+
+app.post('/api/send-pdf', async (req, res) => {
+  const { email, filename, file } = req.body;
+
+  if (!email || !filename || !file) {
+    return res.status(400).json({ error: "Données manquantes (email, filename ou file)" });
+  }
+
+  console.log('Reçu un PDF avec une taille:', Buffer.byteLength(file, 'base64'), 'octets');
+
+  try {
+    // Configure ton transporteur SMTP ici
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // ou autre SMTP
+      auth: {
+        user: process.env.SMTP_USER, // Mets ton mail dans .env
+        pass: process.env.SMTP_PASS, // Mets ton mdp ou token dans .env
+      },
+    });
+
+    // Prépare le mail avec la pièce jointe décodée du base64
+    const mailOptions = {
+      from: `"TF Coaching" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `Tarifs TF Coaching - ${filename}`,
+      text: `Bonjour, \n\nVeuillez trouver en pièce jointe le PDF tarifaire "${filename}".\n\nCordialement,\nTF Coaching`,
+      attachments: [
+        {
+          filename,
+          content: Buffer.from(file, 'base64'),
+          contentType: 'application/pdf',
+        },
+      ],
+    };
+
+    // Envoi du mail
+    await transporter.sendMail(mailOptions);
+
+    res.json({ status: 'ok', message: 'Email envoyé avec succès' });
+  } catch (error) {
+    console.error('Erreur envoi mail:', error);
+    res.status(500).json({ error: "Erreur lors de l’envoi du mail" });
+  }
 });
 
 //////////////////: Fire base Storage 
