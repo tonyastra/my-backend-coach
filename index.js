@@ -70,6 +70,16 @@ const attempts = {};
 // });
 const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT), // 587
+  secure: false, // true si port 465
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
+
 app.post('/api/send-pdf', async (req, res) => {
   const { email, filename, file } = req.body;
 
@@ -80,16 +90,6 @@ app.post('/api/send-pdf', async (req, res) => {
   console.log('Reçu un PDF avec une taille:', Buffer.byteLength(file, 'base64'), 'octets');
 
   try {
-    // Configure ton transporteur SMTP ici
-    const transporter = nodemailer.createTransport({
-      service: "gmail", // ou autre SMTP
-      auth: {
-        user: process.env.SMTP_USER, // Mets ton mail dans .env
-        pass: process.env.SMTP_PASS, // Mets ton mdp ou token dans .env
-      },
-    });
-
-    // Prépare le mail avec la pièce jointe décodée du base64
     const mailOptions = {
       from: `"TF Coaching" <${process.env.SMTP_USER}>`,
       to: email,
@@ -104,9 +104,7 @@ app.post('/api/send-pdf', async (req, res) => {
       ],
     };
 
-    // Envoi du mail
     await transporter.sendMail(mailOptions);
-
     res.json({ status: 'ok', message: 'Email envoyé avec succès' });
   } catch (error) {
     console.error('Erreur envoi mail:', error);
@@ -316,6 +314,7 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
       return res.json(dossierDoc.data());
 
     } else if (requesterRole === 'coach') {
+      
       // Coach : on récupère tous les dossiers clients
 
       // Récupérer tous les users
@@ -352,6 +351,26 @@ app.get('/dossiers', authenticateToken, async (req, res) => {
   }
 });
 
+// 🔹 Route GET dédiée aux créneaux de cours collectifs
+app.get('/cours-collectifs', async (req, res) => {
+  try {
+    const docRef = db.collection('users').doc('courco'); // ⚠️ ID fixe dans Firestore
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(200).json([]); // Aucun créneau encore enregistré
+    }
+
+    const data = docSnap.data();
+    const creneaux = Array.isArray(data.creneaux) ? data.creneaux : [];
+
+    return res.status(200).json(creneaux);
+  } catch (error) {
+    console.error('❌ Erreur récupération des cours collectifs :', error);
+    return res.status(500).json({ message: 'Erreur serveur lors du chargement des cours collectifs.' });
+  }
+});
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// ENREGISTREMENT UNIVERSEL (POST) ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -380,78 +399,79 @@ app.post(
      * 📦 Cas 1 — Création d’un nouveau client (pas encore connecté)
      * Aucun token nécessaire ici.
      */
-      if (section === 'nouveauClient') {
-        try {
-          const {
-            email, password,
-            securityQuestion, securityAnswer,
-            profil, mensurationProfil, hygieneVie, objectifs,
-            medical, physio, nutrition, activite, preference
-          } = typeof data === 'string' ? JSON.parse(data) : data;
+    if (section === 'nouveauClient') {
+      try {
+        const {
+          email, password,
+          securityQuestion, securityAnswer,
+          profil, mensurationProfil, hygieneVie, objectifs,
+          medical, physio, nutrition, activite, preference
+        } = typeof data === 'string' ? JSON.parse(data) : data;
 
-          if (!email || !password) {
-            return res.status(400).json({ message: 'Email et mot de passe requis.' });
-          }
-
-          const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
-          const userId = emailToId(email);
-          const userDocRef = db.collection('users').doc(userId);
-          const userDoc = await userDocRef.get();
-
-          if (userDoc.exists) {
-            return res.status(409).json({ message: 'Utilisateur déjà existant.' });
-          }
-
-          const hashedPassword = bcrypt.hashSync(password, 10);
-
-          await userDocRef.set({
-            email,
-            password: hashedPassword,
-            security: {
-              question: securityQuestion,
-              answer: securityAnswer
-            }
-          });
-
-          // Upload photoProfil sur Firebase Storage + récupérer URL publique
-          if (req.files && req.files['photoProfil']) {
-            const photoFile = req.files['photoProfil'][0];
-            const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
-            await bucket.upload(photoFile.path, {
-              destination,
-              public: true,
-              metadata: { contentType: photoFile.mimetype }
-            });
-            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
-            profil.photoProfil = publicUrl;
-          }
-
-          // Création du dossier client initial
-          const dossierClient = {
-            email,
-            profil: profil ? [profil] : [],
-            mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
-            hygieneVie: hygieneVie ? [hygieneVie] : [],
-            objectifs: objectifs ? [objectifs] : [],
-            medical: medical ? [medical] : [],
-            physio: physio ? [physio] : [],
-            nutrition: nutrition ? [nutrition] : [],
-            activite: activite ? [activite] : [],
-            preference: preference ? [preference] : [],
-            mensurations: [],
-            entrainements: [],
-            performances: [],
-            dietes: []
-          };
-
-          await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
-
-          return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
-        } catch (error) {
-          console.error("❌ Erreur inscription nouveau client :", error);
-          return res.status(500).json({ message: "Erreur lors de l'inscription." });
+        if (!email || !password) {
+          return res.status(400).json({ message: 'Email et mot de passe requis.' });
         }
+
+        const emailToId = (email) => email.toLowerCase().replace(/[@.]/g, '_');
+        const userId = emailToId(email);
+        const userDocRef = db.collection('users').doc(userId);
+        const userDoc = await userDocRef.get();
+
+        if (userDoc.exists) {
+          return res.status(409).json({ message: 'Utilisateur déjà existant.' });
+        }
+
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        await userDocRef.set({
+          email,
+          password: hashedPassword,
+          security: {
+            question: securityQuestion,
+            answer: securityAnswer
+          }
+        });
+
+        // Upload photoProfil sur Firebase Storage + récupérer URL publique
+        if (req.files && req.files['photoProfil']) {
+          const photoFile = req.files['photoProfil'][0];
+          const destination = `photos_profil/${Date.now()}_${photoFile.originalname}`;
+          await bucket.upload(photoFile.path, {
+            destination,
+            public: true,
+            metadata: { contentType: photoFile.mimetype }
+          });
+          const publicUrl = `https://storage.googleapis.com/${bucket.name}/${destination}`;
+          profil.photoProfil = publicUrl;
+        }
+
+        // Création du dossier client initial
+        const dossierClient = {
+          email,
+          profil: profil ? [profil] : [],
+          mensurationProfil: mensurationProfil ? [mensurationProfil] : [],
+          hygieneVie: hygieneVie ? [hygieneVie] : [],
+          objectifs: objectifs ? [objectifs] : [],
+          medical: medical ? [medical] : [],
+          physio: physio ? [physio] : [],
+          nutrition: nutrition ? [nutrition] : [],
+          activite: activite ? [activite] : [],
+          preference: preference ? [preference] : [],
+          mensurations: [],
+          entrainements: [],
+          performances: [],
+          dietes: []
+        };
+
+        await userDocRef.collection('dossier_client').doc(userId).set(dossierClient);
+
+        return res.status(201).json({ message: 'Utilisateur enregistré avec succès.', userId });
+      } catch (error) {
+        console.error("❌ Erreur inscription nouveau client :", error);
+        return res.status(500).json({ message: "Erreur lors de l'inscription." });
       }
+    }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * ❓ Cas 1.5 — Vérification de la question de sécurité (sans authentification)
@@ -525,11 +545,61 @@ app.post(
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
+     * SECTION: coursCollectifs
+     * ➕ Ajout ou mise à jour d’un créneau collectif dans le document users/courco
+     * Les créneaux sont enregistrés dans le champ `creneaux` (array d’objets)
+     * Empêche les doublons (même jour + heureDebut + typeCours)
+     */
+    if (section === 'coursCollectifs') {
+      const {
+        jour,
+        heureDebut,
+        heureFin,
+        typeCours,
+        lieu,
+        duree,
+        places,
+        placesRestantes,
+        date
+      } = data;
+    
+      if (!jour || !heureDebut || !heureFin || !typeCours || !lieu || !duree || !places || !placesRestantes || !date) {
+        return res.status(400).json({ message: "❌ Données incomplètes pour le créneau collectif." });
+      }
+    
+      const id = `${jour}_${heureDebut.replace(':', '_')}_${typeCours}`;
+    
+      const newCreneau = {
+        id,
+        jour,
+        heureDebut,
+        heureFin,
+        typeCours,
+        lieu,
+        duree,
+        places,
+        placesRestantes,
+        date, // ✅ On enregistre bien la date ISO
+        dateCreation: new Date().toISOString()
+      };
+    
+      try {
+        const docRef = db.collection('users').doc('courco');
+        await docRef.set({
+          creneaux: admin.firestore.FieldValue.arrayUnion(newCreneau)
+        }, { merge: true });
+    
+        return res.status(200).json({ message: "✅ Créneau enregistré avec succès.", data: newCreneau });
+      } catch (error) {
+        console.error("❌ Erreur enregistrement créneau :", error);
+        return res.status(500).json({ message: "Erreur lors de l'enregistrement du créneau collectif." });
+      }
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
      * 🔐 Cas 2 — Accès authentifié (client ou coach) pour les autres sections
      */
     authenticateToken(req, res, async () => {
-
-
       try {
         const userEmail = req.user.email.toLowerCase();
         const userId = userEmail.replace(/[@.]/g, '_');
@@ -914,7 +984,6 @@ app.post(
 
           return res.status(201).json({ message: 'Diète sauvegardée avec succès.' });
         }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
          * SECTION SECTION pour initialiser une journée dans suiviDiete
@@ -964,6 +1033,71 @@ app.post(
             structure: nouveauJour
           });
         }
+        /**
+         * SECTION SECTION pour initialiser un bilan hebdo
+         */
+        if (section === 'bilanHebdoInit') {
+          const currentDate = new Date();
+          const currentWeek = `${currentDate.getFullYear()}-W${String(
+            Math.ceil(((currentDate - new Date(currentDate.getFullYear(), 0, 1)) / 86400000 + currentDate.getDay() + 1) / 7)
+          ).padStart(2, '0')}`;
+        
+          if (!dossierData.bilanHebdo) {
+            dossierData.bilanHebdo = {};
+          }
+        
+          if (dossierData.bilanHebdo[currentWeek]) {
+            return res.status(200).json({ message: 'Bilan déjà initialisé pour cette semaine.' });
+          }
+        
+          const nouveauBilan = {
+            entrainement: '',
+            alimentation: '',
+            psychologique: '',
+            global: '',
+            sommeil: '',
+            douleurs: '',
+            motivation: '',
+            commentaireCoach: ''
+          };
+        
+          dossierData.bilanHebdo[currentWeek] = nouveauBilan;
+        
+          await dossierRef.update({
+            bilanHebdo: dossierData.bilanHebdo
+          });
+        
+          return res.status(200).json({
+            message: 'Bilan hebdomadaire initialisé',
+            semaine: currentWeek,
+            structure: nouveauBilan
+          });
+        }
+        /**
+         * SECTION SECTION pour UPTDATE un bilan hebdo
+         */
+        if (section === 'bilanHebdoUpdate') {
+          const { semaine, contenu } = req.body;
+        
+          if (!semaine || !contenu) {
+            return res.status(400).json({ error: 'Semaine et contenu requis.' });
+          }
+        
+          if (!dossierData.bilanHebdo || !dossierData.bilanHebdo[semaine]) {
+            return res.status(404).json({ error: 'Bilan hebdomadaire non initialisé.' });
+          }
+        
+          dossierData.bilanHebdo[semaine] = {
+            ...dossierData.bilanHebdo[semaine],
+            ...contenu
+          };
+        
+          await dossierRef.update({
+            bilanHebdo: dossierData.bilanHebdo
+          });
+        
+          return res.status(200).json({ message: 'Bilan mis à jour.' });
+        }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         return res.status(400).json({ message: `Section inconnue: ${section}` });
 
@@ -974,6 +1108,184 @@ app.post(
     });
   }
 );
+
+
+// --------------------------------------
+// ENREGISTRER UNE RÉSERVATION DE STEP + ENVOI EMAIL CONFIRMATION
+// --------------------------------------
+app.post('/reservation-step', async (req, res) => {
+  const { nom, prenom, email, aSonStep, modePaiement, creneauxChoisis } = req.body;
+
+  if (!nom || !prenom || !email || !creneauxChoisis || creneauxChoisis.length === 0) {
+    return res.status(400).json({ message: 'Champs obligatoires manquants.' });
+  }
+
+  try {
+    // 🔄 Récupération des créneaux dans Firestore
+    const docRef = db.collection('users').doc('courco');
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(404).json({ message: 'Créneaux non trouvés.' });
+    }
+
+    const data = docSnap.data();
+    let creneaux = data.creneaux || [];
+
+    // 🔐 Génération d’un code d’annulation
+    const codeAnnulation = Math.random().toString(36).substring(2, 8);
+
+    // 📦 Données du participant à insérer
+    const participant = {
+      nom,
+      prenom,
+      email,
+      aSonStep,
+      modePaiement,
+      date: new Date().toISOString(),
+      codeAnnulation
+    };
+
+    let coursConfirme = null; // Pour contenu email
+
+    // 🔁 Mise à jour des créneaux avec participant
+    creneaux = creneaux.map((creneau) => {
+      if (creneauxChoisis.includes(creneau.id)) {
+        const participants = creneau.participants || [];
+        const dejaInscrit = participants.some(p => p.email === email);
+
+        if (!dejaInscrit) {
+          participants.push(participant);
+          if (!aSonStep) {
+            creneau.placesRestantes = Math.max(0, (creneau.placesRestantes || creneau.places || 0) - 1);
+          }
+          coursConfirme = creneau;
+        }
+
+        creneau.participants = participants;
+      }
+      return creneau;
+    });
+
+    // 💾 Enregistrement dans Firestore
+    await docRef.update({ creneaux });
+
+    const formatDateFr = (dateIso) => {
+      return new Date(dateIso).toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    };
+
+
+    // ✉️ Envoi d’email si réservation confirmée
+    if (coursConfirme) {
+      const emailBody = `
+Bonjour ${prenom} ${nom},
+
+Votre réservation a bien été enregistrée ✅
+
+Voici les détails de votre cours :
+
+📅 Jour : ${formatDateFr(participant.date)}
+🕒 Horaire : ${coursConfirme.heureDebut} → ${coursConfirme.heureFin}
+📍 Type de cours : ${coursConfirme.typeCours}
+💳 Paiement : ${modePaiement}
+🎯 Step personnel : ${aSonStep ? 'Oui' : 'Non'}
+
+Si vous devez annuler votre réservation, merci de le faire le plus tôt possible afin de libérer votre place :
+
+👉 Annuler ma réservation :
+https://app-tfcoaching.netlify.app/client/annulation?email=${encodeURIComponent(email)}&code=${codeAnnulation}
+
+Merci pour votre confiance,
+Sportivement,
+TF Coaching
+      `;
+
+
+      // 📤 Envoi avec nodemailer
+      const mailOptions = {
+        from: `"TF Coaching" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Confirmation de votre réservation – TF Coaching',
+        text: emailBody,
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
+
+    return res.status(200).json({ message: '✅ Réservation enregistrée et email envoyé.' });
+
+  } catch (error) {
+    console.error('❌ Erreur enregistrement réservation :', error);
+    return res.status(500).json({ message: 'Erreur serveur lors de l’enregistrement.' });
+  }
+});
+
+// --------------------------------------
+// ANNULER UNE RÉSERVATION DE STEP
+// --------------------------------------
+app.post('/annuler-reservation-step', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Adresse email manquante.' });
+  }
+
+  try {
+    const docRef = db.collection('users').doc('courco');
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return res.status(404).json({ message: 'Créneaux non trouvés.' });
+    }
+
+    const data = docSnap.data();
+    let creneaux = data.creneaux || [];
+
+    let annulationEffectuée = false;
+
+    creneaux = creneaux.map((creneau) => {
+      let participants = creneau.participants || [];
+
+      // Trouver l'index du participant
+      const index = participants.findIndex((p) => p.email === email);
+
+      if (index !== -1) {
+        const participant = participants[index];
+
+        // ✅ Supprimer le participant
+        participants.splice(index, 1);
+
+        // ✅ Recréditer une place uniquement si la personne n'avait PAS son step
+        if (participant.aSonStep === false || participant.aSonStep === 'false') {
+          creneau.placesRestantes = (creneau.placesRestantes || 0) + 1;
+        }
+
+        annulationEffectuée = true;
+      }
+
+      creneau.participants = participants;
+      return creneau;
+    });
+
+    if (!annulationEffectuée) {
+      return res.status(404).json({ message: 'Aucune réservation trouvée pour cette adresse email.' });
+    }
+
+    await docRef.update({ creneaux });
+
+    return res.status(200).json({ message: '✅ Réservation annulée avec succès.' });
+  } catch (error) {
+    console.error('❌ Erreur lors de l’annulation :', error);
+    return res.status(500).json({ message: '❌ Erreur serveur pendant l’annulation.' });
+  }
+});
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// MISE A JOUR UNIVERSEL (PUT) ///////////////////////////////////////////////////
