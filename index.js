@@ -1114,9 +1114,9 @@ app.post(
 // ENREGISTRER UNE RÉSERVATION DE STEP + ENVOI EMAIL CONFIRMATION
 // --------------------------------------
 app.post('/reservation-step', async (req, res) => {
-  const { nom, prenom, email, aSonStep, modePaiement, creneauxChoisis } = req.body;
+  const { nom, prenom, email, numero, aSonStep, modePaiement, creneauxChoisis } = req.body;
 
-  if (!nom || !prenom || !email || !creneauxChoisis || creneauxChoisis.length === 0) {
+  if (!nom || !prenom || !email || !numero || !creneauxChoisis || creneauxChoisis.length === 0) {
     return res.status(400).json({ message: 'Champs obligatoires manquants.' });
   }
 
@@ -1140,6 +1140,7 @@ app.post('/reservation-step', async (req, res) => {
       nom,
       prenom,
       email,
+      numero,
       aSonStep,
       modePaiement,
       date: new Date().toISOString(),
@@ -1189,7 +1190,7 @@ Votre réservation a bien été enregistrée ✅
 
 Voici les détails de votre cours :
 
-📅 Jour : ${formatDateFr(participant.date)}
+📅 Jour : ${formatDateFr(coursConfirme.date)}
 🕒 Horaire : ${coursConfirme.heureDebut} → ${coursConfirme.heureFin}
 📍 Type de cours : ${coursConfirme.typeCours}
 💳 Paiement : ${modePaiement}
