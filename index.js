@@ -471,7 +471,6 @@ app.post(
         return res.status(500).json({ message: "Erreur lors de l'inscription." });
       }
     }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * ❓ Cas 1.5 — Vérification de la question de sécurité (sans authentification)
@@ -594,6 +593,46 @@ app.post(
         console.error("❌ Erreur enregistrement créneau :", error);
         return res.status(500).json({ message: "Erreur lors de l'enregistrement du créneau collectif." });
       }
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * SECTION: Bilan Client
+     */
+    if (section === 'bilan_client') {
+      const payload = typeof data === 'string' ? JSON.parse(data) : data;
+      const {
+        nom, prenom, email, telephone,
+        question1, question2, question3,
+        question4, question5, question6
+      } = payload || {};
+    
+      if (!nom || !prenom || !email || !telephone) {
+        return res.status(400).json({ message: 'Champs requis manquants.' });
+      }
+    
+      // 🔹 Création de l'ID personnalisé
+      const docId = `bilan_${prenom}_${nom}`.toLowerCase().replace(/\s+/g, '_');
+    
+      await db.collection('users')
+        .doc('coach_admin_com')
+        .collection('dossier_coach')
+        .doc(docId)
+        .set({
+          type: 'bilan_client',
+          nom,
+          prenom,
+          email,
+          telephone,
+          question1,
+          question2,
+          question3,
+          question4,
+          question5,
+          question6,
+          createdAt: new Date().toISOString()
+        });
+    
+      return res.status(200).json({ message: `Bilan client enregistré avec l'ID : ${docId}` });
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
